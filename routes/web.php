@@ -20,5 +20,8 @@ require __DIR__.'/auth.php';
 
 Route::group(['prefix' => 'admin'], function () {
     Route::get('/dashboard', function () {return view('admin.overviewPage');})->name('admin.dashboard');
+    Route::get('/catalog', function () {return view('admin.bookCatalogPage');})->name('admin.bookCatalog');
+    Route::get('/add-book', function () {return view('admin.addBookPage');})->name('admin.addBook');
+    Route::get('/edit-book', function () {return view('admin.editBookPage');})->name('admin.editBook');
 });
 

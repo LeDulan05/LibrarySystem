@@ -12,47 +12,47 @@
             </div>
 
             <nav class="sidebar-nav">
-                <div class="nav-item active">
+                <div class="nav-item {{ request()->is('admin/dashboard') ? 'active' : '' }}">
                     <img src="{{ asset('AdminAssets/SidebarAssets/overviewIcon.svg') }}" alt="Overview Icon" class="sidebar-svg-icon">
                     <span>Overview</span>
                 </div>
 
-                <div class="nav-item">
+                <div class="nav-item {{ request()->is('admin/catalog*') ? 'active' : '' }}">
                     <img src="{{ asset('AdminAssets/SidebarAssets/catalogIcon.svg') }}" alt="Book Catalog Icon" class="sidebar-svg-icon">
                     <span>Book Catalog</span>
                 </div>
 
-                <div class="nav-item">
+                <div class="nav-item {{ request()->is('admin/categories*') ? 'active' : '' }}">
                     <img src="{{ asset('AdminAssets/SidebarAssets/categoryIcon.svg') }}" alt="Categories Icon" class="sidebar-svg-icon">
                     <span>Categories</span>
                 </div>
 
-                <div class="nav-item">
+                <div class="nav-item {{ request()->is('admin/members*') ? 'active' : '' }}">
                     <img src="{{ asset('AdminAssets/SidebarAssets/memberIcon.svg') }}" alt="Members Icon" class="sidebar-svg-icon">
                     <span>Members</span>
                 </div>
 
-                <div class="nav-item">
+                <div class="nav-item {{ request()->is('admin/borrow*') ? 'active' : '' }}">
                     <img src="{{ asset('AdminAssets/SidebarAssets/borrowIcon.svg') }}" alt="Borrow Requests Icon" class="sidebar-svg-icon">
                     <span>Borrow Requests</span>
                 </div>
 
-                <div class="nav-item">
+                <div class="nav-item {{ request()->is('admin/reservation*') ? 'active' : '' }}">
                     <img src="{{ asset('AdminAssets/SidebarAssets/reservationIcon.svg') }}" alt="Reservation Requests Icon" class="sidebar-svg-icon">
                     <span>Reservation Requests</span>
                 </div>
 
-                <div class="nav-item">
+                <div class="nav-item {{ request()->is('admin/returns*') ? 'active' : '' }}">
                     <img src="{{ asset('AdminAssets/SidebarAssets/returnIcon.svg') }}" alt="Book Returns Icon" class="sidebar-svg-icon">
                     <span>Book Returns</span>
                 </div>
 
-                <div class="nav-item">
+                <div class="nav-item {{ request()->is('admin/penalties*') ? 'active' : '' }}">
                     <img src="{{ asset('AdminAssets/SidebarAssets/penaltyIcon.svg') }}" alt="Penalties Icon" class="sidebar-svg-icon">
                     <span>Penalties</span>
                 </div>
 
-                <div class="nav-item">
+                <div class="nav-item {{ request()->is('admin/reports*') ? 'active' : '' }}">
                     <img src="{{ asset('AdminAssets/SidebarAssets/reportIcon.svg') }}" alt="Reports Icon" class="sidebar-svg-icon">
                     <span>Reports</span>
                 </div>
