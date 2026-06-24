@@ -22,7 +22,7 @@
                     <span>Book Catalog</span>
                 </div>
 
-                <div class="nav-item {{ request()->is('admin/categories*') ? 'active' : '' }}">
+                <div class="nav-item {{ request()->is('admin/categories*', 'admin/add-book*', 'admin/edit-book*' ) ? 'active' : '' }}">
                     <img src="{{ asset('AdminAssets/SidebarAssets/categoryIcon.svg') }}" alt="Categories Icon" class="sidebar-svg-icon">
                     <span>Categories</span>
                 </div>
