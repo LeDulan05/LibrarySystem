@@ -24,5 +24,7 @@ Route::group(['prefix' => 'admin'], function () {
     Route::get('/add-book', function () {return view('admin.addBookPage');})->name('admin.addBook');
     Route::get('/edit-book', function () {return view('admin.editBookPage');})->name('admin.editBook');
     Route::get('/categories', function () {return view('admin.categoriesPage');})->name('admin.bookCategories');
+    Route::get('/members', function () {return view('admin.membersPage');})->name('admin.memberManagement');
+
 });
 

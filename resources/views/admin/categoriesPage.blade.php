@@ -38,71 +38,73 @@
                 </div>
 
                 <div class="categories-panel">
-                    <table class="categories-data-table">
-                        <thead>
-                            <tr>
-                                <th>CATEGORY NAME</th>
-                                <th>BOOK COUNT</th>
-                                <th style="width: 140px; text-align: center;">ACTIONS</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="cat-title-text">Programming</td>
-                                <td class="count-text">45 <span class="sub-count-label">books</span></td>
-                                <td class="actions-cell-row">
-                                    <button class="action-btn-view"><img src="{{ asset('AdminAssets/CategoriesAssets/viewIcon.svg') }}" alt="View"></button>
-                                    <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
-                                    <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="cat-title-text">Networking</td>
-                                <td class="count-text">28 <span class="sub-count-label">books</span></td>
-                                <td class="actions-cell-row">
-                                    <button class="action-btn-view"><img src="{{ asset('AdminAssets/CategoriesAssets/viewIcon.svg') }}" alt="View"></button>
-                                    <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
-                                    <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="cat-title-text">Database</td>
-                                <td class="count-text">32 <span class="sub-count-label">books</span></td>
-                                <td class="actions-cell-row">
-                                    <button class="action-btn-view"><img src="{{ asset('AdminAssets/CategoriesAssets/viewIcon.svg') }}" alt="View"></button>
-                                    <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
-                                    <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="cat-title-text">Artificial Intelligence</td>
-                                <td class="count-text">39 <span class="sub-count-label">books</span></td>
-                                <td class="actions-cell-row">
-                                    <button class="action-btn-view"><img src="{{ asset('AdminAssets/CategoriesAssets/viewIcon.svg') }}" alt="View"></button>
-                                    <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
-                                    <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="cat-title-text">Cybersecurity</td>
-                                <td class="count-text">21 <span class="sub-count-label">books</span></td>
-                                <td class="actions-cell-row">
-                                    <button class="action-btn-view"><img src="{{ asset('AdminAssets/CategoriesAssets/viewIcon.svg') }}" alt="View"></button>
-                                    <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
-                                    <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="cat-title-text">Research</td>
-                                <td class="count-text">17 <span class="sub-count-label">books</span></td>
-                                <td class="actions-cell-row">
-                                    <button class="action-btn-view"><img src="{{ asset('AdminAssets/CategoriesAssets/viewIcon.svg') }}" alt="View"></button>
-                                    <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
-                                    <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="table-responsive-wrapper">
+                        <table class="categories-data-table">
+                            <thead>
+                                <tr>
+                                    <th>CATEGORY NAME</th>
+                                    <th>BOOK COUNT</th>
+                                    <th style="width: 140px; text-align: center;">ACTIONS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="cat-title-text">Programming</td>
+                                    <td class="count-text">45 <span class="sub-count-label">books</span></td>
+                                    <td class="actions-cell-row">
+                                        <button class="action-btn-view"><img src="{{ asset('AdminAssets/CategoriesAssets/viewIcon.svg') }}" alt="View"></button>
+                                        <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
+                                        <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="cat-title-text">Networking</td>
+                                    <td class="count-text">28 <span class="sub-count-label">books</span></td>
+                                    <td class="actions-cell-row">
+                                        <button class="action-btn-view"><img src="{{ asset('AdminAssets/CategoriesAssets/viewIcon.svg') }}" alt="View"></button>
+                                        <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
+                                        <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="cat-title-text">Database</td>
+                                    <td class="count-text">32 <span class="sub-count-label">books</span></td>
+                                    <td class="actions-cell-row">
+                                        <button class="action-btn-view"><img src="{{ asset('AdminAssets/CategoriesAssets/viewIcon.svg') }}" alt="View"></button>
+                                        <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
+                                        <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="cat-title-text">Artificial Intelligence</td>
+                                    <td class="count-text">39 <span class="sub-count-label">books</span></td>
+                                    <td class="actions-cell-row">
+                                        <button class="action-btn-view"><img src="{{ asset('AdminAssets/CategoriesAssets/viewIcon.svg') }}" alt="View"></button>
+                                        <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
+                                        <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="cat-title-text">Cybersecurity</td>
+                                    <td class="count-text">21 <span class="sub-count-label">books</span></td>
+                                    <td class="actions-cell-row">
+                                        <button class="action-btn-view"><img src="{{ asset('AdminAssets/CategoriesAssets/viewIcon.svg') }}" alt="View"></button>
+                                        <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
+                                        <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="cat-title-text">Research</td>
+                                    <td class="count-text">17 <span class="sub-count-label">books</span></td>
+                                    <td class="actions-cell-row">
+                                        <button class="action-btn-view"><img src="{{ asset('AdminAssets/CategoriesAssets/viewIcon.svg') }}" alt="View"></button>
+                                        <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
+                                        <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
 
             </div>
@@ -122,7 +124,6 @@
         font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         background-color: #1C1C1C;
         -webkit-font-smoothing: antialiased;
-        overflow: hidden;
     }
     .layout-container {
         display: flex;
@@ -146,6 +147,8 @@
         background-color: #FFFFFF;
         padding: 20px 40px;
         border-bottom: 1px solid #EAE6DF;
+        flex-wrap: wrap; /* Allows native header wrapping on mobile viewports */
+        gap: 16px;
     }
     .canvas-content {
         padding: 32px 40px;
@@ -185,10 +188,12 @@
         align-items: center;
         gap: 16px;
         width: 100%;
+        flex-wrap: wrap; /* Allows search layout elements to adapt and fold cleanly */
     }
     .search-box-wrapper {
         flex: 2; 
         position: relative;
+        min-width: 240px; /* Guarantees the search bar keeps an acceptable width */
     }
     .search-icon-svg {
         position: absolute;
@@ -217,7 +222,7 @@
 
     .dropdown-wrapper-spacer {
         flex: 1;
-        min-width: 170px;
+        min-width: 120px; /* Flexes down responsibly on tiny resolutions */
     }
 
     .categories-panel {
@@ -226,9 +231,18 @@
         border-radius: 16px;
         padding: 24px;
     }
+
+    /* Swipe Box wrapper handling widescreen tables cleanly on compressed mobile screen boundaries */
+    .table-responsive-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
     .categories-data-table {
         width: 100%;
         border-collapse: collapse;
+        min-width: 650px; /* Forces layout structural consistency when workspace width narrows */
     }
     .categories-data-table th {
         background-color: #FDFBF7;
@@ -286,7 +300,7 @@
         opacity: 0.7;
     }
     .action-btn-view img, .action-btn-edit img, .action-btn-delete img {
-        width: 20px;
-        height: 20px;
+        width: 50px;
+        height: 50px;
     }
 </style>
