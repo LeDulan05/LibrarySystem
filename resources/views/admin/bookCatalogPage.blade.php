@@ -23,43 +23,42 @@
             <div class="canvas-content">
 
                 <div class="control-row-container">
-                    <div class="control-row">
+                    <form action="{{ route('admin.bookCatalog') }}" method="GET" class="control-row" id="filterForm">
+                        
                         <div class="search-box-wrapper">
                             <i class="bi bi-search search-icon"></i>
-                            <input type="text" class="search-input" placeholder="Search books...">
+                            <input type="text" name="search" class="search-input" placeholder="Search books..." value="{{ request('search') }}" onkeypress="if(event.key === 'Enter') this.form.submit();">
                         </div>
 
                         <div class="dropdown-wrapper">
-                            <select class="custom-filter-dropdown">
-                                <option value="all" selected>Select Category</option>
-                                <option value="programming">Programming</option>
-                                <option value="networking">Networking</option>
-                                <option value="database">Database</option>
-                                <option value="ai">Artificial Intelligence</option>
-                                <option value="cybersecurity">Cybersecurity</option>
-                                <option value="research">Research</option>
+                            <select name="category" class="custom-filter-dropdown" onchange="this.form.submit()">
+                                <option value="all" {{ request('category') == 'all' ? 'selected' : '' }}>Select Category</option>
+                                @foreach($categories as $category)
+                                    <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
+                                        {{ $category->name }}
+                                    </option>
+                                @endforeach
                             </select>
                         </div>
 
                         <div class="dropdown-wrapper">
-                            <select class="custom-filter-dropdown">
-                                <option value="all" selected>Status</option>
-                                <option value="available">Available</option>
-                                <option value="unavailable">Unavailable</option>
+                            <select name="status" class="custom-filter-dropdown" onchange="this.form.submit()">
+                                <option value="all" {{ request('status') == 'all' ? 'selected' : '' }}>Status</option>
+                                <option value="available" {{ request('status') == 'available' ? 'selected' : '' }}>Available</option>
+                                <option value="unavailable" {{ request('status') == 'unavailable' ? 'selected' : '' }}>Unavailable</option>
                             </select>
                         </div>
 
-                        <button class="btn-export">
-                            <img src="{{ asset('AdminAssets/CatalogAssets/downloadIcon.svg') }}" alt="Export Icon" class="btn-icon-svg">
-                            <span>Export</span>
-                        </button>
-                    </div>
+                        <a href="{{ route('admin.bookCatalog') }}" class="btn-export">
+                            <span>Reset</span>
+                        </a>
+                    </form>
                 </div>
 
                 <div class="action-strip">
-                    <button class="btn-add-book">
+                    <a href="{{ route('admin.addBook') }}" class="btn-add-book" style="text-decoration: none;">
                         <span class="btn-plus-symbol">&#43;</span> Add New Book
-                    </button>
+                    </a>
                 </div>
 
                 <div class="catalog-panel">
@@ -76,148 +75,74 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td class="mono-text">#0001</td>
-                                    <td>
-                                        <div class="book-title-cell">
-                                            <img src="{{ asset('AdminAssets/CatalogAssets/blueBookIcon.svg') }}" alt="Book" class="table-book-icon">
-                                            <span>Introduction to Artificial Intelligence</span>
-                                        </div>
-                                    </td>
-                                    <td>Stuart Russell</td>
-                                    <td><span class="cat-badge badge-blue">AI</span></td>
-                                    <td><span class="status-badge badge-success">Available</span></td>
-                                    <td class="actions-cell-row">
-                                        <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
-                                        <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="mono-text">#0002</td>
-                                    <td>
-                                        <div class="book-title-cell">
-                                            <img src="{{ asset('AdminAssets/CatalogAssets/orangeBookIcon.svg') }}" alt="Book" class="table-book-icon">
-                                            <span>Clean Code: A Handbook of Agile Software Craftsmanship</span>
-                                        </div>
-                                    </td>
-                                    <td>Robert C. Martin</td>
-                                    <td><span class="cat-badge badge-light-blue">Programming</span></td>
-                                    <td><span class="status-badge badge-success">Available</span></td>
-                                    <td class="actions-cell-row">
-                                        <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
-                                        <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="mono-text">#0003</td>
-                                    <td>
-                                        <div class="book-title-cell">
-                                            <img src="{{ asset('AdminAssets/CatalogAssets/purpleBookIcon.svg') }}" alt="Book" class="table-book-icon">
-                                            <span>Computer Networks</span>
-                                        </div>
-                                    </td>
-                                    <td>Andrew S. Tanenbaum</td>
-                                    <td><span class="cat-badge badge-medium-blue">Networking</span></td>
-                                    <td><span class="status-badge badge-success">Available</span></td>
-                                    <td class="actions-cell-row">
-                                        <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
-                                        <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="mono-text">#0004</td>
-                                    <td>
-                                        <div class="book-title-cell">
-                                            <img src="{{ asset('AdminAssets/CatalogAssets/greenBookIcon.svg') }}" alt="Book" class="table-book-icon">
-                                            <span>Database System Concepts</span>
-                                        </div>
-                                    </td>
-                                    <td>Abraham Silberschatz</td>
-                                    <td><span class="cat-badge badge-dark-blue">Database</span></td>
-                                    <td><span class="status-badge badge-success">Available</span></td>
-                                    <td class="actions-cell-row">
-                                        <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
-                                        <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="mono-text">#0005</td>
-                                    <td>
-                                        <div class="book-title-cell">
-                                            <img src="{{ asset('AdminAssets/CatalogAssets/blueBookIcon.svg') }}" alt="Book" class="table-book-icon">
-                                            <span>Cybersecurity Essentials</span>
-                                        </div>
-                                    </td>
-                                    <td>Charles J. Brooks</td>
-                                    <td><span class="cat-badge badge-cyan">Cybersecurity</span></td>
-                                    <td><span class="status-badge badge-success">Available</span></td>
-                                    <td class="actions-cell-row">
-                                        <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
-                                        <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="mono-text">#0006</td>
-                                    <td>
-                                        <div class="book-title-cell">
-                                            <img src="{{ asset('AdminAssets/CatalogAssets/purpleBookIcon.svg') }}" alt="Book" class="table-book-icon">
-                                            <span>Research Methodology: Methods and Techniques</span>
-                                        </div>
-                                    </td>
-                                    <td>C.R. Kothari</td>
-                                    <td><span class="cat-badge badge-teal">Research</span></td>
-                                    <td><span class="status-badge badge-due">Unavailable</span></td>
-                                    <td class="actions-cell-row">
-                                        <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
-                                        <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="mono-text">#0007</td>
-                                    <td>
-                                        <div class="book-title-cell">
-                                            <img src="{{ asset('AdminAssets/CatalogAssets/greenBookIcon.svg') }}" alt="Book" class="table-book-icon">
-                                            <span>Python for Data Analysis</span>
-                                        </div>
-                                    </td>
-                                    <td>Wes McKinney</td>
-                                    <td><span class="cat-badge badge-light-blue">Programming</span></td>
-                                    <td><span class="status-badge badge-success">Available</span></td>
-                                    <td class="actions-cell-row">
-                                        <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
-                                        <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="mono-text">#0008</td>
-                                    <td>
-                                        <div class="book-title-cell">
-                                            <img src="{{ asset('AdminAssets/CatalogAssets/orangeBookIcon.svg') }}" alt="Book" class="table-book-icon">
-                                            <span>Machine Learning Yearning</span>
-                                        </div>
-                                    </td>
-                                    <td>Andrew Ng</td>
-                                    <td><span class="cat-badge badge-blue">AI</span></td>
-                                    <td><span class="status-badge badge-success">Available</span></td>
-                                    <td class="actions-cell-row">
-                                        <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
-                                        <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
-                                    </td>
-                                </tr>
+                                @foreach($books as $book)
+                                    <tr>
+                                        <td class="mono-text">#{{ str_pad($book->id, 4, '0', STR_PAD_LEFT) }}</td>
+                                        <td>
+                                            <div class="book-title-cell">
+                                                <img src="{{ asset('AdminAssets/CatalogAssets/blueBookIcon.svg') }}" alt="Book" class="table-book-icon">
+                                                <span>{{ $book->title }}</span>
+                                            </div>
+                                        </td>
+                                        <td>{{ $book->author }}</td>
+                                        <td><span class="cat-badge badge-blue">{{ $book->category_name }}</span></td>
+                                        <td>
+                                            @if($book->available_copies > 0)
+                                                <span class="status-badge badge-success">Available ({{ $book->available_copies }})</span>
+                                            @else
+                                                <span class="status-badge badge-due">Unavailable</span>
+                                            @endif
+                                        </td>
+                                        <td class="actions-cell-row">
+                                            <a href="{{ route('admin.editBook', $book->id) }}" class="action-btn-edit">
+                                                <img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit">
+                                            </a>
+                                            <form action="{{ route('admin.bookCatalog.destroy', $book->id) }}" method="POST" onsubmit="return confirm('Are you sure?');" style="display:inline;">
+                                                @csrf
+                                                @method('DELETE')
+                                                <button type="submit" class="action-btn-delete">
+                                                    <img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete">
+                                                </button>
+                                            </form>
+                                        </td>
+                                    </tr>
+                                @endforeach
                             </tbody>
                         </table>
                     </div>
 
-                    <div class="catalog-pagination-row">
-                        <div class="pagination-info text-zinc">Showing 1-8 of 8</div>
-                        <div class="pagination-nav">
-                            <span class="page-link active">1</span>
-                            <span class="page-link">2</span>
-                            <span class="page-link">3</span>
-                            <span class="page-link">4</span>
-                            <span class="page-link">5</span>
+                    @if ($books->hasPages())
+                        <div class="catalog-pagination-row">
+                            <div class="pagination-info text-zinc">
+                                Showing {{ $books->firstItem() }}-{{ $books->lastItem() }} of {{ $books->total() }}
+                            </div>
+                            <div class="pagination-nav">
+                                @if ($books->onFirstPage())
+                                    <span class="page-link disabled" style="opacity: 0.4; cursor: not-allowed;">&laquo;</span>
+                                @else
+                                    <a href="{{ $books->previousPageUrl() }}" class="page-link" style="text-decoration: none;">&laquo;</a>
+                                @endif
+
+                                @foreach ($books->getUrlRange(1, $books->lastPage()) as $page => $url)
+                                    @if ($page == $books->currentPage())
+                                        <span class="page-link active">{{ $page }}</span>
+                                    @else
+                                        <a href="{{ $url }}" class="page-link" style="text-decoration: none;">{{ $page }}</a>
+                                    @endif
+                                @endforeach
+
+                                @if ($books->hasMorePages())
+                                    <a href="{{ $books->nextPageUrl() }}" class="page-link" style="text-decoration: none;">&raquo;</a>
+                                @else
+                                    <span class="page-link disabled" style="opacity: 0.4; cursor: not-allowed;">&raquo;</span>
+                                @endif
+                            </div>
                         </div>
-                    </div>
+                    @else
+                        <div class="catalog-pagination-row" style="justify-content: flex-start;">
+                            <div class="pagination-info text-zinc">Total Books: {{ $books->total() }}</div>
+                        </div>
+                    @endif
                 </div>
 
             </div>
@@ -244,7 +169,7 @@
         overflow: hidden;
     }
 
-    /* Main Content Area Dimensions */
+    /* Main Content Area */
     .main-canvas {
         flex: 1;
         background-color: #F9F6F0;
@@ -259,7 +184,7 @@
         background-color: #FFFFFF;
         padding: 20px 40px;
         border-bottom: 1px solid #EAE6DF;
-        flex-wrap: wrap; /* Wraps heading components fluidly on mobile viewports */
+        flex-wrap: wrap; 
         gap: 16px;
     }
     .canvas-content {
@@ -285,7 +210,6 @@
         justify-content: center;
     }
 
-    /* Controls Fluid Wrapping Container Box */
     .control-row-container {
         background-color: #FFFFFF;
         border: 1px solid #EAE6DF;
@@ -301,14 +225,14 @@
         align-items: center;
         gap: 16px;
         width: 100%;
-        flex-wrap: wrap; /* Allows search blocks and menus to break cleanly down columns */
+        flex-wrap: wrap; 
     }
     .search-box-wrapper {
         flex: 2; 
         position: relative; 
         display: flex;
         align-items: center;
-        min-width: 240px; /* Protects input fields layout formatting baseline */
+        min-width: 240px; 
     }
 
     .search-icon {
@@ -417,7 +341,6 @@
         padding: 24px;
     }
 
-    /* Swipe box viewport handling widescreen tables cleanly on compressed mobile screen boundaries */
     .table-responsive-wrapper {
         width: 100%;
         overflow-x: auto;
@@ -427,7 +350,7 @@
     .catalog-data-table {
         width: 100%;
         border-collapse: collapse;
-        min-width: 850px; /* Protects data columns structures from crashing or overlapping text layout dimensions */
+        min-width: 850px; 
     }
     .catalog-data-table th {
         background-color: #FDFBF7;
@@ -518,7 +441,6 @@
         height: 50px;
     }
 
-    /* System Pagination Listing Controls interface elements */
     .catalog-pagination-row {
         display: flex;
         justify-content: space-between;

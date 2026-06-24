@@ -25,37 +25,37 @@
                 <div class="metrics-grid">
                     <div class="metric-card">
                         <img src="{{ asset('AdminAssets/OverviewAssets/totalBooksIcon.svg') }}" alt="Books Icon" class="icon-wrapper">
-                        <div class="metric-value">12,450</div>
+                        <div class="metric-value">{{ number_format($totalBooks) }}</div>
                         <div class="metric-label">Total Books</div>
                     </div>
 
                     <div class="metric-card">
                         <img src="{{ asset('AdminAssets/OverviewAssets/totalMembersIcon.svg') }}" alt="Members Icon" class="icon-wrapper">
-                        <div class="metric-value">3,820</div>
+                        <div class="metric-value">{{ number_format($totalMembers) }}</div>
                         <div class="metric-label">Total Members</div>
                     </div>
-
+                    
                     <div class="metric-card">
                         <img src="{{ asset('AdminAssets/OverviewAssets/totalPenaltiesIcon.svg') }}" alt="Penalties Icon" class="icon-wrapper">
-                        <div class="metric-value">₱2,450</div>
+                        <div class="metric-value">₱{{ number_format($totalPenalties, 2) }}</div>
                         <div class="metric-label">Total Penalties</div>
                     </div>
 
                     <div class="metric-card">
                         <img src="{{ asset('AdminAssets/OverviewAssets/borrowTodayIcon.svg') }}" alt="Borrowed Icon" class="icon-wrapper">
-                        <div class="metric-value">23</div>
+                        <div class="metric-value">{{ $borrowedToday }}</div>
                         <div class="metric-label">Borrowed Today</div>
                     </div>
 
                     <div class="metric-card">
                         <img src="{{ asset('AdminAssets/OverviewAssets/pendingReturnIcon.svg') }}" alt="Pending Returns Icon" class="icon-wrapper">
-                        <div class="metric-value">87</div>
+                        <div class="metric-value">{{ $pendingReturns }}</div>
                         <div class="metric-label">Pending Returns</div>
                     </div>
 
                     <div class="metric-card">
                         <img src="{{ asset('AdminAssets/OverviewAssets/totalReservationIcon.svg') }}" alt="Book Reservations Icon" class="icon-wrapper">
-                        <div class="metric-value">487</div>
+                        <div class="metric-value">{{ $bookReservations }}</div>
                         <div class="metric-label">Book Reservations</div>
                     </div>
                 </div>
@@ -79,7 +79,7 @@
                                 <i class="bi bi-chevron-right" alignment="right"></i>
                             </a>
                             <a href="{{ route('admin.memberManagement') }}" class="action-row">
-                                <div class="action-left"><img src="{{ asset('AdminAssets/OverviewAssets/regMemberIcon.svg') }}" alt="Register Member Icon">Member Management</div>
+                                <div class="action-left"><img src="{{ asset('AdminAssets/OverviewAssets/regMemberIcon.svg') }}" alt="Register Member Icon">Member </div>
                                 <i class="bi bi-chevron-right" alignment="right"></i>
                             </a>
                             <a href="{{ route('admin.borrowRequest') }}" class="action-row">
@@ -113,43 +113,28 @@
                                <th>STATUS</th>
                             </tr>
                         </thead>
-                        <tbody>
-                            <tr>
-                                <td>Juan dela Cruz</td>
-                                <td>Introduction to AI</td>
-                                <td>Borrowed</td>
-                                <td>Dec 10</td>
-                                <td><span class="status-badge badge-success">Active</span></td>
-                            </tr>
-                            <tr>
-                                <td>Maria Santos</td>
-                                <td>Clean Code</td>
-                                <td>Returned</td>
-                                <td>Dec 9</td>
-                                <td><span class="status-badge badge-success">Returned</span></td>
-                            </tr>
-                            <tr>
-                                <td>Pedro Reyes</td>
-                                <td>Python for DS</td>
-                                <td>Borrow Request</td>
-                                <td>Dec 8</td>
-                                <td><span class="status-badge badge-pending">Pending</span></td>
-                            </tr>
-                            <tr>
-                                <td>Ana Lim</td>
-                                <td>Database Concepts</td>
-                                <td>Penalty Paid</td>
-                                <td>Dec 7</td>
-                                <td><span class="status-badge badge-success">Paid</span></td>
-                            </tr>
-                            <tr>
-                                <td>Carlos Cruz</td>
-                                <td>Cybersecurity</td>
-                                <td>Reservation</td>
-                                <td>Dec 6</td>
-                                <td><span class="status-badge badge-success">Approved</span></td>
-                            </tr>
-                        </tbody>
+                            <tbody>
+                                @foreach($recentTransactions as $transaction)
+                                    <tr>
+                                        <!-- Concatenating user attributes matching the ERD schema table fields -->
+                                        <td>{{ $transaction->user->first_name }} {{ $transaction->user->last_name }}</td>
+                                        <!-- Pulling relational book title field attribute -->
+                                        <td>{{ $transaction->book->title }}</td>
+                                        <td>{{ $transaction->status }}</td>
+                                        <td>{{ \Carbon\Carbon::parse($transaction->borrow_date)->format('M d') }}</td>
+                                        <td>
+                                            <!-- Badge status highlighting conditional mapping -->
+                                            @if($transaction->status == 'Returned')
+                                                <span class="status-badge badge-success">Returned</span>
+                                            @elseif($transaction->status == 'Borrowed')
+                                                <span class="status-badge badge-success">Active</span>
+                                            @else
+                                                <span class="status-badge badge-pending">{{ $transaction->status }}</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
                     </table>
                 </div>
             </div> 
@@ -400,7 +385,7 @@
             labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
             datasets: [{
                 label: 'Books Borrowed',
-                data: [42, 58, 52, 75, 48, 65, 60, 88, 55, 78, 92, 70], 
+                data: "json($monthlyData)", 
                 borderColor: '#FF5722', 
                 backgroundColor: 'rgba(255, 87, 34, 0.05)', 
                 borderWidth: 3,
