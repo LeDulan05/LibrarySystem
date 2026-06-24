@@ -55,10 +55,7 @@
 
                 <div class="member-search-container">
                     <div class="search-box-wrapper">
-                        <svg class="search-icon-svg" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <circle cx="11" cy="11" r="8"></circle>
-                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                        </svg>
+                            <i class="bi bi-search search-icon"></i>
                         <input type="text" class="search-input" placeholder="Search members...">
                     </div>
                 </div>
@@ -180,7 +177,7 @@
         overflow: hidden;
     }
 
-    /* Core Main Canvas Viewport Layout */
+    /* Main Content */
     .main-canvas {
         flex: 1;
         background-color: #F9F6F0;
@@ -195,7 +192,7 @@
         background-color: #FFFFFF;
         padding: 20px 40px;
         border-bottom: 1px solid #EAE6DF;
-        flex-wrap: wrap; /* Allows wrap stacking natively on mobile screens */
+        flex-wrap: wrap; 
         gap: 16px;
     }
     .canvas-content {
@@ -215,7 +212,6 @@
         flex-wrap: wrap;
     }
 
-    /* Add Member Action Button */
     .btn-add-member {
         background-color: #FF5722;
         color: #FFFFFF;
@@ -248,10 +244,9 @@
         justify-content: center;
     }
 
-    /* Summary Analytic Metric Cards Responsive Auto-Fit Grid */
+    /* Summary Analytic Metric Cards */
     .summary-metrics-grid {
         display: grid;
-        /* auto-fit automatically wraps columns dynamically depending on available workspace width */
         grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
         gap: 20px;
         margin-bottom: 24px;
@@ -275,10 +270,6 @@
         width: 18px;
         height: 18px;
     }
-    .sum-olive { background-color: #2E3A14; color: #FFFFFF; }
-    .sum-green { background-color: #008236; color: #FFFFFF; }
-    .sum-orange { background-color: #FF5722; color: #FFFFFF; }
-    .sum-yellow { background-color: #A4C439; color: #FFFFFF; }
 
     .sum-value {
         font-family: 'Plus Jakarta Sans', sans-serif;
@@ -295,7 +286,6 @@
         font-weight: 600;
     }
 
-    /* Search Control Row Shell */
     .member-search-container {
         background-color: #FFFFFF;
         border: 1px solid #EAE6DF;
@@ -305,22 +295,25 @@
         width: 100%;
         box-shadow: 0 2px 4px rgba(0,0,0,0.01);
     }
+
     .search-box-wrapper {
-        width: 100%;
-        position: relative;
+    flex: 2; 
+    position: relative; 
+    display: flex;
+    align-items: center;
     }
-    .search-icon-svg {
-        position: absolute;
-        left: 16px;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 18px;
-        height: 18px;
-        color: #A1A1AA;
+
+    .search-icon {
+    position: absolute;
+    left: 18px; 
+    font-size: 1.1rem;
+    color: #A1A1AA; 
+    pointer-events: none; 
     }
+
     .search-input {
         width: 100%;
-        padding: 12px 16px 12px 46px;
+        padding: 12px 16px 12px 48px;
         background-color: #F4F1EA;
         border: none;
         border-radius: 12px;
@@ -331,7 +324,6 @@
         outline: none;
     }
 
-    /* Core Directory Listing Table View Frame */
     .directory-panel {
         background-color: #FFFFFF;
         border: 1px solid #EAE6DF;
@@ -339,7 +331,6 @@
         padding: 24px;
     }
 
-    /* Swipe Box wrapper handling widescreen assets cleanly on compressed devices */
     .table-responsive-wrapper {
         width: 100%;
         overflow-x: auto;
@@ -349,7 +340,7 @@
     .directory-data-table {
         width: 100%;
         border-collapse: collapse;
-        min-width: 850px; /* Forces structural consistency when width breaks down */
+        min-width: 850px; 
     }
     .directory-data-table th {
         background-color: #FDFBF7;
@@ -373,7 +364,6 @@
         border-bottom: none;
     }
 
-    /* Identity and Circular Avatar Structures */
     .member-identity-cell {
         display: flex;
         align-items: center;
@@ -427,7 +417,6 @@
     .badge-success { background-color: #DCFCE7; color: #008236; }
     .badge-suspended { background-color: #FFE2E2; color: #C10007; }
 
-    /* Operational Row Controls Actions Grid */
     .actions-cell-row {
         display: flex;
         align-items: center;
@@ -447,7 +436,13 @@
         opacity: 0.7;
     }
     .action-btn img {
-        width: 50px;
-        height: 50px;
+        width: 20px;
+        height: 20px;
+    }
+
+    .icon-wrapper {
+        width: 42px;
+        height: 42px;
+        margin-bottom: 16px;
     }
 </style>

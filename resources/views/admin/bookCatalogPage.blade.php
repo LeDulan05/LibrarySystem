@@ -25,7 +25,7 @@
                 <div class="control-row-container">
                     <div class="control-row">
                         <div class="search-box-wrapper">
-                            <i class="bi bi-search"></i>
+                            <i class="bi bi-search search-icon"></i>
                             <input type="text" class="search-input" placeholder="Search books...">
                         </div>
 
@@ -63,148 +63,150 @@
                 </div>
 
                 <div class="catalog-panel">
-                    <table class="catalog-data-table">
-                        <thead>
-                            <tr>
-                                <th style="width: 80px;">ID</th>
-                                <th>TITLE</th>
-                                <th>AUTHOR</th>
-                                <th>CATEGORY</th>
-                                <th>STATUS</th>
-                                <th style="width: 100px; text-align: center;">ACTIONS</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td class="mono-text">#0001</td>
-                                <td>
-                                    <div class="book-title-cell">
-                                        <img src="{{ asset('AdminAssets/CatalogAssets/blueBookIcon.svg') }}" alt="Book" class="table-book-icon">
-                                        <span>Introduction to Artificial Intelligence</span>
-                                    </div>
-                                </td>
-                                <td>Stuart Russell</td>
-                                <td><span class="cat-badge badge-blue">AI</span></td>
-                                <td><span class="status-badge badge-success">Available</span></td>
-                                <td class="actions-cell-row">
-                                    <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
-                                    <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="mono-text">#0002</td>
-                                <td>
-                                    <div class="book-title-cell">
-                                        <img src="{{ asset('AdminAssets/CatalogAssets/orangeBookIcon.svg') }}" alt="Book" class="table-book-icon">
-                                        <span>Clean Code: A Handbook of Agile Software Craftsmanship</span>
-                                    </div>
-                                </td>
-                                <td>Robert C. Martin</td>
-                                <td><span class="cat-badge badge-light-blue">Programming</span></td>
-                                <td><span class="status-badge badge-success">Available</span></td>
-                                <td class="actions-cell-row">
-                                    <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
-                                    <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="mono-text">#0003</td>
-                                <td>
-                                    <div class="book-title-cell">
-                                        <img src="{{ asset('AdminAssets/CatalogAssets/purpleBookIcon.svg') }}" alt="Book" class="table-book-icon">
-                                        <span>Computer Networks</span>
-                                    </div>
-                                </td>
-                                <td>Andrew S. Tanenbaum</td>
-                                <td><span class="cat-badge badge-medium-blue">Networking</span></td>
-                                <td><span class="status-badge badge-success">Available</span></td>
-                                <td class="actions-cell-row">
-                                    <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
-                                    <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="mono-text">#0004</td>
-                                <td>
-                                    <div class="book-title-cell">
-                                        <img src="{{ asset('AdminAssets/CatalogAssets/greenBookIcon.svg') }}" alt="Book" class="table-book-icon">
-                                        <span>Database System Concepts</span>
-                                    </div>
-                                </td>
-                                <td>Abraham Silberschatz</td>
-                                <td><span class="cat-badge badge-dark-blue">Database</span></td>
-                                <td><span class="status-badge badge-success">Available</span></td>
-                                <td class="actions-cell-row">
-                                    <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
-                                    <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="mono-text">#0005</td>
-                                <td>
-                                    <div class="book-title-cell">
-                                        <img src="{{ asset('AdminAssets/CatalogAssets/blueBookIcon.svg') }}" alt="Book" class="table-book-icon">
-                                        <span>Cybersecurity Essentials</span>
-                                    </div>
-                                </td>
-                                <td>Charles J. Brooks</td>
-                                <td><span class="cat-badge badge-cyan">Cybersecurity</span></td>
-                                <td><span class="status-badge badge-success">Available</span></td>
-                                <td class="actions-cell-row">
-                                    <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
-                                    <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="mono-text">#0006</td>
-                                <td>
-                                    <div class="book-title-cell">
-                                        <img src="{{ asset('AdminAssets/CatalogAssets/purpleBookIcon.svg') }}" alt="Book" class="table-book-icon">
-                                        <span>Research Methodology: Methods and Techniques</span>
-                                    </div>
-                                </td>
-                                <td>C.R. Kothari</td>
-                                <td><span class="cat-badge badge-teal">Research</span></td>
-                                <td><span class="status-badge badge-due">Unavailable</span></td>
-                                <td class="actions-cell-row">
-                                    <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
-                                    <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="mono-text">#0007</td>
-                                <td>
-                                    <div class="book-title-cell">
-                                        <img src="{{ asset('AdminAssets/CatalogAssets/greenBookIcon.svg') }}" alt="Book" class="table-book-icon">
-                                        <span>Python for Data Analysis</span>
-                                    </div>
-                                </td>
-                                <td>Wes McKinney</td>
-                                <td><span class="cat-badge badge-light-blue">Programming</span></td>
-                                <td><span class="status-badge badge-success">Available</span></td>
-                                <td class="actions-cell-row">
-                                    <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
-                                    <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td class="mono-text">#0008</td>
-                                <td>
-                                    <div class="book-title-cell">
-                                        <img src="{{ asset('AdminAssets/CatalogAssets/orangeBookIcon.svg') }}" alt="Book" class="table-book-icon">
-                                        <span>Machine Learning Yearning</span>
-                                    </div>
-                                </td>
-                                <td>Andrew Ng</td>
-                                <td><span class="cat-badge badge-blue">AI</span></td>
-                                <td><span class="status-badge badge-success">Available</span></td>
-                                <td class="actions-cell-row">
-                                    <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
-                                    <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+                    <div class="table-responsive-wrapper">
+                        <table class="catalog-data-table">
+                            <thead>
+                                <tr>
+                                    <th style="width: 80px;">ID</th>
+                                    <th>TITLE</th>
+                                    <th>AUTHOR</th>
+                                    <th>CATEGORY</th>
+                                    <th>STATUS</th>
+                                    <th style="width: 100px; text-align: center;">ACTIONS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="mono-text">#0001</td>
+                                    <td>
+                                        <div class="book-title-cell">
+                                            <img src="{{ asset('AdminAssets/CatalogAssets/blueBookIcon.svg') }}" alt="Book" class="table-book-icon">
+                                            <span>Introduction to Artificial Intelligence</span>
+                                        </div>
+                                    </td>
+                                    <td>Stuart Russell</td>
+                                    <td><span class="cat-badge badge-blue">AI</span></td>
+                                    <td><span class="status-badge badge-success">Available</span></td>
+                                    <td class="actions-cell-row">
+                                        <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
+                                        <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="mono-text">#0002</td>
+                                    <td>
+                                        <div class="book-title-cell">
+                                            <img src="{{ asset('AdminAssets/CatalogAssets/orangeBookIcon.svg') }}" alt="Book" class="table-book-icon">
+                                            <span>Clean Code: A Handbook of Agile Software Craftsmanship</span>
+                                        </div>
+                                    </td>
+                                    <td>Robert C. Martin</td>
+                                    <td><span class="cat-badge badge-light-blue">Programming</span></td>
+                                    <td><span class="status-badge badge-success">Available</span></td>
+                                    <td class="actions-cell-row">
+                                        <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
+                                        <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="mono-text">#0003</td>
+                                    <td>
+                                        <div class="book-title-cell">
+                                            <img src="{{ asset('AdminAssets/CatalogAssets/purpleBookIcon.svg') }}" alt="Book" class="table-book-icon">
+                                            <span>Computer Networks</span>
+                                        </div>
+                                    </td>
+                                    <td>Andrew S. Tanenbaum</td>
+                                    <td><span class="cat-badge badge-medium-blue">Networking</span></td>
+                                    <td><span class="status-badge badge-success">Available</span></td>
+                                    <td class="actions-cell-row">
+                                        <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
+                                        <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="mono-text">#0004</td>
+                                    <td>
+                                        <div class="book-title-cell">
+                                            <img src="{{ asset('AdminAssets/CatalogAssets/greenBookIcon.svg') }}" alt="Book" class="table-book-icon">
+                                            <span>Database System Concepts</span>
+                                        </div>
+                                    </td>
+                                    <td>Abraham Silberschatz</td>
+                                    <td><span class="cat-badge badge-dark-blue">Database</span></td>
+                                    <td><span class="status-badge badge-success">Available</span></td>
+                                    <td class="actions-cell-row">
+                                        <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
+                                        <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="mono-text">#0005</td>
+                                    <td>
+                                        <div class="book-title-cell">
+                                            <img src="{{ asset('AdminAssets/CatalogAssets/blueBookIcon.svg') }}" alt="Book" class="table-book-icon">
+                                            <span>Cybersecurity Essentials</span>
+                                        </div>
+                                    </td>
+                                    <td>Charles J. Brooks</td>
+                                    <td><span class="cat-badge badge-cyan">Cybersecurity</span></td>
+                                    <td><span class="status-badge badge-success">Available</span></td>
+                                    <td class="actions-cell-row">
+                                        <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
+                                        <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="mono-text">#0006</td>
+                                    <td>
+                                        <div class="book-title-cell">
+                                            <img src="{{ asset('AdminAssets/CatalogAssets/purpleBookIcon.svg') }}" alt="Book" class="table-book-icon">
+                                            <span>Research Methodology: Methods and Techniques</span>
+                                        </div>
+                                    </td>
+                                    <td>C.R. Kothari</td>
+                                    <td><span class="cat-badge badge-teal">Research</span></td>
+                                    <td><span class="status-badge badge-due">Unavailable</span></td>
+                                    <td class="actions-cell-row">
+                                        <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
+                                        <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="mono-text">#0007</td>
+                                    <td>
+                                        <div class="book-title-cell">
+                                            <img src="{{ asset('AdminAssets/CatalogAssets/greenBookIcon.svg') }}" alt="Book" class="table-book-icon">
+                                            <span>Python for Data Analysis</span>
+                                        </div>
+                                    </td>
+                                    <td>Wes McKinney</td>
+                                    <td><span class="cat-badge badge-light-blue">Programming</span></td>
+                                    <td><span class="status-badge badge-success">Available</span></td>
+                                    <td class="actions-cell-row">
+                                        <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
+                                        <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td class="mono-text">#0008</td>
+                                    <td>
+                                        <div class="book-title-cell">
+                                            <img src="{{ asset('AdminAssets/CatalogAssets/orangeBookIcon.svg') }}" alt="Book" class="table-book-icon">
+                                            <span>Machine Learning Yearning</span>
+                                        </div>
+                                    </td>
+                                    <td>Andrew Ng</td>
+                                    <td><span class="cat-badge badge-blue">AI</span></td>
+                                    <td><span class="status-badge badge-success">Available</span></td>
+                                    <td class="actions-cell-row">
+                                        <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
+                                        <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
 
                     <div class="catalog-pagination-row">
                         <div class="pagination-info text-zinc">Showing 1-8 of 8</div>
@@ -234,7 +236,6 @@
         font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
         background-color: #1C1C1C;
         -webkit-font-smoothing: antialiased;
-        overflow: hidden;
     }
     .layout-container {
         display: flex;
@@ -243,7 +244,7 @@
         overflow: hidden;
     }
 
-    /* Main Content */
+    /* Main Content Area Dimensions */
     .main-canvas {
         flex: 1;
         background-color: #F9F6F0;
@@ -258,6 +259,8 @@
         background-color: #FFFFFF;
         padding: 20px 40px;
         border-bottom: 1px solid #EAE6DF;
+        flex-wrap: wrap; /* Wraps heading components fluidly on mobile viewports */
+        gap: 16px;
     }
     .canvas-content {
         padding: 32px 40px;
@@ -282,7 +285,7 @@
         justify-content: center;
     }
 
-    /* Controls Row */
+    /* Controls Fluid Wrapping Container Box */
     .control-row-container {
         background-color: #FFFFFF;
         border: 1px solid #EAE6DF;
@@ -298,15 +301,27 @@
         align-items: center;
         gap: 16px;
         width: 100%;
+        flex-wrap: wrap; /* Allows search blocks and menus to break cleanly down columns */
     }
     .search-box-wrapper {
         flex: 2; 
-        position: relative;
+        position: relative; 
+        display: flex;
+        align-items: center;
+        min-width: 240px; /* Protects input fields layout formatting baseline */
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 18px; 
+        font-size: 1.1rem;
+        color: #A1A1AA; 
+        pointer-events: none; 
     }
 
     .search-input {
         width: 100%;
-        padding: 12px 16px 12px 46px;
+        padding: 12px 16px 12px 48px;
         background-color: #F4F1EA;
         border: none;
         border-radius: 12px;
@@ -368,7 +383,7 @@
         height: 16px;
     }
 
-    /* Action Strip Resource */
+    /* Action Strip Resource Placement */
     .action-strip {
         display: flex;
         justify-content: flex-end;
@@ -401,9 +416,18 @@
         border-radius: 16px;
         padding: 24px;
     }
+
+    /* Swipe box viewport handling widescreen tables cleanly on compressed mobile screen boundaries */
+    .table-responsive-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+
     .catalog-data-table {
         width: 100%;
         border-collapse: collapse;
+        min-width: 850px; /* Protects data columns structures from crashing or overlapping text layout dimensions */
     }
     .catalog-data-table th {
         background-color: #FDFBF7;
@@ -494,13 +518,15 @@
         height: 50px;
     }
 
-    /* System Pagination Listing Controls interface modules */
+    /* System Pagination Listing Controls interface elements */
     .catalog-pagination-row {
         display: flex;
         justify-content: space-between;
         align-items: center;
         margin-top: 24px;
         padding-top: 12px;
+        flex-wrap: wrap;
+        gap: 12px;
     }
     .text-zinc {
         color: #71717A;

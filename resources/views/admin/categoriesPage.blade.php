@@ -25,10 +25,7 @@
                 <div class="control-row-container">
                     <div class="control-row">
                         <div class="search-box-wrapper">
-                            <svg class="search-icon-svg" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <circle cx="11" cy="11" r="8"></circle>
-                                <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
-                            </svg>
+                            <i class="bi bi-search search-icon"></i>
                             <input type="text" class="search-input" placeholder="Search category...">
                         </div>
                         
@@ -188,25 +185,27 @@
         align-items: center;
         gap: 16px;
         width: 100%;
-        flex-wrap: wrap; /* Allows search layout elements to adapt and fold cleanly */
+        flex-wrap: wrap; 
     }
+    
     .search-box-wrapper {
-        flex: 2; 
-        position: relative;
-        min-width: 240px; /* Guarantees the search bar keeps an acceptable width */
+    flex: 2; 
+    position: relative; 
+    display: flex;
+    align-items: center;
     }
-    .search-icon-svg {
-        position: absolute;
-        left: 16px;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 18px;
-        height: 18px;
-        color: #A1A1AA;
+
+    .search-icon {
+    position: absolute;
+    left: 18px; 
+    font-size: 1.1rem;
+    color: #A1A1AA; 
+    pointer-events: none; 
     }
+
     .search-input {
         width: 100%;
-        padding: 12px 16px 12px 46px;
+        padding: 12px 16px 12px 48px;
         background-color: #F4F1EA;
         border: none;
         border-radius: 12px;

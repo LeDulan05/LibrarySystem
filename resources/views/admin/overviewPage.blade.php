@@ -74,26 +74,26 @@
                     <div class="quick-actions-card">
                         <h2>Quick Actions</h2>
                         <div class="actions-list">
-                            <div class="action-row">
+                            <a href="{{ route('admin.addBook') }}" class="action-row">
                                 <div class="action-left"><img src="{{ asset('AdminAssets/OverviewAssets/newBookIcon.svg') }}" alt="New Book Icon">Add New Book</div>
                                 <i class="bi bi-chevron-right" alignment="right"></i>
-                            </div>
-                            <div class="action-row">
-                                <div class="action-left"><img src="{{ asset('AdminAssets/OverviewAssets/regMemberIcon.svg') }}" alt="Register Member Icon">Register Member</div>
+                            </a>
+                            <a href="{{ route('admin.memberManagement') }}" class="action-row">
+                                <div class="action-left"><img src="{{ asset('AdminAssets/OverviewAssets/regMemberIcon.svg') }}" alt="Register Member Icon">Member Management</div>
                                 <i class="bi bi-chevron-right" alignment="right"></i>
-                            </div>
-                            <div class="action-row">
+                            </a>
+                            <a href="{{ route('admin.borrowRequest') }}" class="action-row">
                                 <div class="action-left"><img src="{{ asset('AdminAssets/OverviewAssets/borrowReqIcon.svg') }}" alt="Borrow Today Icon">View Borrow Requests</div>
                                 <i class="bi bi-chevron-right" alignment="right"></i>
-                            </div>
-                            <div class="action-row">
+                            </a>
+                            <a href="{{ route('admin.bookReturn') }}" class="action-row">
                                 <div class="action-left"><img src="{{ asset('AdminAssets/OverviewAssets/mngReturnIcon.svg') }}" alt="Pending Return Icon">Manage Returns</div>
                                 <i class="bi bi-chevron-right" alignment="right"></i>
-                            </div>
-                            <div class="action-row">
+                            </a>
+                            <a href="{{ route('admin.report') }}" class="action-row">
                                 <div class="action-left"><img src="{{ asset('AdminAssets/OverviewAssets/viewReportIcon.svg') }}" alt="View Reports Icon">View Reports</div>
                                 <i class="bi bi-chevron-right" alignment="right"></i>
-                            </div>
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -178,7 +178,7 @@
         overflow: hidden;
     }
 
-    /* Main Content Area adjustments */
+    /* Main Content */
     .main-canvas {
         flex: 1;
         background-color: #F9F6F0;
@@ -304,6 +304,7 @@
         padding: 14px 0;
         border-bottom: 1px solid #F4F1EA;
         cursor: pointer;
+        text-decoration: none; 
     }
     .action-row:last-child {
         border-bottom: none;
@@ -319,6 +320,9 @@
     .action-left img {
         width: 32px;
         height: 32px;
+    }
+    .action-row .bi-chevron-right {
+        color: #71717A;
     }
 
     /* Transactions Table */
@@ -387,7 +391,6 @@
     }
 </style>
 
-/* Script for Line Chart */
 <script>
     const ctx = document.getElementById('borrowingActivityChart').getContext('2d');
     
