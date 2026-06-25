@@ -10,7 +10,7 @@ Route::get('/', function () {
 
 Route::get('/dashboard', function (Illuminate\Http\Request $request) {
     $totalBooks = \App\Models\Book::count();
-    $totalStudents = \App\Models\User::count(); // Assuming all users are students for now
+    $totalStudents = \App\Models\User::count(); // Assuming all users are students muna habang wala pa si admin side
     
     $user = clone $request->user();
     $user->load(['transactions.book', 'reservations.book', 'transactions.penalty']);
@@ -20,8 +20,41 @@ Route::get('/dashboard', function (Illuminate\Http\Request $request) {
     return view('user.overviewPage', compact('totalBooks', 'totalStudents', 'user', 'recommendedBooks'));
 })->middleware(['auth', 'verified'])->name('dashboard');
 
-Route::get('/notifications', function () {
-    return view('user.notificationsPage');
+Route::get('/notifications', function (\Illuminate\Http\Request $request) {
+    $user = clone $request->user();
+    $user->load(['transactions.book', 'reservations.book']);
+    
+    $notifications = collect();
+
+    foreach ($user->transactions as $t) {
+        $notifications->push([
+            'type' => 'Borrow Request',
+            'status' => $t->status,
+            'book_title' => $t->book->title ?? 'Unknown Book',
+            'date' => $t->updated_at,
+            'is_unread' => $t->updated_at > now()->subDays(2),
+            'message' => $t->status === 'active' ? 'has been approved. Please pick it up within 3 days.' :
+                         ($t->status === 'pending' ? 'is pending approval by the admin.' :
+                         ($t->status === 'returned' ? 'has been successfully returned.' : 'has been updated.'))
+        ]);
+    }
+
+    foreach ($user->reservations as $r) {
+        $notifications->push([
+            'type' => 'Reservation',
+            'status' => $r->status,
+            'book_title' => $r->book->title ?? 'Unknown Book',
+            'date' => $r->updated_at,
+            'is_unread' => $r->updated_at > now()->subDays(2),
+            'message' => $r->status === 'fulfilled' ? 'has been approved and is ready for pickup.' :
+                         ($r->status === 'pending' ? 'is currently in queue (Position #' . ($r->queue_position ?? '-') . ').' :
+                         ($r->status === 'closed' ? 'has been closed.' : 'has been updated.'))
+        ]);
+    }
+
+    $notifications = $notifications->sortByDesc('date');
+
+    return view('user.notificationsPage', compact('notifications'));
 })->middleware(['auth', 'verified'])->name('notifications');
 
 use App\Http\Controllers\Member\CatalogController;
@@ -37,9 +70,11 @@ Route::get('/borrowed', [BorrowController::class, 'index'])->middleware(['auth',
 use App\Http\Controllers\Member\PenaltyController;
 
 Route::get('/reservations', [ReservationController::class, 'index'])->middleware(['auth', 'verified'])->name('reservations');
+Route::delete('/reservations/{reservation}', [ReservationController::class, 'destroy'])->middleware(['auth', 'verified'])->name('reservations.destroy');
 Route::get('/penalties', [PenaltyController::class, 'index'])->middleware(['auth', 'verified'])->name('penalties');
 
 Route::post('/library/{book}/borrow', [BorrowController::class, 'store'])->middleware(['auth', 'verified'])->name('library.borrow');
+Route::delete('/borrow/{transaction}', [BorrowController::class, 'destroy'])->middleware(['auth', 'verified'])->name('borrow.destroy');
 Route::post('/library/{book}/reserve', [ReservationController::class, 'store'])->middleware(['auth', 'verified'])->name('library.reserve');
 
 Route::middleware('auth')->group(function () {

@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 
 class CatalogController extends Controller
 {
-    // TODO: searchable, filterable by category, matches "Book Catalog" screen
     public function index(Request $request)
     {
         $query = Book::with('category');

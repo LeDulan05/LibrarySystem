@@ -23,7 +23,7 @@ class ScrapeBooks extends Command
      *
      * @var string
      */
-    protected $description = 'Fetch books from Google Books API and seed the database with real covers';
+    protected $description = 'Fetch books from OpenLibrary API and seed the database';
 
     /**
      * Execute the console command.
@@ -124,12 +124,11 @@ class ScrapeBooks extends Command
                     $isbn = '978' . str_pad(mt_rand(1, 9999999999), 10, '0', STR_PAD_LEFT);
                 }
 
-                // Check if book already exists
+                // skip duplicates
                 if (Book::where('isbn', $isbn)->orWhere('title', $title)->exists()) {
                     continue;
                 }
 
-                // Handle Cover Image Download
                 $book_cover = null;
                 $cover_i = $item['cover_i'] ?? null;
                 
@@ -147,7 +146,7 @@ class ScrapeBooks extends Command
                     }
                 }
 
-                // Invent realistic copies
+                // random stock count
                 $total_copies = mt_rand(1, 5);
                 $available_copies = mt_rand(0, $total_copies);
 
