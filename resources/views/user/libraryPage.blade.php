@@ -65,13 +65,21 @@
                             $categoryName = $book->category ? $book->category->name : 'UNCATEGORIZED';
                         @endphp
                         <a href="{{ route('library.show', $book->id) }}" class="book-card" style="text-decoration:none; color:inherit;">
-                            <div class="book-cover {{ $colorClass }}">
-                                <div class="category-badge">
-                                    {{ strtoupper($categoryName) }} <span class="availability-dot {{ $book->available_copies > 0 ? 'dot-available' : 'dot-unavailable' }}"></span>
+                            @if($book->book_cover)
+                                <div class="book-cover" style="background-image: url('{{ asset('storage/' . $book->book_cover) }}'); background-size: cover; background-position: center;">
+                                    <div class="category-badge" style="background: rgba(0,0,0,0.6); color: white; padding: 4px 8px; border-radius: 12px; top: 8px;">
+                                        {{ strtoupper($categoryName) }} <span class="availability-dot {{ $book->available_copies > 0 ? 'dot-available' : 'dot-unavailable' }}"></span>
+                                    </div>
                                 </div>
-                                <div class="book-cover-title">{{ $book->title }}</div>
-                                <div class="book-cover-author">{{ $book->author }}</div>
-                            </div>
+                            @else
+                                <div class="book-cover {{ $colorClass }}">
+                                    <div class="category-badge">
+                                        {{ strtoupper($categoryName) }} <span class="availability-dot {{ $book->available_copies > 0 ? 'dot-available' : 'dot-unavailable' }}"></span>
+                                    </div>
+                                    <div class="book-cover-title">{{ $book->title }}</div>
+                                    <div class="book-cover-author">{{ $book->author }}</div>
+                                </div>
+                            @endif
                             <div class="book-title">{{ $book->title }}</div>
                             <div class="book-author">{{ $book->author }}</div>
                         </a>
