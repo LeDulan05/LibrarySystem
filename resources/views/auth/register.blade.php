@@ -9,12 +9,16 @@
         </p>
 
         <div class="flex flex-col sm:flex-row gap-4">
+            @php
+                $totalBooks = \App\Models\Book::sum('available_copies') ?? 0;
+                $totalStudents = \App\Models\User::count() ?? 0;
+            @endphp
             <div class="bg-[#425028] p-6 rounded-xl flex-1 border border-[#4e5c33] shadow-inner">
-                <div class="text-3xl font-bold mb-1">12,450</div>
+                <div class="text-3xl font-bold mb-1">{{ number_format($totalBooks) }}</div>
                 <div class="text-[10px] uppercase tracking-widest text-gray-300 font-semibold">BOOKS AVAILABLE</div>
             </div>
             <div class="bg-[#425028] p-6 rounded-xl flex-1 border border-[#4e5c33] shadow-inner">
-                <div class="text-3xl font-bold mb-1">3,820</div>
+                <div class="text-3xl font-bold mb-1">{{ number_format($totalStudents) }}</div>
                 <div class="text-[10px] uppercase tracking-widest text-gray-300 font-semibold">ACTIVE STUDENTS</div>
             </div>
         </div>

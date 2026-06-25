@@ -22,6 +22,19 @@ class CatalogController extends Controller
             });
         }
 
+        if ($request->filled('category')) {
+            $query->where('category_id', $request->input('category'));
+        }
+
+        if ($request->filled('availability')) {
+            $availability = $request->input('availability');
+            if ($availability === 'available') {
+                $query->where('available_copies', '>', 0);
+            } elseif ($availability === 'unavailable') {
+                $query->where('available_copies', '<=', 0);
+            }
+        }
+
         if ($request->filled('sort')) {
             $sort = $request->input('sort') === 'desc' ? 'desc' : 'asc';
             $query->orderBy('title', $sort);
@@ -31,8 +44,9 @@ class CatalogController extends Controller
         }
 
         $books = $query->get();
+        $categories = \App\Models\Category::orderBy('name')->get();
 
-        return view('user.libraryPage', compact('books'));
+        return view('user.libraryPage', compact('books', 'categories'));
     }
 
     public function show(Book $book)
