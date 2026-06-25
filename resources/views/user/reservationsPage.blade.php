@@ -32,13 +32,18 @@
 
             <div class="canvas-content">
                 
+                @php
+                    $activeRes = $reservations->whereIn('status', ['pending', 'fulfilled'])->count();
+                    $fulfilledRes = $reservations->where('status', 'fulfilled')->count();
+                    $pendingRes = $reservations->where('status', 'pending')->count();
+                @endphp
                 <!-- Summary Cards -->
                 <div class="summary-cards">
                     <div class="summary-card">
                         <div class="summary-icon bg-blue-light text-blue">
                             <i class="bi bi-calendar4-week"></i>
                         </div>
-                        <div class="summary-number">2</div>
+                        <div class="summary-number">{{ $activeRes }}</div>
                         <div class="summary-label">Active Reservations</div>
                     </div>
                     
@@ -46,15 +51,15 @@
                         <div class="summary-icon bg-green-light text-green">
                             <i class="bi bi-check-lg"></i>
                         </div>
-                        <div class="summary-number">1</div>
-                        <div class="summary-label">Approved</div>
+                        <div class="summary-number">{{ $fulfilledRes }}</div>
+                        <div class="summary-label">Ready for Pickup</div>
                     </div>
 
                     <div class="summary-card">
                         <div class="summary-icon bg-yellow-light text-yellow">
                             <i class="bi bi-clock"></i>
                         </div>
-                        <div class="summary-number">1</div>
+                        <div class="summary-number">{{ $pendingRes }}</div>
                         <div class="summary-label">Pending</div>
                     </div>
                 </div>
@@ -62,80 +67,68 @@
                 <!-- Reservations List -->
                 <div class="books-list">
                     
-                    <!-- Dummy Pending -->
+                    @forelse($reservations as $res)
+                    @php
+                        $book = $res->book;
+                        $colors = ['bg-cover-blue', 'bg-cover-orange', 'bg-cover-purple', 'bg-cover-green', 'bg-cover-red'];
+                        $bgColor = $colors[$book->id % count($colors)];
+                        
+                        if ($res->status === 'fulfilled') {
+                            $statusPill = 'status-approved';
+                            $statusText = 'Ready for Pickup';
+                        } elseif ($res->status === 'pending') {
+                            $statusPill = 'status-pending';
+                            $statusText = 'Pending';
+                        } else {
+                            $statusPill = 'status-pending';
+                            $statusText = ucfirst($res->status);
+                        }
+                    @endphp
                     <div class="reservation-card">
-                        <div class="res-cover bg-cover-green">
-                            <div class="cover-badge">PROGRAMMING</div>
-                            <div class="cover-title">Python for Data Analysis</div>
-                            <div class="cover-author">Wes McKinney</div>
-                        </div>
+                        @if($book->book_cover)
+                            <img src="{{ $book->book_cover }}" alt="Cover" class="res-cover" style="object-fit: cover; padding: 0; border: none;">
+                        @else
+                            <div class="res-cover {{ $bgColor }}">
+                                <div class="cover-badge">{{ strtoupper(Str::limit($book->category->name ?? 'Category', 10)) }}</div>
+                                <div class="cover-title">{{ Str::limit($book->title, 40) }}</div>
+                                <div class="cover-author">{{ Str::limit($book->author, 20) }}</div>
+                            </div>
+                        @endif
                         
                         <div class="res-details">
                             <div class="res-header">
                                 <div>
-                                    <span class="category-pill">Programming</span>
-                                    <h3 class="book-title">Python for Data Analysis</h3>
-                                    <div class="book-author">Wes McKinney</div>
+                                    <span class="category-pill">{{ $book->category->name ?? 'Category' }}</span>
+                                    <h3 class="book-title">{{ $book->title }}</h3>
+                                    <div class="book-author">{{ $book->author }}</div>
                                 </div>
                                 <div>
-                                    <span class="status-pill status-pending">Pending</span>
+                                    <span class="status-pill {{ $statusPill }}">{{ $statusText }}</span>
                                 </div>
                             </div>
                             
                             <div class="res-meta-row">
                                 <div>
                                     <div class="meta-label">Reserved</div>
-                                    <div class="meta-value">Dec 12, 2024</div>
-                                    <button class="btn-cancel-text">Cancel Reservation</button>
+                                    <div class="meta-value">{{ $res->reservation_date ? \Carbon\Carbon::parse($res->reservation_date)->format('M j, Y') : 'Unknown' }}</div>
+                                    @if($res->status === 'pending')
+                                        <button class="btn-cancel-text">Cancel Reservation</button>
+                                    @endif
                                 </div>
                                 <div>
                                     <div class="meta-label">Pickup Date</div>
-                                    <div class="meta-value">Dec 15, 2024</div>
+                                    <div class="meta-value">{{ $res->status === 'fulfilled' && $res->hold_expires_at ? \Carbon\Carbon::parse($res->hold_expires_at)->format('M j, Y') : 'TBD' }}</div>
                                 </div>
                                 <div>
                                     <div class="meta-label">Queue Position</div>
-                                    <div class="meta-value">#1</div>
+                                    <div class="meta-value">#{{ $res->queue_position ?? '-' }}</div>
                                 </div>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Dummy Approved -->
-                    <div class="reservation-card">
-                        <div class="res-cover bg-cover-purple">
-                            <div class="cover-badge">AI</div>
-                            <div class="cover-title">Machine Learning Yearning</div>
-                            <div class="cover-author">Andrew Ng</div>
-                        </div>
-                        
-                        <div class="res-details">
-                            <div class="res-header">
-                                <div>
-                                    <span class="category-pill">AI</span>
-                                    <h3 class="book-title">Machine Learning Yearning</h3>
-                                    <div class="book-author">Andrew Ng</div>
-                                </div>
-                                <div>
-                                    <span class="status-pill status-approved">Approved</span>
-                                </div>
-                            </div>
-                            
-                            <div class="res-meta-row">
-                                <div>
-                                    <div class="meta-label">Reserved</div>
-                                    <div class="meta-value">Dec 5, 2024</div>
-                                </div>
-                                <div>
-                                    <div class="meta-label">Pickup Date</div>
-                                    <div class="meta-value">Dec 18, 2024</div>
-                                </div>
-                                <div>
-                                    <div class="meta-label">Queue Position</div>
-                                    <div class="meta-value">#3</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    @empty
+                        <div class="text-sm text-gray-500">You don't have any reservations.</div>
+                    @endforelse
 
                 </div>
 

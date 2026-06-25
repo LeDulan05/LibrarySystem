@@ -16,16 +16,25 @@ class ReservationController extends Controller
         return view('user.reservationsPage', compact('reservations'));
     }
 
-    // TODO: only reachable when $book->isAvailable() is false, matches
-    // "Book Reserve Confirmation" screen on success. Should set
-    // queue_position based on how many pending reservations already
-    // exist for this book.
     public function store(Request $request, Book $book)
     {
         if ($book->isAvailable()) {
             return response()->json(['stub' => 'reserve blocked, copies are available, borrow instead'], 422);
         }
 
-        return response()->json(['stub' => 'reservation created, added to queue']);
+        // Calculate queue position
+        $queuePosition = \App\Models\Reservation::where('book_id', $book->id)
+            ->where('status', 'pending')
+            ->count() + 1;
+
+        // Create reservation
+        $request->user()->reservations()->create([
+            'book_id' => $book->id,
+            'status' => 'pending',
+            'reservation_date' => now(),
+            'queue_position' => $queuePosition,
+        ]);
+
+        return response()->json(['success' => true]);
     }
 }

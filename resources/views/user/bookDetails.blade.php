@@ -158,7 +158,7 @@
                 </div>
                 <div class="receipt-row">
                     <span>Expected Due Date</span>
-                    <strong>{{ \Carbon\Carbon::now()->addDays(14)->format('M j, Y') }}</strong>
+                    <strong>14 days after approval</strong>
                 </div>
             </div>
             

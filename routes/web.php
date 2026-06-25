@@ -8,10 +8,14 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/dashboard', function () {
+Route::get('/dashboard', function (Illuminate\Http\Request $request) {
     $totalBooks = \App\Models\Book::sum('available_copies');
     $totalStudents = \App\Models\User::count(); // Assuming all users are students for now
-    return view('user.overviewPage', compact('totalBooks', 'totalStudents'));
+    
+    $user = clone $request->user();
+    $user->load(['transactions.book', 'reservations.book', 'transactions.penalty']);
+    
+    return view('user.overviewPage', compact('totalBooks', 'totalStudents', 'user'));
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::get('/notifications', function () {
