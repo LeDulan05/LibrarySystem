@@ -85,7 +85,15 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__.'/auth.php';
 
-Route::group(['prefix' => 'admin'], function () {
+use App\Http\Controllers\Admin\AuthController;
+
+Route::middleware('guest')->group(function () {
+    Route::get('/admin/login', [AuthController::class, 'create'])->name('admin.login');
+    Route::post('/admin/login', [AuthController::class, 'store']);
+});
+
+Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
+    Route::post('/logout', [AuthController::class, 'destroy'])->name('admin.logout');
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
     Route::get('/catalog', [BookController::class, 'index'])->name('admin.bookCatalog');
     Route::get('/add-book', [BookController::class, 'create'])->name('admin.addBook');
@@ -103,6 +111,5 @@ Route::group(['prefix' => 'admin'], function () {
     Route::get('/return', function () {return view('admin.bookReturnsPage');})->name('admin.bookReturn');
     Route::get('/penalty', function () {return view('admin.penaltyManagementPage');})->name('admin.penaltyManagement');
     Route::get('/reports', function () {return view('admin.reportsPage');})->name('admin.report');
-
 });
 
