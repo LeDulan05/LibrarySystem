@@ -74,40 +74,42 @@
                                     <th style="width: 100px; text-align: center;">ACTIONS</th>
                                 </tr>
                             </thead>
-                            <tbody>
-                                @foreach($books as $book)
-                                    <tr>
-                                        <td class="mono-text">#{{ str_pad($book->id, 4, '0', STR_PAD_LEFT) }}</td>
-                                        <td>
-                                            <div class="book-title-cell">
-                                                <img src="{{ asset('AdminAssets/CatalogAssets/blueBookIcon.svg') }}" alt="Book" class="table-book-icon">
-                                                <span>{{ $book->title }}</span>
-                                            </div>
-                                        </td>
-                                        <td>{{ $book->author }}</td>
-                                        <td><span class="cat-badge badge-blue">{{ $book->category_name }}</span></td>
-                                        <td>
-                                            @if($book->available_copies > 0)
-                                                <span class="status-badge badge-success">Available ({{ $book->available_copies }})</span>
-                                            @else
-                                                <span class="status-badge badge-due">Unavailable</span>
-                                            @endif
-                                        </td>
-                                        <td class="actions-cell-row">
-                                            <a href="{{ route('admin.editBook', $book->id) }}" class="action-btn-edit">
-                                                <img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit">
-                                            </a>
-                                            <form action="{{ route('admin.bookCatalog.destroy', $book->id) }}" method="POST" onsubmit="return confirm('Are you sure?');" style="display:inline;">
-                                                @csrf
-                                                @method('DELETE')
-                                                <button type="submit" class="action-btn-delete">
+                                <tbody>
+                                    @foreach($books as $book)
+                                        <tr>
+                                            <td class="mono-text">#{{ str_pad($book->id, 4, '0', STR_PAD_LEFT) }}</td>
+                                            <td>
+                                                <div class="book-title-cell">
+                                                    <img src="{{ asset('AdminAssets/CatalogAssets/blueBookIcon.svg') }}" alt="Book" class="table-book-icon">
+                                                    <span id="book-title-{{ $book->id }}">{{ $book->title }}</span>
+                                                </div>
+                                            </td>
+                                            <td>{{ $book->author }}</td>
+                                            <td><span class="cat-badge badge-blue">{{ $book->category_name }}</span></td>
+                                            <td>
+                                                @if($book->available_copies > 0)
+                                                    <span class="status-badge badge-success">Available ({{ $book->available_copies }})</span>
+                                                @else
+                                                    <span class="status-badge badge-due">Unavailable</span>
+                                                @endif
+                                            </td>
+                                            <td class="actions-cell-row">
+                                                <a href="{{ route('admin.editBook', $book->id) }}" class="action-btn-edit">
+                                                    <img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit">
+                                                </a>
+                                                
+                                                <form id="delete-form-{{ $book->id }}" action="{{ route('admin.bookCatalog.destroy', $book->id) }}" method="POST" style="display:none;">
+                                                    @csrf
+                                                    @method('DELETE')
+                                                </form>
+
+                                                <button type="button" class="action-btn-delete" onclick="confirmDelete({{ $book->id }})">
                                                     <img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete">
                                                 </button>
-                                            </form>
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </tbody>
+                                            </td>
+                                        </tr>
+                                    @endforeach
+                                </tbody>
                         </table>
                     </div>
 
@@ -148,6 +150,26 @@
             </div>
         </main>
     </div>
+
+/* Modal Overlay */
+<div class="modal-overlay" id="deleteModalOverlay">
+    <div class="delete-modal-card">
+        <div class="modal-icon-header">
+            <img src="{{ asset('AdminAssets/CatalogAssets/deleteBookConfirmationIcon.svg') }}" alt="Delete">
+        </div>
+        
+        <h3 class="modal-main-title">Delete Book?</h3>
+        <p class="modal-warning-body">
+            Are you sure you want to delete <strong id="modalTargetBookTitle">"Book Title"</strong>? This cannot be undone.
+        </p>
+        
+        <div class="modal-actions-footer">
+            <button type="button" class="btn-modal-cancel" onclick="closeDeleteModal()">Cancel</button>
+            <button type="button" class="btn-modal-delete" id="modalConfirmDeleteBtn">Delete</button>
+        </div>
+    </div>
+</div>
+
 </body>
 </html>
 
@@ -481,4 +503,114 @@
         background-color: #FF5722;
         color: #FFFFFF;
     }
+
+.modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.4);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.2s ease;
+    }
+    .modal-overlay.modal-visible {
+        opacity: 1;
+        pointer-events: auto;
+    }
+    .delete-modal-card {
+        background-color: #FFFFFF;
+        border-radius: 24px;
+        padding: 32px;
+        width: 100%;
+        max-width: 440px;
+        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        text-align: center;
+        transform: scale(0.95);
+        transition: transform 0.2s ease;
+    }
+    .modal-overlay.modal-visible .delete-modal-card {
+        transform: scale(1);
+    }
+    .modal-icon-header {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+
+    .modal-main-title {
+        font-size: 1.35rem;
+        font-weight: 800;
+        color: #1A1A1A;
+        margin-bottom: 12px;
+        letter-spacing: -0.01em;
+    }
+    .modal-warning-body {
+        font-size: 0.925rem;
+        color: #71717A;
+        line-height: 1.5;
+        margin-bottom: 28px;
+        font-weight: 500;
+    }
+    .modal-warning-body strong {
+        color: #1A1A1A;
+        font-weight: 700;
+    }
+    .modal-actions-footer {
+        display: flex;
+        gap: 12px;
+    }
+    .btn-modal-cancel {
+        flex: 1;
+        height: 48px;
+        background-color: #FFFFFF;
+        border: 1px solid #E5E7EB;
+        border-radius: 14px;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 0.925rem;
+        font-weight: 700;
+        color: #4B5563;
+        cursor: pointer;
+    }
+    .btn-modal-delete {
+        flex: 1;
+        height: 48px;
+        background-color: #C10007;
+        border: none;
+        border-radius: 14px;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        font-size: 0.925rem;
+        font-weight: 700;
+        color: #FFFFFF;
+        cursor: pointer;
+    }
 </style>
+
+<script>
+    let activeDeleteFormId = null;
+
+    function confirmDelete(bookId) {
+        activeDeleteFormId = 'delete-form-' + bookId;
+        
+        const bookTitle = document.getElementById('book-title-' + bookId).innerText;
+        document.getElementById('modalTargetBookTitle').innerText = `"${bookTitle}"`;
+        
+        document.getElementById('deleteModalOverlay').classList.add('modal-visible');
+    }
+
+    function closeDeleteModal() {
+        document.getElementById('deleteModalOverlay').classList.remove('modal-visible');
+        activeDeleteFormId = null;
+    }
+
+    document.getElementById('modalConfirmDeleteBtn').addEventListener('click', function() {
+        if(activeDeleteFormId) {
+            document.getElementById(activeDeleteFormId).submit();
+        }
+    });
+</script>

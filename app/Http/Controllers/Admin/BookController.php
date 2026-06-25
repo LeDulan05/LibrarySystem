@@ -13,46 +13,45 @@ class BookController extends Controller
      * Display the Book Catalog Page with all books and categories.
      */
     public function index(Request $request)
-{
-    // 1. Start a base query joining books and categories
-    $query = DB::table('books')
-        ->join('categories', 'books.category_id', '=', 'categories.id')
-        ->select('books.*', 'categories.name as category_name');
+    {
+        // 1. Start a base query joining books and categories
+        $query = DB::table('books')
+            ->join('categories', 'books.category_id', '=', 'categories.id')
+            ->select('books.*', 'categories.name as category_name'); //
 
-    // 2. Filter by Search input if a keyword is typed
-    if ($request->has('search') && $request->search != '') {
-        $query->where(function($q) use ($request) {
-            $q->where('books.title', 'like', '%' . $request->search . '%')
-              ->orWhere('books.author', 'like', '%' . $request->search . '%')
-              ->orWhere('books.isbn', 'like', '%' . $request->search . '%');
-        });
-    }
-
-    // 3. Filter by Category dropdown choice selection
-    if ($request->has('category') && $request->category != 'all' && $request->category != '') {
-        $query->where('books.category_id', $request->category);
-    }
-
-    // 4. Filter by Status dropdown choice selection
-    if ($request->has('status') && $request->status != 'all' && $request->status != '') {
-        if ($request->status == 'available') {
-            $query->where('books.available_copies', '>', 0); // Copies are in stock
-        } elseif ($request->status == 'unavailable') {
-            $query->where('books.available_copies', '=', 0); // Out of stock
+        // 2. Filter by Search input if a keyword is typed
+        if ($request->has('search') && $request->search != '') {
+            $query->where(function($q) use ($request) {
+                $q->where('books.title', 'like', '%' . $request->search . '%')
+                  ->orWhere('books.author', 'like', '%' . $request->search . '%')
+                  ->orWhere('books.isbn', 'like', '%' . $request->search . '%');
+            }); //
         }
+
+        // 3. Filter by Category dropdown choice selection
+        if ($request->has('category') && $request->category != 'all' && $request->category != '') {
+            $query->where('books.category_id', $request->category); //
+        }
+
+        // 4. Filter by Status dropdown choice selection
+        if ($request->has('status') && $request->status != 'all' && $request->status != '') {
+            if ($request->status == 'available') {
+                $query->where('books.available_copies', '>', 0); // Copies are in stock
+            } elseif ($request->status == 'unavailable') {
+                $query->where('books.available_copies', '=', 0); // Out of stock
+            }
+        }
+
+        // 5. Finalize execution with sorting and pagination
+        $books = $query->orderBy('books.created_at', 'desc')
+                       ->paginate(8)
+                       ->appends($request->all()); //
+
+        // Fetch master categories list for dropdown options loop
+        $categories = DB::table('categories')->get(); //
+
+        return view('admin.bookCatalogPage', compact('books', 'categories')); //
     }
-
-    // 5. Finalize execution with sorting and pagination
-    // appends() keeps active filters preserved across pagination links
-    $books = $query->orderBy('books.created_at', 'desc')
-                   ->paginate(8)
-                   ->appends($request->all());
-
-    // Fetch master categories list for dropdown options loop
-    $categories = DB::table('categories')->get();
-
-    return view('admin.bookCatalogPage', compact('books', 'categories'));
-}
 
     /**
      * Show the form for creating a new book.
@@ -60,9 +59,9 @@ class BookController extends Controller
     public function create()
     {
         // Fetch categories to populate the category selection dropdown
-        $categories = DB::table('categories')->get();
+        $categories = DB::table('categories')->get(); //
 
-        return view('admin.addBookPage', compact('categories'));
+        return view('admin.addBookPage', compact('categories')); //
     }
 
     /**
@@ -70,7 +69,7 @@ class BookController extends Controller
      */
     public function store(Request $request)
     {
-        // Validate incoming request fields matching your form structures
+        // FIX: Included publisher, year_published, and description in the validator rules array
         $validated = $request->validate([
             'title'            => 'required|string|max:255',
             'author'           => 'required|string|max:255',
@@ -81,28 +80,31 @@ class BookController extends Controller
             'total_copies'     => 'required|integer|min:1',
             'description'      => 'nullable|string',
             'book_cover'       => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
-        ]);
+        ]); //
 
         // Handle cover file upload if provided
-        $coverPath = null;
+        $coverPath = null; //
         if ($request->hasFile('book_cover')) {
-            $coverPath = $request->file('book_cover')->store('book_covers', 'public');
+            $coverPath = $request->file('book_cover')->store('book_covers', 'public'); //
         }
 
         // Insert row into 'books' table matching ERD attributes
         DB::table('books')->insert([
-            'title'            => $validated['title'],
-            'author'           => $validated['author'],
-            'isbn'             => $validated['isbn'],
-            'category_id'      => $validated['category_id'],
-            'total_copies'     => $validated['total_copies'],
-            // available_copies initially equals total_copies on a new addition
-            'available_copies' => $validated['total_copies'], 
-            'created_at'       => Carbon::now(),
-            'updated_at'       => Carbon::now(),
+            'title'            => $validated['title'], //
+            'author'           => $validated['author'], //
+            'isbn'             => $validated['isbn'], //
+            'publisher'        => $validated['publisher'], //
+            'year_published'   => $validated['year_published'],
+            'description'      => $validated['description'],
+            'book_cover'       => $coverPath,
+            'category_id'      => $validated['category_id'], //
+            'total_copies'     => $validated['total_copies'], //
+            'available_copies' => $validated['total_copies'], // available_copies initially equals total_copies
+            'created_at'       => Carbon::now(), //
+            'updated_at'       => Carbon::now(), //
         ]);
 
-        return redirect()->route('admin.bookCatalog')->with('success', 'Book added successfully!');
+        return redirect()->route('admin.bookCatalog')->with('success', 'Book added successfully!'); //
     }
 
     /**
@@ -111,15 +113,15 @@ class BookController extends Controller
     public function edit($id)
     {
         // Find the single book entry or fail
-        $book = DB::table('books')->where('id', $id)->first();
+        $book = DB::table('books')->where('id', $id)->first(); //
         if (!$book) {
-            abort(404, 'Book not found.');
+            abort(404, 'Book not found.'); //
         }
 
         // Fetch categories for the dropdown selections
-        $categories = DB::table('categories')->get();
+        $categories = DB::table('categories')->get(); //
 
-        return view('admin.editBookPage', compact('book', 'categories'));
+        return view('admin.editBookPage', compact('book', 'categories')); //
     }
 
     /**
@@ -127,37 +129,53 @@ class BookController extends Controller
      */
     public function update(Request $request, $id)
     {
+        // FIX: Expanded validation rules to encompass form attributes from your migration layout
         $validated = $request->validate([
             'title'          => 'required|string|max:255',
             'author'         => 'required|string|max:255',
             'isbn'           => 'required|string|max:255',
             'category_id'    => 'required|integer|exists:categories,id',
+            'publisher'      => 'required|string|max:255',
+            'year_published' => 'required|integer|min:1000|max:' . (Carbon::now()->year + 1),
             'total_copies'   => 'required|integer|min:0',
-        ]);
+            'description'    => 'nullable|string',
+            'book_cover'     => 'nullable|image|mimes:jpeg,png,jpg|max:5120',
+        ]); //
 
         // Fetch current copies to recalculate available inventory metrics safely
-        $currentBook = DB::table('books')->where('id', $id)->first();
+        $currentBook = DB::table('books')->where('id', $id)->first(); //
         if (!$currentBook) {
-            abort(404);
+            abort(404); //
         }
 
-        // Calculate discrepancy differences to update available capacity numbers 
-        $copiesDifference = $validated['total_copies'] - $currentBook->total_copies;
-        $newAvailableCopies = $currentBook->available_copies + $copiesDifference;
+        // Handle cover image modification if a fresh upload is supplied
+        $coverPath = $currentBook->book_cover;
+        if ($request->hasFile('book_cover')) {
+            $coverPath = $request->file('book_cover')->store('book_covers', 'public');
+        }
 
+        // Calculate discrepancy differences to update available capacity numbers
+        $copiesDifference = $validated['total_copies'] - $currentBook->total_copies; //
+        $newAvailableCopies = $currentBook->available_copies + $copiesDifference; //
+
+        // FIX: Saved missing structural parameters to the update payload block array
         DB::table('books')
             ->where('id', $id)
             ->update([
-                'title'            => $validated['title'],
-                'author'           => $validated['author'],
-                'isbn'             => $validated['isbn'],
-                'category_id'      => $validated['category_id'],
-                'total_copies'     => $validated['total_copies'],
-                'available_copies' => max(0, $newAvailableCopies),
-                'updated_at'       => Carbon::now(),
+                'title'            => $validated['title'], //
+                'author'           => $validated['author'], //
+                'isbn'             => $validated['isbn'], //
+                'category_id'      => $validated['category_id'], //
+                'publisher'        => $validated['publisher'],
+                'year_published'   => $validated['year_published'],
+                'description'      => $validated['description'],
+                'book_cover'       => $coverPath,
+                'total_copies'     => $validated['total_copies'], //
+                'available_copies' => max(0, $newAvailableCopies), //
+                'updated_at'       => Carbon::now(), //
             ]);
 
-        return redirect()->route('admin.bookCatalog')->with('success', 'Book updated successfully!');
+        return redirect()->route('admin.bookCatalog')->with('success', 'Book updated successfully!'); //
     }
 
     /**
@@ -165,8 +183,8 @@ class BookController extends Controller
      */
     public function destroy($id)
     {
-        DB::table('books')->where('id', $id)->delete();
+        DB::table('books')->where('id', $id)->delete(); //
 
-        return redirect()->route('admin.bookCatalog')->with('success', 'Book removed from catalog.');
+        return redirect()->route('admin.bookCatalog')->with('success', 'Book removed from catalog.'); //
     }
 }

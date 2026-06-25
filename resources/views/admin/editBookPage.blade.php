@@ -22,12 +22,13 @@
 
             <div class="canvas-content">
                 
-                <a href="{{ route('admin.dashboard') }}" class="back-navigation-link">
+                <a href="{{ route('admin.bookCatalog') }}" class="back-navigation-link">
                     <span class="left-arrow-chevron">&lsaquo;</span> Back to Catalog
                 </a>
 
-                <form action="#" method="POST" enctype="multipart/form-data" class="book-information-form-card">
+                <form action="{{ route('admin.updateBook', $book->id) }}" method="POST" enctype="multipart/form-data" class="book-information-form-card">
                     @csrf
+                    @method('PUT')
                     
                     <h2 class="form-section-heading">Book Information</h2>
                     
@@ -35,68 +36,102 @@
                         
                         <div class="form-group span-full-width">
                             <label class="input-element-label">Book Title</label>
-                            <input type="text" class="form-text-input" placeholder="Enter the full book title" required>
+                            <input type="text" name="title" class="form-text-input" placeholder="Enter the full book title" value="{{ old('title', $book->title) }}" required>
+                            @error('title')
+                                <span style="color: #C10007; font-size: 0.8rem; font-weight: 600; margin-top: 4px;">{{ $message }}</span>
+                            @enderror
                         </div>
 
                         <div class="form-group">
                             <label class="input-element-label">Author</label>
-                            <input type="text" class="form-text-input" placeholder="Author full name" required>
+                            <input type="text" name="author" class="form-text-input" placeholder="Author full name" value="{{ old('author', $book->author) }}" required>
+                            @error('author')
+                                <span style="color: #C10007; font-size: 0.8rem; font-weight: 600; margin-top: 4px;">{{ $message }}</span>
+                            @enderror
                         </div>
 
                         <div class="form-group">
                             <label class="input-element-label">ISBN</label>
-                            <input type="text" class="form-text-input" placeholder="978-X-XXXX-XXXX-X" required>
+                            <input type="text" name="isbn" class="form-text-input" placeholder="978-X-XXXX-XXXX-X" value="{{ old('isbn', $book->isbn) }}" required>
+                            @error('isbn')
+                                <span style="color: #C10007; font-size: 0.8rem; font-weight: 600; margin-top: 4px;">{{ $message }}</span>
+                            @enderror
                         </div>
 
                         <div class="form-group">
                             <label class="input-element-label">Category</label>
                             <div class="form-select-wrapper">
-                                <select class="form-select-dropdown" required>
-                                    <option value="" disabled selected hidden></option>
-                                    <option value="programming">Programming</option>
-                                    <option value="networking">Networking</option>
-                                    <option value="database">Database</option>
-                                    <option value="ai">Artificial Intelligence</option>
-                                    <option value="cybersecurity">Cybersecurity</option>
-                                    <option value="research">Research</option>
+                                <select name="category_id" class="form-select-dropdown" required>
+                                    <option value="" disabled hidden>Select Category</option>
+                                    @foreach($categories as $category)
+                                        <option value="{{ $category->id }}" {{ old('category_id', $book->category_id) == $category->id ? 'selected' : '' }}>
+                                            {{ $category->name }}
+                                        </option>
+                                    @endforeach
                                 </select>
                             </div>
+                            @error('category_id')
+                                <span style="color: #C10007; font-size: 0.8rem; font-weight: 600; margin-top: 4px;">{{ $message }}</span>
+                            @enderror
                         </div>
 
                         <div class="form-group">
                             <label class="input-element-label">Publisher</label>
-                            <input type="text" class="form-text-input" placeholder="Publisher name" required>
+                            <input type="text" name="publisher" class="form-text-input" placeholder="Publisher name" value="{{ old('publisher', $book->publisher) }}" required>
+                            @error('publisher')
+                                <span style="color: #C10007; font-size: 0.8rem; font-weight: 600; margin-top: 4px;">{{ $message }}</span>
+                            @enderror
                         </div>
 
                         <div class="form-group">
                             <label class="input-element-label">Year Published</label>
-                            <input type="number" class="form-text-input" placeholder="2024" min="1000" max="2026" required>
+                            <input type="number" name="year_published" class="form-text-input" placeholder="2024" min="1000" max="{{ \Carbon\Carbon::now()->year + 1 }}" value="{{ old('year_published', $book->year_published) }}" required>
+                            @error('year_published')
+                                <span style="color: #C10007; font-size: 0.8rem; font-weight: 600; margin-top: 4px;">{{ $message }}</span>
+                            @enderror
                         </div>
 
                         <div class="form-group">
                             <label class="input-element-label">Number of Copies</label>
-                            <input type="number" class="form-text-input" value="1" min="1" required>
+                            <input type="number" name="total_copies" class="form-text-input" value="{{ old('total_copies', $book->total_copies) }}" min="0" required>
+                            @error('total_copies')
+                                <span style="color: #C10007; font-size: 0.8rem; font-weight: 600; margin-top: 4px;">{{ $message }}</span>
+                            @enderror
                         </div>
 
                         <div class="form-group span-full-width">
                             <label class="input-element-label">Description</label>
-                            <textarea class="form-textarea-input" placeholder="Brief description of this book.." rows="4"></textarea>
+                            <textarea name="description" class="form-textarea-input" placeholder="Brief description of this book.." rows="4">{{ old('description', $book->description) }}</textarea>
+                            @error('description')
+                                <span style="color: #C10007; font-size: 0.8rem; font-weight: 600; margin-top: 4px;">{{ $message }}</span>
+                            @enderror
                         </div>
 
                         <div class="form-group span-full-width">
                             <label class="input-element-label">Book Cover</label>
                             <label class="upload-dropzone-capsule">
-                                <input type="file" name="book_cover" accept="image/*" class="hidden-file-input">
+                                <input type="file" name="book_cover" id="cover_input" accept="image/*" class="hidden-file-input" onchange="previewFileName()">
                                 <img src="{{ asset('AdminAssets/CatalogAssets/bookCoverIcon.svg') }}" alt="Book Icon" class="upload-vector-icon">
-                                <div class="upload-prompt-text">Click to upload or drag and drop</div>
+                                <div class="upload-prompt-text" id="upload_prompt">
+                                    @if($book->book_cover)
+                                        Current: {{ basename($book->book_cover) }} (Click to replace)
+                                    @else
+                                        Click to upload or drag and drop
+                                    @endif
+                                </div>
                                 <div class="upload-limitation-subtext">PNG, JPG up to 5MB</div>
                             </label>
+                            @error('book_cover')
+                                <span style="color: #C10007; font-size: 0.8rem; font-weight: 600; margin-top: 4px;">{{ $message }}</span>
+                            @enderror
                         </div>
                     </div>
 
                     <div class="form-action-footer-strip">
-                        <button type="button" class="btn-form-cancel">Cancel</button>
-                        <button type="submit" class="btn-form-submit">Add Book</button>
+                        <a href="{{ route('admin.bookCatalog') }}" class="btn-form-cancel">
+                            <span>Cancel</span>
+                        </a>
+                        <button type="submit" class="btn-form-submit">Save Changes</button>
                     </div>
 
                 </form>
@@ -104,6 +139,17 @@
             </div>
         </main>
     </div>
+
+    <script>
+        function previewFileName() {
+            const fileInput = document.getElementById('cover_input');
+            const promptText = document.getElementById('upload_prompt');
+            if(fileInput.files.length > 0) {
+                promptText.innerText = "Selected: " + fileInput.files[0].name;
+                promptText.style.color = "#FF5722";
+            }
+        }
+    </script>
 </body>
 </html>
 
@@ -324,6 +370,10 @@
         font-size: 0.925rem;
         font-weight: 700;
         cursor: pointer;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         transition: background-color 0.15s ease;
     }
     .btn-form-cancel:hover {

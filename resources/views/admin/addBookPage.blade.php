@@ -121,8 +121,8 @@
                     </div>
 
                     <div class="form-action-footer-strip">
-                        <a href="{{ route('admin.addBook') }}" class="btn-form-cancel">
-                            <span>Reset</span>
+                        <a href="{{ route('admin.bookCatalog') }}" class="btn-form-cancel">
+                            <span>Cancel</span>
                         </a>                        
                         <button type="submit" class="btn-form-submit">Add Book</button>
                     </div>
@@ -134,7 +134,6 @@
     </div>
 
     <script>
-        // Real-time helper modifying prompt feedback inside upload capsule block
         function previewFileName() {
             const fileInput = document.getElementById('cover_input');
             const promptText = document.getElementById('upload_prompt');
@@ -167,7 +166,6 @@
         overflow: hidden;
     }
 
-    /* Core Canvas Layout Context Framing */
     .main-canvas {
         flex: 1;
         background-color: #F9F6F0;
@@ -208,7 +206,6 @@
         justify-content: center;
     }
 
-    /* Back Navigation Navigation Typography Link Anchor Controls */
     .back-navigation-link {
         font-size: 0.875rem;
         color: #71717A;
@@ -231,7 +228,6 @@
         margin-top: -2px;
     }
 
-    /* Core Content Entry Form Card Structure Section */
     .book-information-form-card {
         background-color: #FFFFFF;
         border: 1px solid #EAE6DF;
@@ -248,7 +244,6 @@
         margin-bottom: 28px;
     }
 
-    /* Sub-grid system components sizing configurations */
     .form-fields-grid {
         display: grid;
         grid-template-columns: repeat(2, 1fr);
@@ -264,7 +259,6 @@
         grid-column: span 2;
     }
 
-    /* Individual Component Field Element Form Inputs Controls */
     .input-element-label {
         font-size: 0.875rem;
         font-weight: 700;
@@ -294,7 +288,6 @@
         resize: vertical;
     }
 
-    /* Direct Select Customizing Overrides wrappers */
     .form-select-wrapper {
         position: relative;
         width: 100%;
@@ -308,7 +301,6 @@
         background-color: #FFFFFF;
     }
 
-    /* Upload Media Vector Capsule Dropzone Field box */
     .upload-dropzone-capsule {
         width: 100%;
         border: 1px dashed #D1D5DB;
@@ -345,7 +337,6 @@
         font-weight: 500;
     }
 
-    /* Footer Action Panel Control Row */
     .form-action-footer-strip {
         display: flex;
         justify-content: space-between;
@@ -364,6 +355,10 @@
         font-size: 0.925rem;
         font-weight: 700;
         cursor: pointer;
+        text-decoration: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
         transition: background-color 0.15s ease;
     }
     .btn-form-cancel:hover {

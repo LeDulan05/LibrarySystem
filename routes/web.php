@@ -47,11 +47,13 @@ require __DIR__.'/auth.php';
 Route::group(['prefix' => 'admin'], function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
     Route::get('/catalog', [BookController::class, 'index'])->name('admin.bookCatalog');
-
     Route::get('/add-book', [BookController::class, 'create'])->name('admin.addBook');
     Route::post('/add-book', [BookController::class, 'store'])->name('admin.bookCatalog.store');
     
-    Route::get('/edit-book', function () {return view('admin.editBookPage');})->name('admin.editBook');
+    Route::get('/edit-book/{id}', [BookController::class, 'edit'])->name('admin.editBook');
+    Route::put('/edit-book/{id}', [BookController::class, 'update'])->name('admin.updateBook');
+
+    Route::delete('/catalog/{id}', [BookController::class, 'destroy'])->name('admin.bookCatalog.destroy');
 
     Route::get('/categories', function () {return view('admin.categoriesPage');})->name('admin.bookCategories');
     Route::get('/members', function () {return view('admin.membersPage');})->name('admin.memberManagement');
