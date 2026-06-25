@@ -15,7 +15,9 @@ Route::get('/dashboard', function (Illuminate\Http\Request $request) {
     $user = clone $request->user();
     $user->load(['transactions.book', 'reservations.book', 'transactions.penalty']);
     
-    return view('user.overviewPage', compact('totalBooks', 'totalStudents', 'user'));
+    $recommendedBooks = \App\Models\Book::inRandomOrder()->limit(4)->get();
+    
+    return view('user.overviewPage', compact('totalBooks', 'totalStudents', 'user', 'recommendedBooks'));
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::get('/notifications', function () {
