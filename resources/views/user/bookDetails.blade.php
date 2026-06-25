@@ -49,13 +49,19 @@
                 <div class="details-layout">
                     <!-- Left Column -->
                     <div class="left-col">
-                        <div class="book-cover-large {{ $colorClass }}">
-                            <div class="category-badge-large">{{ strtoupper($book->category->name ?? 'UNCATEGORIZED') }}</div>
-                            <div class="cover-content">
-                                <div class="cover-title">{{ $book->title }}</div>
-                                <div class="cover-author">{{ $book->author }}</div>
+                        @if($book->book_cover)
+                            <div class="book-cover-large" style="background-image: url('{{ asset('storage/' . $book->book_cover) }}'); background-size: cover; background-position: center; position: relative;">
+                                <div class="category-badge-large" style="position: absolute; top: 16px; left: 16px; background: rgba(0,0,0,0.6); padding: 6px 12px; border-radius: 8px;">{{ strtoupper($book->category->name ?? 'UNCATEGORIZED') }}</div>
                             </div>
-                        </div>
+                        @else
+                            <div class="book-cover-large {{ $colorClass }}">
+                                <div class="category-badge-large">{{ strtoupper($book->category->name ?? 'UNCATEGORIZED') }}</div>
+                                <div class="cover-content">
+                                    <div class="cover-title">{{ $book->title }}</div>
+                                    <div class="cover-author">{{ $book->author }}</div>
+                                </div>
+                            </div>
+                        @endif
 
                         <div class="status-card">
                             <div class="status-row">
