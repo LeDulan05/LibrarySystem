@@ -23,15 +23,21 @@
             <div class="canvas-content">
 
                 <div class="control-row-container">
-                    <div class="control-row">
+                    <form action="{{ route('admin.bookCategories') }}" method="GET" class="control-row" id="searchCategoryForm">
                         <div class="search-box-wrapper">
                             <i class="bi bi-search search-icon"></i>
-                            <input type="text" class="search-input" placeholder="Search category...">
+                            <input type="text" name="search" class="search-input" placeholder="Search category..." value="{{ request('search') }}" onkeypress="if(event.key === 'Enter') this.form.submit();">
                         </div>
+                        
+                        @if(request('search'))
+                            <a href="{{ route('admin.bookCategories') }}" class="btn-reset-filters" style="text-decoration:none; display:flex; align-items:center; color:#FF5722; font-size:0.875rem; font-weight:700;">
+                                Clear Search
+                            </a>
+                        @endif
                         
                         <div class="dropdown-wrapper-spacer"></div>
                         <div class="dropdown-wrapper-spacer"></div>
-                    </div>
+                    </form>
                 </div>
 
                 <div class="categories-panel">
@@ -45,60 +51,29 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td class="cat-title-text">Programming</td>
-                                    <td class="count-text">45 <span class="sub-count-label">books</span></td>
-                                    <td class="actions-cell-row">
-                                        <button class="action-btn-view"><img src="{{ asset('AdminAssets/CategoriesAssets/viewIcon.svg') }}" alt="View"></button>
-                                        <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
-                                        <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="cat-title-text">Networking</td>
-                                    <td class="count-text">28 <span class="sub-count-label">books</span></td>
-                                    <td class="actions-cell-row">
-                                        <button class="action-btn-view"><img src="{{ asset('AdminAssets/CategoriesAssets/viewIcon.svg') }}" alt="View"></button>
-                                        <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
-                                        <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="cat-title-text">Database</td>
-                                    <td class="count-text">32 <span class="sub-count-label">books</span></td>
-                                    <td class="actions-cell-row">
-                                        <button class="action-btn-view"><img src="{{ asset('AdminAssets/CategoriesAssets/viewIcon.svg') }}" alt="View"></button>
-                                        <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
-                                        <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="cat-title-text">Artificial Intelligence</td>
-                                    <td class="count-text">39 <span class="sub-count-label">books</span></td>
-                                    <td class="actions-cell-row">
-                                        <button class="action-btn-view"><img src="{{ asset('AdminAssets/CategoriesAssets/viewIcon.svg') }}" alt="View"></button>
-                                        <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
-                                        <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="cat-title-text">Cybersecurity</td>
-                                    <td class="count-text">21 <span class="sub-count-label">books</span></td>
-                                    <td class="actions-cell-row">
-                                        <button class="action-btn-view"><img src="{{ asset('AdminAssets/CategoriesAssets/viewIcon.svg') }}" alt="View"></button>
-                                        <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
-                                        <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="cat-title-text">Research</td>
-                                    <td class="count-text">17 <span class="sub-count-label">books</span></td>
-                                    <td class="actions-cell-row">
-                                        <button class="action-btn-view"><img src="{{ asset('AdminAssets/CategoriesAssets/viewIcon.svg') }}" alt="View"></button>
-                                        <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
-                                        <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
-                                    </td>
-                                </tr>
+                                @forelse($categories as $category)
+                                    <tr>
+                                        <td class="cat-title-text">{{ $category->name }}</td>
+                                        <td class="count-text">
+                                            {{ $category->books_count }} 
+                                            <span class="sub-count-label">{{ Str::plural('book', $category->books_count) }}</span>
+                                        </td>
+                                        <td class="actions-cell-row">
+                                            <!-- ROUTE FIXED: Now routes to your custom single category layout view -->
+                                            <a href="{{ route('admin.categories.show', $category->id) }}" class="action-btn-view">
+                                                <img src="{{ asset('AdminAssets/CategoriesAssets/viewIcon.svg') }}" alt="View">
+                                            </a>
+                                            <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
+                                            <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="3" style="text-align: center; color: #71717A; padding: 40px 0; font-weight: 600;">
+                                            No collection categories match your search parameters.
+                                        </td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
@@ -129,7 +104,7 @@
         overflow: hidden;
     }
 
-    /* Main Content */
+    /* Core Workspace Elements Styling Layout */
     .main-canvas {
         flex: 1;
         background-color: #F9F6F0;
@@ -144,7 +119,7 @@
         background-color: #FFFFFF;
         padding: 20px 40px;
         border-bottom: 1px solid #EAE6DF;
-        flex-wrap: wrap; /* Allows native header wrapping on mobile viewports */
+        flex-wrap: wrap; 
         gap: 16px;
     }
     .canvas-content {
@@ -189,18 +164,18 @@
     }
     
     .search-box-wrapper {
-    flex: 2; 
-    position: relative; 
-    display: flex;
-    align-items: center;
+        flex: 2; 
+        position: relative; 
+        display: flex;
+        align-items: center;
     }
 
     .search-icon {
-    position: absolute;
-    left: 18px; 
-    font-size: 1.1rem;
-    color: #A1A1AA; 
-    pointer-events: none; 
+        position: absolute;
+        left: 18px; 
+        font-size: 1.1rem;
+        color: #A1A1AA; 
+        pointer-events: none; 
     }
 
     .search-input {
@@ -221,7 +196,7 @@
 
     .dropdown-wrapper-spacer {
         flex: 1;
-        min-width: 120px; /* Flexes down responsibly on tiny resolutions */
+        min-width: 120px; 
     }
 
     .categories-panel {
@@ -231,7 +206,6 @@
         padding: 24px;
     }
 
-    /* Swipe Box wrapper handling widescreen tables cleanly on compressed mobile screen boundaries */
     .table-responsive-wrapper {
         width: 100%;
         overflow-x: auto;
@@ -241,7 +215,7 @@
     .categories-data-table {
         width: 100%;
         border-collapse: collapse;
-        min-width: 650px; /* Forces layout structural consistency when workspace width narrows */
+        min-width: 650px; 
     }
     .categories-data-table th {
         background-color: #FDFBF7;

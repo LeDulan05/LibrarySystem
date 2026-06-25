@@ -5,8 +5,6 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- Google Fonts Imports for IskoLib Design System -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@100;200;400&display=swap" rel="stylesheet">    
@@ -31,17 +29,17 @@
             <div class="canvas-content">
 
                 <div class="date-filter-container">
-                    <div class="date-filter-row">
+                    <form action="{{ route('admin.report') }}" method="GET" class="date-filter-row" id="dateFilterForm">
                         <div class="date-input-group">
                             <span class="date-label">From</span>
-                            <input type="date" class="date-field-input" value="2024-11-01">
+                            <input type="date" name="from_date" class="date-field-input" value="{{ $fromDate }}" onchange="document.getElementById('dateFilterForm').submit()">
                         </div>
                         <div class="date-input-group">
                             <span class="date-label">To</span>
-                            <input type="date" class="date-field-input" value="2024-12-31">
+                            <input type="date" name="to_date" class="date-field-input" value="{{ $toDate }}" onchange="document.getElementById('dateFilterForm').submit()">
                         </div>
                         <div class="dropdown-wrapper-spacer"></div>
-                    </div>
+                    </form>
                 </div>
 
                 <div class="report-chart-container">
@@ -54,34 +52,31 @@
                 <div class="summary-metrics-grid">
                     <div class="summary-card">
                         <img src="{{ asset('AdminAssets/ReportAssets/lateReturnsIcon.svg') }}" alt="Total Late Returns" class="icon-wrapper">
-                        <div class="sum-value">4</div>
+                        <div class="sum-value">{{ number_format($totalLateReturns) }}</div>
                         <div class="sum-label">Total Late Returns</div>
                     </div>
                         
                     <div class="summary-card">
                         <img src="{{ asset('AdminAssets/ReportAssets/totalPenaltiesIcon.svg') }}" alt="Total Penalties" class="icon-wrapper">
-                        <div class="sum-value">₱140.00</div>
+                        <div class="sum-value">₱{{ number_format($totalPenalties, 2) }}</div>
                         <div class="sum-label">Total Penalties</div>
                     </div>
 
                     <div class="summary-card">
                         <img src="{{ asset('AdminAssets/ReportAssets/paidIcon.svg') }}" alt="Paid" class="icon-wrapper">
-                        <div class="sum-value">₱65.00</div>
+                        <div class="sum-value">₱{{ number_format($paidPenalties, 2) }}</div>
                         <div class="sum-label">Paid</div>
                     </div>
 
                     <div class="summary-card">
                         <img src="{{ asset('AdminAssets/ReportAssets/outstandingIcon.svg') }}" alt="Outstanding" class="icon-wrapper">
-                        <div class="sum-value">₱75.00</div>
+                        <div class="sum-value">₱{{ number_format($outstandingPenalties, 2) }}</div>
                         <div class="sum-label">Outstanding</div>
                     </div>
                 </div>
 
-                <!-- Detailed Late Return Data Table Panel -->
                 <div class="queue-panel">
                     <h2 class="panel-section-heading">Late Return Details</h2>
-                    
-                    <!-- Responsive swipable container scroll-box to prevent mobile clipping -->
                     <div class="table-responsive-wrapper">
                         <table class="queue-data-table">
                             <thead>
@@ -96,24 +91,27 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td class="member-name-text">Ana Lim</td>
-                                    <td class="book-title-text">Research Methodology</td>
-                                    <td class="date-text">Nov 26, 2024</td>
-                                    <td class="date-text">Dec 8, 2024</td>
-                                    <td class="days-late-text" style="text-align: center;">12</td>
-                                    <td class="penalty-text penalty-active">₱60.00</td>
-                                    <td><span class="status-badge badge-due">Unpaid</span></td>
-                                </tr>
-                                <tr>
-                                    <td class="member-name-text">Carlos Cruz</td>
-                                    <td class="book-title-text">Cybersecurity Essentials</td>
-                                    <td class="date-text">Dec 5, 2024</td>
-                                    <td class="date-text">Dec 8, 2024</td>
-                                    <td class="days-late-text" style="text-align: center;">3</td>
-                                    <td class="penalty-text penalty-active">₱15.00</td>
-                                    <td><span class="status-badge badge-due">Unpaid</span></td>
-                                </tr>
+                                @forelse($lateReturns as $log)
+                                    <tr>
+                                        <td class="member-name-text">{{ $log->member_name }}</td>
+                                        <td class="book-title-text">{{ $log->book_title }}</td>
+                                        <td class="date-text">{{ \Carbon\Carbon::parse($log->due_date)->format('M d, Y') }}</td>
+                                        <td class="date-text">{{ \Carbon\Carbon::parse($log->return_date)->format('M d, Y') }}</td>
+                                        <td class="days-late-text" style="text-align: center;">{{ $log->days_late }}</td>
+                                        <td class="penalty-text penalty-active">₱{{ number_format($log->penalty_amount, 2) }}</td>
+                                        <td>
+                                            <span class="status-badge {{ $log->penalty_status === 'paid' ? 'badge-success' : 'badge-due' }}">
+                                                {{ ucfirst($log->penalty_status === 'paid' ? 'Paid' : 'Unpaid') }}
+                                            </span>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="7" style="text-align: center; color: #71717A; padding: 40px 0; font-weight: 600;">
+                                            No late return metrics found within this time window.
+                                        </td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
@@ -122,6 +120,54 @@
             </div>
         </main>
     </div>
+
+    <script>
+        const ctx = document.getElementById('borrowingActivityChart').getContext('2d');
+        const backendChartData = @json($chartData);
+        
+        new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                datasets: [{
+                    label: 'Activity Count',
+                    data: backendChartData, 
+                    borderColor: '#FF5722', 
+                    backgroundColor: 'rgba(255, 87, 34, 0.04)', 
+                    borderWidth: 2.5,
+                    tension: 0.35,
+                    pointRadius: 4.5,
+                    pointBackgroundColor: '#FF5722',
+                    pointBorderColor: '#FFFFFF',
+                    pointBorderWidth: 1,
+                    pointHoverRadius: 6
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false }
+                },
+                scales: {
+                    x: {
+                        grid: { display: false }, 
+                        ticks: { color: '#A1A1AA', font: { weight: '600', size: 11 } }
+                    },
+                    y: {
+                        min: 0,
+                        ticks: {
+                            stepSize: 25,
+                            color: '#A1A1AA',
+                            font: { weight: '600', size: 11 }
+                        },
+                        border: { dash: [4, 4] },
+                        grid: { color: '#E5E7EB' }
+                    }
+                }
+            }
+        });
+    </script>
 </body>
 </html>
 
@@ -142,8 +188,6 @@
         width: 100vw;
         overflow: hidden;
     }
-
-    /* Main Content */
     .main-canvas {
         flex: 1;
         background-color: #F9F6F0;
@@ -189,7 +233,6 @@
         align-items: center;
         justify-content: center;
     }
-
     .btn-export-report {
         display: flex;
         align-items: center;
@@ -201,13 +244,11 @@
         border-radius: 10px;
         cursor: pointer;
         font-family: 'Plus Jakarta Sans', sans-serif;
-        weight: 700;
         font-weight: 700;
         font-size: 0.875rem;
         color: #FFFFFF;
         box-shadow: 0 2px 6px rgba(33, 43, 5, 0.15);
     }
-
     .date-filter-container {
         background-color: #FFFFFF;
         border: 1px solid #EAE6DF;
@@ -249,7 +290,6 @@
         flex: 1;
         min-width: 100px;
     }
-
     .report-chart-container {
         background-color: #FFFFFF;
         border: 1px solid #EAE6DF;
@@ -263,8 +303,6 @@
         width: 100%;
         margin-top: 16px;
     }
-
-    /* Summary Analytic Metric Cards */
     .summary-metrics-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
@@ -282,7 +320,6 @@
         height: 42px;
         margin-bottom: 16px;
     }
-
     .sum-value {
         font-family: 'Plus Jakarta Sans', sans-serif;
         font-size: 1.75rem;
@@ -297,7 +334,6 @@
         color: #71717A;
         font-weight: 600;
     }
-
     .queue-panel {
         background-color: #FFFFFF;
         border: 1px solid #EAE6DF;
@@ -311,7 +347,6 @@
         color: #1A1A1A;
         letter-spacing: -0.01em;
     }
-
     .table-responsive-wrapper {
         width: 100%;
         overflow-x: auto;
@@ -344,8 +379,6 @@
     .queue-data-table tbody tr:last-child td {
         border-bottom: none;
     }
-
-    /* Row Content Typography */
     .member-name-text {
         color: #1A1A1A;
         font-weight: 700;
@@ -367,7 +400,6 @@
     .penalty-active {
         color: #F1580A!important; 
     }
-
     .status-badge {
         padding: 6px 14px;
         border-radius: 9999px;
@@ -375,54 +407,6 @@
         font-weight: 700;
         display: inline-block;
     }
+    .badge-success { background-color: #DCFCE7; color: #008236; } 
     .badge-due { background-color: #FFE2E2; color: #C10007; }
 </style>
-
-
-    <script>
-        const ctx = document.getElementById('borrowingActivityChart').getContext('2d');
-        
-        new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
-                datasets: [{
-                    label: 'Activity Count',
-                    data: [42, 58, 50, 74, 48, 65, 61, 88, 53, 77, 91, 70], 
-                    borderColor: '#FF5722', 
-                    backgroundColor: 'rgba(255, 87, 34, 0.04)', 
-                    borderWidth: 2.5,
-                    tension: 0.35,
-                    pointRadius: 4.5,
-                    pointBackgroundColor: '#FF5722',
-                    pointBorderColor: '#FFFFFF',
-                    pointBorderWidth: 1,
-                    pointHoverRadius: 6
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                    legend: { display: false }
-                },
-                scales: {
-                    x: {
-                        grid: { display: false }, 
-                        ticks: { color: '#A1A1AA', font: { weight: '600', size: 11 } }
-                    },
-                    y: {
-                        min: 0,
-                        max: 100,
-                        ticks: {
-                            stepSize: 25,
-                            color: '#A1A1AA',
-                            font: { weight: '600', size: 11 }
-                        },
-                        border: { dash: [4, 4] },
-                        grid: { color: '#E5E7EB' }
-                    }
-                }
-            }
-        });
-    </script>
