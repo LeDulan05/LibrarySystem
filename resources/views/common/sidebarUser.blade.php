@@ -43,10 +43,13 @@
             <i class="bi bi-gear sidebar-icon"></i>
             <span>Settings</span>
         </a>
-        <div class="nav-item btn-signout">
+        <form method="POST" action="{{ route('logout') }}" id="logout-form" style="display: none;">
+            @csrf
+        </form>
+        <a href="#" onclick="event.preventDefault(); document.getElementById('logout-form').submit();" class="nav-item btn-signout" style="text-decoration:none;">
             <i class="bi bi-box-arrow-right sidebar-icon"></i>
             <span>Sign Out</span>
-        </div>
+        </a>
     </div>
 </aside>
 

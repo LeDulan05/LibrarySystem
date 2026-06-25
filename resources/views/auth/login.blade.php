@@ -9,12 +9,16 @@
         </p>
 
         <div class="flex flex-col sm:flex-row gap-4">
+            @php
+                $totalBooks = \App\Models\Book::sum('available_copies') ?? 0;
+                $totalStudents = \App\Models\User::count() ?? 0;
+            @endphp
             <div class="bg-[#425028] p-6 rounded-xl flex-1 border border-[#4e5c33] shadow-inner">
-                <div class="text-3xl font-bold mb-1">12,450</div>
+                <div class="text-3xl font-bold mb-1">{{ number_format($totalBooks) }}</div>
                 <div class="text-[10px] uppercase tracking-widest text-gray-300 font-semibold">BOOKS AVAILABLE</div>
             </div>
             <div class="bg-[#425028] p-6 rounded-xl flex-1 border border-[#4e5c33] shadow-inner">
-                <div class="text-3xl font-bold mb-1">3,820</div>
+                <div class="text-3xl font-bold mb-1">{{ number_format($totalStudents) }}</div>
                 <div class="text-[10px] uppercase tracking-widest text-gray-300 font-semibold">ACTIVE STUDENTS</div>
             </div>
         </div>
@@ -55,7 +59,7 @@
                     </svg>
                 </div>
                 <input id="password" class="block w-full border-gray-200 rounded-lg shadow-sm focus:ring-[#f05c0a] focus:border-[#f05c0a] sm:text-sm pl-10 pr-10 py-3 bg-white" type="password" name="password" required autocomplete="current-password" placeholder="Enter your password" />
-                <div class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 cursor-pointer">
+                <div class="absolute inset-y-0 right-0 pr-3 flex items-center text-gray-400 cursor-pointer" onclick="const p = document.getElementById('password'); p.type = p.type === 'password' ? 'text' : 'password';">
                     <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
@@ -104,4 +108,27 @@
             <a href="{{ route('register') }}" class="font-bold text-[#f05c0a] hover:text-[#d85208] ml-1">Register your account</a>
         </div>
     </form>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const emailInput = document.getElementById('email');
+            const rememberCheckbox = document.getElementById('remember_me');
+            
+            // Load saved email if exists
+            const savedEmail = localStorage.getItem('remembered_email');
+            if (savedEmail) {
+                emailInput.value = savedEmail;
+                rememberCheckbox.checked = true;
+            }
+
+            // Save email on form submit if remember me is checked
+            document.querySelector('form').addEventListener('submit', function() {
+                if (rememberCheckbox.checked) {
+                    localStorage.setItem('remembered_email', emailInput.value);
+                } else {
+                    localStorage.removeItem('remembered_email');
+                }
+            });
+        });
+    </script>
 </x-guest-layout>

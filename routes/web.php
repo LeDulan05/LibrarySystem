@@ -9,7 +9,9 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function () {
-    return view('user.overviewPage');
+    $totalBooks = \App\Models\Book::sum('available_copies');
+    $totalStudents = \App\Models\User::count(); // Assuming all users are students for now
+    return view('user.overviewPage', compact('totalBooks', 'totalStudents'));
 })->middleware(['auth', 'verified'])->name('dashboard');
 
 Route::get('/notifications', function () {

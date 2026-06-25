@@ -24,9 +24,9 @@
                         <span class="notification-badge">2</span>
                     </a>
                     @if(Auth::check())
-                        <div class="profile-avatar">{{ strtoupper(substr(Auth::user()->first_name ?? 'J', 0, 1)) }}{{ strtoupper(substr(Auth::user()->last_name ?? 'D', 0, 1)) }}</div>
+                        <a href="{{ route('profile.edit') }}" class="profile-avatar" style="text-decoration:none;">{{ strtoupper(substr(Auth::user()->first_name ?? 'J', 0, 1)) }}{{ strtoupper(substr(Auth::user()->last_name ?? 'D', 0, 1)) }}</a>
                     @else
-                        <div class="profile-avatar">JD</div>
+                        <a href="{{ route('profile.edit') }}" class="profile-avatar" style="text-decoration:none;">JD</a>
                     @endif
                 </div>
             </div>
@@ -41,6 +41,23 @@
                             <input type="text" name="search" class="search-input" placeholder="Search by title, author, ISBN.." value="{{ request('search') }}">
                         </div>
                         
+                        <!-- Category Filter -->
+                        <select name="category" class="filter-select" onchange="this.form.submit()">
+                            <option value="">All Genres</option>
+                            @foreach($categories as $category)
+                                <option value="{{ $category->id }}" {{ request('category') == $category->id ? 'selected' : '' }}>
+                                    {{ $category->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        
+                        <!-- Availability Filter -->
+                        <select name="availability" class="filter-select" onchange="this.form.submit()">
+                            <option value="">All Books</option>
+                            <option value="available" {{ request('availability') === 'available' ? 'selected' : '' }}>Available</option>
+                            <option value="unavailable" {{ request('availability') === 'unavailable' ? 'selected' : '' }}>Unavailable</option>
+                        </select>
+
                         <!-- Sort Button -->
                         <button type="submit" name="sort" value="{{ request('sort') === 'asc' ? 'desc' : 'asc' }}" class="sort-button">
                             <i class="bi bi-sort-alpha-{{ request('sort') === 'desc' ? 'up' : 'down' }}"></i> Sort {{ request('sort') === 'asc' ? 'Z-A' : 'A-Z' }}
@@ -228,6 +245,28 @@
     }
     .search-input::placeholder {
         color: #A1A1AA;
+    }
+    .filter-select {
+        background-color: #F4F1EA;
+        border: 1px solid #EAE6DF;
+        border-radius: 8px;
+        padding: 0 36px 0 16px;
+        height: 48px;
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #3F3F46;
+        cursor: pointer;
+        outline: none;
+        transition: all 0.2s ease;
+        appearance: none;
+        background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%233F3F46' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3e%3cpolyline points='6 9 12 15 18 9'%3e%3c/polyline%3e%3c/svg%3e");
+        background-repeat: no-repeat;
+        background-position: right 12px center;
+        background-size: 16px;
+    }
+    .filter-select:hover, .filter-select:focus {
+        background-color: #EAE6DF;
+        color: #1A1A1A;
     }
     .sort-button {
         background-color: #F4F1EA;
