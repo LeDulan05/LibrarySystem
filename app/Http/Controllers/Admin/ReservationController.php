@@ -82,7 +82,7 @@ public function index(Request $request)
         }
 
         DB::table('reservations')->where('id', $id)->update([
-            'status' => 'approved',
+            'status' => 'fulfilled',  
             'hold_expires_at' => Carbon::now()->addDays(3),
             'updated_at' => Carbon::now()
         ]);
@@ -100,8 +100,7 @@ public function index(Request $request)
         $reason = $request->input('rejection_reason', 'Unspecified administrative reason');
 
         DB::table('reservations')->where('id', $id)->update([
-            'status' => 'rejected',
-            'notes' => $reason, // accurately logs the rejection option context
+            'status' => 'cancelled', 
             'updated_at' => Carbon::now()
         ]);
 
@@ -118,7 +117,6 @@ public function index(Request $request)
                 'reservations.created_at as request_date',
                 'reservations.hold_expires_at',
                 'reservations.status',
-                'reservations.notes',
                 DB::raw("CONCAT(users.first_name, ' ', users.last_name) as member_name"),
                 'users.student_id',
                 'books.title as book_title',
