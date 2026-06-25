@@ -17,12 +17,12 @@
             <span>Overview</span>
         </a>
 
-        <a href="{{ route('admin.bookCatalog') }}" class="nav-item {{ request()->is('admin/catalog*') ? 'active' : '' }}">
+        <a href="{{ route('admin.bookCatalog') }}" class="nav-item {{ request()->is('admin/catalog*', 'admin/add-book*', 'admin/edit-book*') ? 'active' : '' }}">
             <img src="{{ asset('AdminAssets/SidebarAssets/catalogIcon.svg') }}" alt="Book Catalog Icon" class="sidebar-svg-icon">
             <span>Book Catalog</span>
         </a>
 
-        <a href="{{ route('admin.bookCategories') }}" class="nav-item {{ request()->is('admin/categories*', 'admin/add-book*', 'admin/edit-book*' ) ? 'active' : '' }}">
+        <a href="{{ route('admin.bookCategories') }}" class="nav-item {{ request()->is('admin/categories*' ) ? 'active' : '' }}">
             <img src="{{ asset('AdminAssets/SidebarAssets/categoryIcon.svg') }}" alt="Categories Icon" class="sidebar-svg-icon">
             <span>Categories</span>
         </a>

@@ -8,15 +8,19 @@ return new class extends Migration
 {
     public function up(): void
     {
-        Schema::create('books', function (Blueprint $table) {
-            $table->id();
-            $table->string('title');
-            $table->string('author');
-            $table->string('isbn')->unique()->nullable();
-            $table->foreignId('category_id')->constrained()->cascadeOnDelete();
-            $table->unsignedInteger('total_copies')->default(1);
-            $table->unsignedInteger('available_copies')->default(1);
-            $table->timestamps();
+    Schema::create('books', function (Blueprint $table) {
+        $table->id();
+        $table->string('title');
+        $table->string('author');
+        $table->string('isbn')->unique()->nullable();
+        $table->foreignId('category_id')->constrained()->cascadeOnDelete();
+        $table->string('publisher');
+        $table->unsignedSmallInteger('year_published');
+        $table->text('description')->nullable();
+        $table->string('book_cover')->nullable();   
+        $table->unsignedInteger('total_copies')->default(1);
+        $table->unsignedInteger('available_copies')->default(1);
+        $table->timestamps();
         });
     }
 

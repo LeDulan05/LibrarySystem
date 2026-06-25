@@ -23,8 +23,12 @@ require __DIR__.'/auth.php';
 Route::group(['prefix' => 'admin'], function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
     Route::get('/catalog', [BookController::class, 'index'])->name('admin.bookCatalog');
-    Route::get('/add-book', function () {return view('admin.addBookPage');})->name('admin.addBook');
+
+    Route::get('/add-book', [BookController::class, 'create'])->name('admin.addBook');
+    Route::post('/add-book', [BookController::class, 'store'])->name('admin.bookCatalog.store');
+    
     Route::get('/edit-book', function () {return view('admin.editBookPage');})->name('admin.editBook');
+
     Route::get('/categories', function () {return view('admin.categoriesPage');})->name('admin.bookCategories');
     Route::get('/members', function () {return view('admin.membersPage');})->name('admin.memberManagement');
     Route::get('/borrow', function () {return view('admin.borrowRequestPage');})->name('admin.borrowRequest');

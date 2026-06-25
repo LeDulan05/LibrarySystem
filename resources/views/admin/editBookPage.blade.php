@@ -267,19 +267,6 @@
         cursor: pointer;
         background-color: #FFFFFF;
     }
-    .form-select-wrapper::after {
-        content: "";
-        position: absolute;
-        right: 18px;
-        top: 50%;
-        transform: translateY(-50%);
-        width: 0;
-        height: 0;
-        border-left: 5px solid transparent;
-        border-right: 5px solid transparent;
-        border-top: 5px solid #A1A1AA;
-        pointer-events: none;
-    }
 
     /* Upload Media Vector Capsule Dropzone Field box */
     .upload-dropzone-capsule {
