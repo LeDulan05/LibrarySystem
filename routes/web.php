@@ -9,7 +9,7 @@ Route::get('/', function () {
 });
 
 Route::get('/dashboard', function (Illuminate\Http\Request $request) {
-    $totalBooks = \App\Models\Book::sum('available_copies');
+    $totalBooks = \App\Models\Book::count();
     $totalStudents = \App\Models\User::count(); // Assuming all users are students for now
     
     $user = clone $request->user();

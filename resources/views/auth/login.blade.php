@@ -10,7 +10,7 @@
 
         <div class="flex flex-col sm:flex-row gap-4">
             @php
-                $totalBooks = \App\Models\Book::sum('available_copies') ?? 0;
+                $totalBooks = \App\Models\Book::count() ?? 0;
                 $totalStudents = \App\Models\User::count() ?? 0;
             @endphp
             <div class="bg-[#425028] p-6 rounded-xl flex-1 border border-[#4e5c33] shadow-inner">
