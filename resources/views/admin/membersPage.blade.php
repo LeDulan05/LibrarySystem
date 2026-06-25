@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
@@ -30,34 +31,34 @@
                 <div class="summary-metrics-grid">
                     <div class="summary-card">
                         <img src="{{ asset('AdminAssets/MemberAssets/totalMembersIcon.svg') }}" alt="Member">
-                        <div class="sum-value">3,820</div>
+                        <div class="sum-value">{{ number_format($totalMembersCount) }}</div>
                         <div class="sum-label">Total Members</div>
                     </div>
                         
                     <div class="summary-card">
                         <img src="{{ asset('AdminAssets/MemberAssets/activeIcon.svg') }}" alt="Active">
-                        <div class="sum-value">3,750</div>
+                        <div class="sum-value">{{ number_format($activeCount) }}</div>
                         <div class="sum-label">Active</div>
                     </div>
 
                     <div class="summary-card">
                         <img src="{{ asset('AdminAssets/MemberAssets/suspendedIcon.svg') }}" alt="Suspended">
-                        <div class="sum-value">45</div>
+                        <div class="sum-value">{{ number_format($suspendedCount) }}</div>
                         <div class="sum-label">Suspended</div>
                     </div>
 
                     <div class="summary-card">
                         <img src="{{ asset('AdminAssets/MemberAssets/newMemberIcon.svg') }}" alt="New Member">
-                        <div class="sum-value">125</div>
+                        <div class="sum-value">{{ number_format($newThisMonthCount) }}</div>
                         <div class="sum-label">New This Month</div>
                     </div>
                 </div>
 
                 <div class="member-search-container">
-                    <div class="search-box-wrapper">
-                            <i class="bi bi-search search-icon"></i>
-                        <input type="text" class="search-input" placeholder="Search members...">
-                    </div>
+                    <form action="{{ route('admin.memberManagement') }}" method="GET" class="search-box-wrapper">
+                        <i class="bi bi-search search-icon"></i>
+                        <input type="text" name="search" class="search-input" placeholder="Search members..." value="{{ request('search') }}" onkeypress="if(event.key === 'Enter') this.form.submit();">
+                    </form>
                 </div>
 
                 <div class="directory-panel">
@@ -75,81 +76,71 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>
-                                        <div class="member-identity-cell">
-                                            <div class="avatar-circle av-olive">Jd</div>
-                                            <span class="member-fullname">Juan dela Cruz</span>
-                                        </div>
-                                    </td>
-                                    <td class="mono-text">2024-00001</td>
-                                    <td class="course-text">BS Computer Science</td>
-                                    <td class="email-text">juan@university.edu</td>
-                                    <td class="borrowed-count-cell">2</td>
-                                    <td><span class="status-badge badge-success">Active</span></td>
-                                    <td class="actions-cell-row">
-                                        <button class="action-btn"><img src="{{ asset('AdminAssets/CategoriesAssets/viewIcon.svg') }}" alt="View"></button>
-                                        <button class="action-btn"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
-                                        <button class="action-btn"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="member-identity-cell">
-                                            <div class="avatar-circle av-darkgreen">MS</div>
-                                            <span class="member-fullname">Maria Santos</span>
-                                        </div>
-                                    </td>
-                                    <td class="mono-text">2024-00002</td>
-                                    <td class="course-text">BS Information Technology</td>
-                                    <td class="email-text">maria@university.edu</td>
-                                    <td class="borrowed-count-cell">0</td>
-                                    <td><span class="status-badge badge-success">Active</span></td>
-                                    <td class="actions-cell-row">
-                                        <button class="action-btn"><img src="{{ asset('AdminAssets/CategoriesAssets/viewIcon.svg') }}" alt="View"></button>
-                                        <button class="action-btn"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
-                                        <button class="action-btn"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="member-identity-cell">
-                                            <div class="avatar-circle av-forest">PR</div>
-                                            <span class="member-fullname">Pedro Reyes</span>
-                                        </div>
-                                    </td>
-                                    <td class="mono-text">2023-00045</td>
-                                    <td class="course-text">BS Electronics Engineering</td>
-                                    <td class="email-text">pedro@university.edu</td>
-                                    <td class="borrowed-count-cell">1</td>
-                                    <td><span class="status-badge badge-success">Active</span></td>
-                                    <td class="actions-cell-row">
-                                        <button class="action-btn"><img src="{{ asset('AdminAssets/CategoriesAssets/viewIcon.svg') }}" alt="View"></button>
-                                        <button class="action-btn"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
-                                        <button class="action-btn"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td>
-                                        <div class="member-identity-cell">
-                                            <div class="avatar-circle av-olive">AL</div>
-                                            <span class="member-fullname">Ana Lim</span>
-                                        </div>
-                                    </td>
-                                    <td class="mono-text">2022-00134</td>
-                                    <td class="course-text">BS Computer Science</td>
-                                    <td class="email-text">ana@university.edu</td>
-                                    <td class="borrowed-count-cell">3</td>
-                                    <td><span class="status-badge badge-suspended">Suspended</span></td>
-                                    <td class="actions-cell-row">
-                                        <button class="action-btn"><img src="{{ asset('AdminAssets/CategoriesAssets/viewIcon.svg') }}" alt="View"></button>
-                                        <button class="action-btn"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
-                                        <button class="action-btn"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
-                                    </td>
-                                </tr>
+                                @php $avatarColors = ['av-olive', 'av-darkgreen', 'av-forest']; @endphp
+                                @forelse($members as $index => $member)
+                                    <tr>
+                                        <td>
+                                            <div class="member-identity-cell">
+                                                <div class="avatar-circle {{ $avatarColors[$member->id % 3] }}">
+                                                    {{ strtoupper(substr($member->first_name ?? 'J', 0, 1)) }}{{ strtoupper(substr($member->last_name ?? 'D', 0, 1)) }}
+                                                </div>
+                                                <span class="member-fullname">{{ $member->first_name }} {{ $member->last_name }}</span>
+                                            </div>
+                                        </td>
+                                        <td class="mono-text">{{ $member->student_number ?? 'N/A' }}</td>
+                                        <td class="course-text">{{ $member->course ?? 'N/A' }}</td>
+                                        <td class="email-text" style="text-transform: lowercase;">{{ $member->email }}</td>
+                                        <td class="borrowed-count-cell">{{ $member->borrowed_count }}</td>
+                                        <td>
+                                            <span class="status-badge {{ ($member->status ?? 'active') == 'active' ? 'badge-success' : 'badge-suspended' }}">
+                                                {{ ucfirst($member->status ?? 'active') }}
+                                            </span>
+                                        </td>
+                                        <td class="actions-cell-row">
+                                            <a href="{{ route('admin.members.show', $member->id) }}" class="action-btn">
+                                                <img src="{{ asset('AdminAssets/CategoriesAssets/viewIcon.svg') }}" alt="View">
+                                            </a>
+                                            <button class="action-btn"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
+                                            <button class="action-btn"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="7" class="empty-table-text-row" style="text-align: center; padding: 40px 0; color: #71717A; font-weight: 600;">No members match your criteria.</td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
+
+                    @if ($members->hasPages())
+                        <div class="catalog-pagination-row">
+                            <div class="pagination-info text-zinc">
+                                Showing {{ $members->firstItem() }}-{{ $members->lastItem() }} of {{ $members->total() }}
+                            </div>
+                            <div class="pagination-nav">
+                                @if ($members->onFirstPage())
+                                    <span class="page-link disabled" style="opacity: 0.4; cursor: not-allowed;">&laquo;</span>
+                                @else
+                                    <a href="{{ $members->previousPageUrl() }}" class="page-link" style="text-decoration: none;">&laquo;</a>
+                                @endif
+
+                                @foreach ($members->getUrlRange(1, $members->lastPage()) as $page => $url)
+                                    @if ($page == $members->currentPage())
+                                        <span class="page-link active">{{ $page }}</span>
+                                    @else
+                                        <a href="{{ $url }}" class="page-link" style="text-decoration: none;">{{ $page }}</a>
+                                    @endif
+                                @endforeach
+
+                                @if ($members->hasMorePages())
+                                    <a href="{{ $members->nextPageUrl() }}" class="page-link" style="text-decoration: none;">&raquo;</a>
+                                @else
+                                    <span class="page-link disabled" style="opacity: 0.4; cursor: not-allowed;">&raquo;</span>
+                                @endif
+                            </div>
+                        </div>
+                    @endif
                 </div>
 
             </div>
@@ -257,20 +248,6 @@
         border-radius: 16px;
         padding: 20px 24px;
     }
-    .sum-icon-wrapper {
-        width: 36px;
-        height: 36px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        margin-bottom: 12px;
-    }
-    .sum-svg-icon {
-        width: 18px;
-        height: 18px;
-    }
-
     .sum-value {
         font-family: 'Plus Jakarta Sans', sans-serif;
         font-size: 1.75rem;
@@ -297,20 +274,18 @@
     }
 
     .search-box-wrapper {
-    flex: 2; 
-    position: relative; 
-    display: flex;
-    align-items: center;
+        flex: 2; 
+        position: relative; 
+        display: flex;
+        align-items: center;
     }
-
     .search-icon {
-    position: absolute;
-    left: 18px; 
-    font-size: 1.1rem;
-    color: #A1A1AA; 
-    pointer-events: none; 
+        position: absolute;
+        left: 18px; 
+        font-size: 1.1rem;
+        color: #A1A1AA; 
+        pointer-events: none; 
     }
-
     .search-input {
         width: 100%;
         padding: 12px 16px 12px 48px;
@@ -330,13 +305,11 @@
         border-radius: 16px;
         padding: 24px;
     }
-
     .table-responsive-wrapper {
         width: 100%;
         overflow-x: auto;
         -webkit-overflow-scrolling: touch;
     }
-
     .directory-data-table {
         width: 100%;
         border-collapse: collapse;
@@ -390,15 +363,12 @@
         font-weight: 700;
         color: #1A1A1A;
     }
-    
     .mono-text {
         font-family: 'JetBrains Mono', monospace;
         font-weight: 400;
         font-size: 0.85rem;
     }
-    .course-text, .email-text {
-        font-weight: 600;
-    }
+    .course-text, .email-text { font-weight: 600; }
     .borrowed-count-cell {
         text-align: center;
         font-weight: 800;
@@ -406,7 +376,6 @@
         font-size: 0.95rem;
     }
 
-    /* Custom Status Badges Matrix Context */
     .status-badge {
         padding: 6px 14px;
         border-radius: 9999px;
@@ -432,17 +401,33 @@
         justify-content: center;
         transition: opacity 0.15s ease;
     }
-    .action-btn:hover {
-        opacity: 0.7;
-    }
-    .action-btn img {
-        width: 20px;
-        height: 20px;
-    }
+    .action-btn:hover { opacity: 0.7; }
+    .action-btn img { width: 20px; height: 20px; }
 
-    .icon-wrapper {
-        width: 42px;
-        height: 42px;
-        margin-bottom: 16px;
+    .catalog-pagination-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 24px;
+        padding-top: 12px;
+        flex-wrap: wrap;
+        gap: 12px;
     }
+    .text-zinc { color: #71717A; font-size: 0.85rem; font-weight: 600; }
+    .pagination-nav { display: flex; align-items: center; gap: 8px; }
+    .page-link {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #71717A;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.15s ease;
+    }
+    .page-link:hover { background-color: #F4F1EA; color: #1A1A1A; }
+    .page-link.active { background-color: #FF5722; color: #FFFFFF; }
 </style>
