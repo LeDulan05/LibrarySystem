@@ -41,160 +41,119 @@
                 <!-- Current Loans List -->
                 <div id="list-current" class="books-list">
                     
-                    <!-- Dummy Active -->
-                    <div class="loan-card active-border">
-                        <div class="loan-cover bg-cover-blue">
-                            <div class="cover-badge">AI <span class="availability-dot dot-available"></span></div>
-                            <div class="cover-title">Introduction to Artificial Intelligence</div>
-                            <div class="cover-author">Stuart Russell</div>
-                        </div>
+                    @forelse($transactions->where('status', '!=', 'returned') as $loan)
+                    @php
+                        $book = $loan->book;
+                        // For a clean UI look on placeholders
+                        $colors = ['bg-cover-blue', 'bg-cover-orange', 'bg-cover-purple', 'bg-cover-green', 'bg-cover-red'];
+                        $bgColor = $colors[$book->id % count($colors)];
+                        
+                        $isOverdue = $loan->status === 'active' && $loan->due_date && \Carbon\Carbon::parse($loan->due_date)->isPast();
+                        $borderClass = $isOverdue ? 'overdue-border' : 'active-border';
+                        
+                        if ($loan->status === 'pending') {
+                            $statusPill = 'status-active';
+                            $statusText = 'Pending Approval';
+                        } elseif ($loan->status === 'active') {
+                            $statusPill = $isOverdue ? 'status-overdue' : 'status-active';
+                            $statusText = $isOverdue ? 'Overdue' : 'Active';
+                        } else {
+                            $statusPill = 'status-overdue';
+                            $statusText = ucfirst($loan->status);
+                        }
+                    @endphp
+                    <div class="loan-card {{ $borderClass }}">
+                        @if($book->book_cover)
+                            <img src="{{ $book->book_cover }}" alt="Cover" class="loan-cover" style="object-fit: cover; padding: 0; border: none;">
+                        @else
+                            <div class="loan-cover {{ $bgColor }}">
+                                <div class="cover-badge">{{ strtoupper(Str::limit($book->category->name ?? 'Category', 10)) }}</div>
+                                <div class="cover-title">{{ Str::limit($book->title, 40) }}</div>
+                                <div class="cover-author">{{ Str::limit($book->author, 20) }}</div>
+                            </div>
+                        @endif
                         <div class="loan-details">
                             <div>
-                                <span class="category-pill">AI</span>
-                                <h3 class="book-title">Introduction to Artificial Intelligence</h3>
-                                <div class="book-author">Stuart Russell</div>
+                                <span class="category-pill">{{ $book->category->name ?? 'Category' }}</span>
+                                <h3 class="book-title">{{ $book->title }}</h3>
+                                <div class="book-author">{{ $book->author }}</div>
                             </div>
                             <div class="loan-meta">
                                 <div>
                                     <div class="meta-label">Borrowed</div>
-                                    <div class="meta-value">Dec 10, 2024</div>
+                                    <div class="meta-value">{{ $loan->borrow_date ? \Carbon\Carbon::parse($loan->borrow_date)->format('M j, Y') : 'Pending' }}</div>
                                 </div>
                                 <div>
                                     <div class="meta-label">Due Date</div>
-                                    <div class="meta-value">Dec 24, 2024</div>
+                                    <div class="meta-value">{{ $loan->due_date ? \Carbon\Carbon::parse($loan->due_date)->format('M j, Y') : 'Pending' }}</div>
                                 </div>
                                 <div>
                                     <div class="meta-label">Time Left</div>
-                                    <div class="meta-value text-green">4d left</div>
+                                    @if($loan->status === 'pending')
+                                        <div class="meta-value text-gray-500">Awaiting Admin</div>
+                                    @elseif($loan->due_date)
+                                        @if($isOverdue)
+                                            <div class="meta-value text-red">{{ \Carbon\Carbon::parse($loan->due_date)->diffInDays(now()) }}d overdue</div>
+                                        @else
+                                            <div class="meta-value text-green">{{ \Carbon\Carbon::parse($loan->due_date)->diffInDays(now()) }}d left</div>
+                                        @endif
+                                    @endif
                                 </div>
                             </div>
                         </div>
                         <div class="loan-status">
-                            <span class="status-pill status-active">Active</span>
+                            <span class="status-pill {{ $statusPill }}">{{ $statusText }}</span>
                         </div>
                     </div>
-
-                    <!-- Dummy Overdue -->
-                    <div class="loan-card overdue-border">
-                        <div class="loan-cover bg-cover-orange">
-                            <div class="cover-badge">PROGRAMMING <span class="availability-dot dot-available"></span></div>
-                            <div class="cover-title">Clean Code: A Handbook of Agile Software Craftsmanship</div>
-                            <div class="cover-author">Robert C. Martin</div>
-                        </div>
-                        <div class="loan-details">
-                            <div>
-                                <span class="category-pill">Programming</span>
-                                <h3 class="book-title">Clean Code: A Handbook of Agile Software Craftsmanship</h3>
-                                <div class="book-author">Robert C. Martin</div>
-                            </div>
-                            <div class="loan-meta">
-                                <div>
-                                    <div class="meta-label">Borrowed</div>
-                                    <div class="meta-value">Nov 30, 2024</div>
-                                </div>
-                                <div>
-                                    <div class="meta-label">Due Date</div>
-                                    <div class="meta-value">Dec 14, 2024</div>
-                                </div>
-                                <div>
-                                    <div class="meta-label">Time Left</div>
-                                    <div class="meta-value text-red">6d overdue</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="loan-status">
-                            <span class="status-pill status-overdue">Overdue</span>
-                        </div>
-                    </div>
+                    @empty
+                        <div class="text-sm text-gray-500">You don't have any active loans right now.</div>
+                    @endforelse
 
                 </div>
 
                 <!-- Borrow History List -->
                 <div id="list-history" class="books-list" style="display:none;">
                     
-                    <!-- Dummy Returned -->
-                    <div class="loan-card">
-                        <div class="loan-cover bg-cover-purple">
-                            <div class="cover-title" style="margin-top:20px;">Computer Networks</div>
-                            <div class="cover-author">Andrew S. Tanenbaum</div>
-                        </div>
+                    @forelse($transactions->where('status', 'returned') as $loan)
+                    @php
+                        $book = $loan->book;
+                        $colors = ['bg-cover-blue', 'bg-cover-orange', 'bg-cover-purple', 'bg-cover-green', 'bg-cover-red'];
+                        $bgColor = $colors[$book->id % count($colors)];
+                        $returnedLate = $loan->due_date && $loan->return_date && \Carbon\Carbon::parse($loan->return_date)->greaterThan(\Carbon\Carbon::parse($loan->due_date));
+                    @endphp
+                    <div class="loan-card {{ $returnedLate ? 'overdue-border' : '' }}">
+                        @if($book->book_cover)
+                            <img src="{{ $book->book_cover }}" alt="Cover" class="loan-cover" style="object-fit: cover; padding: 0; border: none;">
+                        @else
+                            <div class="loan-cover {{ $bgColor }}">
+                                <div class="cover-title" style="margin-top:20px;">{{ Str::limit($book->title, 40) }}</div>
+                                <div class="cover-author">{{ Str::limit($book->author, 20) }}</div>
+                            </div>
+                        @endif
                         <div class="loan-details">
                             <div>
-                                <span class="category-pill">Networking</span>
-                                <h3 class="book-title">Computer Networks</h3>
-                                <div class="book-author">Andrew S. Tanenbaum</div>
+                                <span class="category-pill">{{ $book->category->name ?? 'Category' }}</span>
+                                <h3 class="book-title">{{ $book->title }}</h3>
+                                <div class="book-author">{{ $book->author }}</div>
                             </div>
                             <div class="loan-meta">
                                 <div>
                                     <div class="meta-label">Borrowed</div>
-                                    <div class="meta-value">Nov 1, 2024</div>
+                                    <div class="meta-value">{{ $loan->borrow_date ? \Carbon\Carbon::parse($loan->borrow_date)->format('M j, Y') : 'Unknown' }}</div>
                                 </div>
                                 <div style="margin-left: 100px;">
                                     <div class="meta-label">Returned</div>
-                                    <div class="meta-value">Nov 15, 2024</div>
+                                    <div class="meta-value">{{ $loan->return_date ? \Carbon\Carbon::parse($loan->return_date)->format('M j, Y') : 'Unknown' }}</div>
                                 </div>
                             </div>
                         </div>
                         <div class="loan-status">
-                            <span class="status-pill status-returned">Returned</span>
+                            <span class="status-pill {{ $returnedLate ? 'status-late' : 'status-returned' }}">{{ $returnedLate ? 'Returned Late' : 'Returned' }}</span>
                         </div>
                     </div>
-
-                    <!-- Dummy Returned -->
-                    <div class="loan-card">
-                        <div class="loan-cover bg-cover-green">
-                            <div class="cover-title" style="margin-top:20px;">Database System Concepts</div>
-                            <div class="cover-author">Abraham Silberschatz</div>
-                        </div>
-                        <div class="loan-details">
-                            <div>
-                                <span class="category-pill">Database</span>
-                                <h3 class="book-title">Database System Concepts</h3>
-                                <div class="book-author">Abraham Silberschatz</div>
-                            </div>
-                            <div class="loan-meta">
-                                <div>
-                                    <div class="meta-label">Borrowed</div>
-                                    <div class="meta-value">Oct 5, 2024</div>
-                                </div>
-                                <div style="margin-left: 100px;">
-                                    <div class="meta-label">Returned</div>
-                                    <div class="meta-value">Oct 19, 2024</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="loan-status">
-                            <span class="status-pill status-returned">Returned</span>
-                        </div>
-                    </div>
-
-                    <!-- Dummy Returned Late -->
-                    <div class="loan-card overdue-border">
-                        <div class="loan-cover bg-cover-red">
-                            <div class="cover-title" style="margin-top:20px;">Cybersecurity Essentials</div>
-                            <div class="cover-author">Charles J. Brooks</div>
-                        </div>
-                        <div class="loan-details">
-                            <div>
-                                <span class="category-pill">Cybersecurity</span>
-                                <h3 class="book-title">Cybersecurity Essentials</h3>
-                                <div class="book-author">Charles J. Brooks</div>
-                            </div>
-                            <div class="loan-meta">
-                                <div>
-                                    <div class="meta-label">Borrowed</div>
-                                    <div class="meta-value">Sep 10, 2024</div>
-                                </div>
-                                <div style="margin-left: 100px;">
-                                    <div class="meta-label">Returned</div>
-                                    <div class="meta-value">Sep 25, 2024</div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="loan-status">
-                            <span class="status-pill status-late">Returned Late</span>
-                        </div>
-                    </div>
+                    @empty
+                        <div class="text-sm text-gray-500">You don't have any borrow history yet.</div>
+                    @endforelse
 
                 </div>
 

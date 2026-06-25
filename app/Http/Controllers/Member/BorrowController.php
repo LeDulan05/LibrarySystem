@@ -16,16 +16,19 @@ class BorrowController extends Controller
         return view('user.borrowedPage', compact('transactions'));
     }
 
-    // TODO: creates a transaction row with status "pending", does NOT
-    // touch available_copies yet, that only happens once admin approves.
-    // This is the "Borrow Request Sent" step in the flow diagram, matches
-    // the "Book Borrow Confirmation" screen on success.
     public function store(Request $request, Book $book)
     {
         if (! $book->isAvailable()) {
             return response()->json(['stub' => 'borrow blocked, no copies left'], 422);
         }
 
-        return response()->json(['stub' => 'borrow request created, status pending']);
+        // Create transaction
+        $request->user()->transactions()->create([
+            'book_id' => $book->id,
+            'status' => 'pending',
+            // borrow_date and due_date will be set by admin upon approval
+        ]);
+
+        return response()->json(['success' => true]);
     }
 }

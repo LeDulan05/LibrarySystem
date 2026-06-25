@@ -62,7 +62,7 @@
                             <i class="bi bi-book"></i>
                         </div>
                         <div class="metric-info">
-                            <div class="metric-value">5</div>
+                            <div class="metric-value">{{ $user->transactions->count() }}</div>
                             <div class="metric-label">Total Books Borrowed</div>
                         </div>
                     </div>
@@ -72,7 +72,7 @@
                             <i class="bi bi-clock"></i>
                         </div>
                         <div class="metric-info">
-                            <div class="metric-value">1</div>
+                            <div class="metric-value">{{ $user->transactions->where('status', 'active')->whereNotNull('due_date')->filter(fn($t) => \Carbon\Carbon::parse($t->due_date)->isPast() || \Carbon\Carbon::parse($t->due_date)->diffInDays(now()) <= 7)->count() }}</div>
                             <div class="metric-label">Books Due This Week</div>
                         </div>
                     </div>
@@ -92,8 +92,8 @@
                             <i class="bi bi-calendar"></i>
                         </div>
                         <div class="metric-info">
-                            <div class="metric-value">1</div>
-                            <div class="metric-label">Reservations</div>
+                            <div class="metric-value">{{ $user->reservations->where('status', 'pending')->count() }}</div>
+                            <div class="metric-label">Pending Reservations</div>
                         </div>
                     </div>
                 </div>
@@ -104,52 +104,55 @@
                     <div class="recent-activity-panel">
                         <div class="panel-header">
                             <h2>Recent Activity</h2>
-                            <a href="#" class="view-all-link">View All</a>
+                            <a href="{{ route('borrowed') }}" class="view-all-link">View All</a>
                         </div>
                         <div class="activity-list">
-                            <div class="activity-item">
-                                <div class="activity-icon-circle text-green bg-green-light">
-                                    <i class="bi bi-check2"></i>
-                                </div>
-                                <div class="activity-details">
-                                    <div class="activity-title">Introduction to Artificial Intelligence</div>
-                                    <div class="activity-meta">Borrow Approved &middot; Dec 10, 2024</div>
-                                </div>
-                                <div class="activity-status badge-approved">Approved</div>
-                            </div>
+                            @php
+                                $recentActivity = collect();
+                                foreach($user->transactions as $t) {
+                                    $recentActivity->push(['type' => 'borrow', 'item' => $t, 'date' => $t->created_at]);
+                                }
+                                foreach($user->reservations as $r) {
+                                    $recentActivity->push(['type' => 'reserve', 'item' => $r, 'date' => $r->created_at]);
+                                }
+                                $recentActivity = $recentActivity->sortByDesc('date')->take(4);
+                            @endphp
 
-                            <div class="activity-item">
-                                <div class="activity-icon-circle text-yellow bg-yellow-light">
-                                    <i class="bi bi-clock"></i>
+                            @forelse($recentActivity as $activity)
+                                @php
+                                    $item = $activity['item'];
+                                    $isBorrow = $activity['type'] === 'borrow';
+                                    
+                                    if ($item->status === 'approved' || $item->status === 'active' || $item->status === 'returned' || $item->status === 'fulfilled') {
+                                        $iconColor = 'text-green';
+                                        $iconBg = 'bg-green-light';
+                                        $icon = 'bi-check2';
+                                        $badgeClass = 'badge-approved';
+                                    } elseif ($item->status === 'pending') {
+                                        $iconColor = 'text-yellow';
+                                        $iconBg = 'bg-yellow-light';
+                                        $icon = 'bi-clock';
+                                        $badgeClass = 'badge-pending';
+                                    } else {
+                                        $iconColor = 'text-red';
+                                        $iconBg = 'bg-red-light';
+                                        $icon = 'bi-x';
+                                        $badgeClass = 'badge-rejected';
+                                    }
+                                @endphp
+                                <div class="activity-item">
+                                    <div class="activity-icon-circle {{ $iconColor }} {{ $iconBg }}">
+                                        <i class="bi {{ $icon }}"></i>
+                                    </div>
+                                    <div class="activity-details">
+                                        <div class="activity-title">{{ $item->book->title }}</div>
+                                        <div class="activity-meta">{{ $isBorrow ? 'Borrow' : 'Reservation' }} {{ ucfirst($item->status) }} &middot; {{ $item->created_at->format('M j, Y') }}</div>
+                                    </div>
+                                    <div class="activity-status {{ $badgeClass }}">{{ ucfirst($item->status) }}</div>
                                 </div>
-                                <div class="activity-details">
-                                    <div class="activity-title">Clean Code</div>
-                                    <div class="activity-meta">Reservation Pending &middot; Dec 8, 2024</div>
-                                </div>
-                                <div class="activity-status badge-pending">Pending</div>
-                            </div>
-
-                            <div class="activity-item">
-                                <div class="activity-icon-circle text-red bg-red-light">
-                                    <i class="bi bi-x"></i>
-                                </div>
-                                <div class="activity-details">
-                                    <div class="activity-title">Database System Concepts</div>
-                                    <div class="activity-meta">Borrow Rejected &middot; Dec 1, 2024</div>
-                                </div>
-                                <div class="activity-status badge-rejected">Rejected</div>
-                            </div>
-
-                            <div class="activity-item">
-                                <div class="activity-icon-circle text-green bg-green-light">
-                                    <i class="bi bi-check2"></i>
-                                </div>
-                                <div class="activity-details">
-                                    <div class="activity-title">Python for Data Analysis</div>
-                                    <div class="activity-meta">Reservation Approved &middot; Nov 28, 2024</div>
-                                </div>
-                                <div class="activity-status badge-approved">Approved</div>
-                            </div>
+                            @empty
+                                <div class="text-sm text-gray-500">No recent activity.</div>
+                            @endforelse
                         </div>
                     </div>
 
