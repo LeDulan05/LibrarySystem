@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 
 class BorrowController extends Controller
 {
-    // TODO: matches "My Borrowed Books" screen
     public function index(Request $request)
     {
         $transactions = $request->user()->transactions()->with('book')->get();
@@ -30,5 +29,20 @@ class BorrowController extends Controller
         ]);
 
         return response()->json(['success' => true]);
+    }
+
+    public function destroy(Request $request, \App\Models\Transaction $transaction)
+    {
+        // Ensure user owns this transaction
+        if ($transaction->user_id !== $request->user()->id) {
+            abort(403);
+        }
+
+        // Only allow canceling if pending
+        if ($transaction->status === 'pending') {
+            $transaction->delete();
+        }
+
+        return redirect()->back();
     }
 }

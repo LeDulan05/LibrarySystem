@@ -103,6 +103,13 @@
                         </div>
                         <div class="loan-status">
                             <span class="status-pill {{ $statusPill }}">{{ $statusText }}</span>
+                            @if($loan->status === 'pending')
+                                <button type="button" class="btn-cancel-pill" onclick="openCancelModal({{ $loan->id }}, '{{ addslashes($book->title) }}')">Cancel Request</button>
+                                <form id="cancel-form-{{ $loan->id }}" method="POST" action="{{ route('borrow.destroy', $loan->id) }}" style="display: none;">
+                                    @csrf
+                                    @method('DELETE')
+                                </form>
+                            @endif
                         </div>
                     </div>
                     @empty
@@ -161,6 +168,23 @@
         </main>
     </div>
 
+    <!-- Cancel Modal Overlay -->
+    <div id="cancelModal" class="modal-overlay" style="display:none;">
+        <div class="modal-content">
+            <div class="modal-icon-container bg-red-light text-red">
+                <i class="bi bi-x-circle"></i>
+            </div>
+            
+            <h2 class="modal-title">Cancel Request?</h2>
+            <p class="modal-desc" id="cancelModalText">Are you sure you want to cancel this borrow request?</p>
+            
+            <div class="modal-actions">
+                <button type="button" class="btn-modal-cancel" onclick="closeCancelModal()">Keep it</button>
+                <button type="button" class="btn-modal-danger" onclick="confirmCancel()">Yes, Cancel</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         function switchTab(tabName) {
             // Reset buttons
@@ -174,6 +198,25 @@
             // Show selected
             document.getElementById('btn-' + tabName).classList.add('active');
             document.getElementById('list-' + tabName).style.display = 'flex';
+        }
+
+        let currentCancelId = null;
+
+        function openCancelModal(id, title) {
+            currentCancelId = id;
+            document.getElementById('cancelModalText').innerText = `Cancel borrow request for "${title}"?`;
+            document.getElementById('cancelModal').style.display = 'flex';
+        }
+
+        function closeCancelModal() {
+            currentCancelId = null;
+            document.getElementById('cancelModal').style.display = 'none';
+        }
+
+        function confirmCancel() {
+            if (currentCancelId) {
+                document.getElementById('cancel-form-' + currentCancelId).submit();
+            }
         }
     </script>
 </body>
@@ -196,6 +239,36 @@
     .profile-avatar { width: 40px; height: 40px; background-color: #E85D22; color: white; font-weight: 700; font-size: 14px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
 
     .canvas-content { padding: 32px 40px; flex: 1; max-width: 1400px; margin: 0 auto; width: 100%; }
+
+    /* Modal Styles */
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+    .modal-content { background: white; width: 100%; max-width: 440px; border-radius: 24px; padding: 40px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+    .modal-icon-container { width: 72px; height: 72px; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 24px auto; }
+    .bg-red-light { background-color: #FEE2E2; }
+    .text-red { color: #DC2626; }
+    .modal-title { font-size: 1.5rem; font-weight: 800; color: #1A1A1A; margin-bottom: 8px; }
+    .modal-desc { font-size: 0.95rem; color: #71717A; margin-bottom: 32px; line-height: 1.5; }
+    .modal-actions { display: flex; gap: 16px; }
+    .modal-actions button { flex: 1; padding: 14px; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: opacity 0.2s; }
+    .btn-modal-cancel { background: white; border: 1px solid #E4E4E7; color: #3F3F46; }
+    .btn-modal-cancel:hover { background: #F4F4F5; }
+    .btn-modal-danger { background: #DC2626; border: none; color: white; }
+    .btn-modal-danger:hover { opacity: 0.9; }
+
+    .btn-cancel-pill {
+        padding: 6px 16px;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        background-color: transparent;
+        color: #DC2626;
+        border: 1px solid #DC2626;
+        cursor: pointer;
+        transition: all 0.2s;
+        width: 100%;
+        text-align: center;
+    }
+    .btn-cancel-pill:hover { background-color: #FEE2E2; }
 
     /* Tabs */
     .tabs-container {
@@ -292,8 +365,10 @@
     .loan-status {
         flex-shrink: 0;
         display: flex;
-        align-items: flex-start;
+        flex-direction: column;
+        align-items: flex-end;
         height: 100px;
+        gap: 8px;
     }
     .status-pill {
         padding: 6px 16px;
