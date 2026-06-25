@@ -22,7 +22,21 @@
                     <div class="flex items-center space-x-2">
                         <!-- IskoLib Logo Area -->
                         <div class="text-3xl font-bold font-serif tracking-wide flex items-center">
-                            <span class="mr-2 bg-white text-[#33411b] p-1 rounded-sm text-xl flex items-center justify-center">🎓</span> IskoLib
+                            <svg width="48" height="48" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" class="mr-2">
+                                <!-- Flag Pole -->
+                                <rect x="30" y="4" width="4" height="18" fill="#FAF6EE"/>
+                                <!-- Flag -->
+                                <path d="M34 6H46C48 6 48 10 46 12H34V6Z" fill="#FAF6EE"/>
+                                <!-- Building -->
+                                <path fill-rule="evenodd" clip-rule="evenodd" d="M32 18L10 38H16V60H48V38H54L32 18ZM32 28C28.686 28 26 30.686 26 34C26 37.314 28.686 40 32 40C35.314 40 38 37.314 38 34C38 30.686 35.314 28 32 28Z" fill="#FAF6EE"/>
+                                <!-- Top Book Pages -->
+                                <path d="M8 48C18 42 26 46 31.5 50L31.5 54C26 50 18 46 8 52V48Z" fill="#F05C0A"/>
+                                <path d="M56 48C46 42 38 46 32.5 50L32.5 54C38 50 46 46 56 52V48Z" fill="#F05C0A"/>
+                                <!-- Bottom Book Pages -->
+                                <path d="M8 55C18 49 26 53 31.5 57L31.5 60C26 56 18 52 8 58V55Z" fill="#F05C0A"/>
+                                <path d="M56 55C46 49 38 53 32.5 57L32.5 60C38 56 46 52 56 58V55Z" fill="#F05C0A"/>
+                            </svg>
+                            IskoLib
                         </div>
                     </div>
                 </div>
