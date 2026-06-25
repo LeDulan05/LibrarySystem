@@ -160,41 +160,26 @@
                     <div class="recommended-books-panel">
                         <h2>Recommended Books</h2>
                         <div class="books-list">
-                            <div class="book-card">
-                                <div class="book-cover bg-cover-blue">
-                                    <div class="book-cover-title">Introduction to Artificial Intelligence</div>
-                                    <div class="book-cover-author">Stuart Russell</div>
-                                </div>
-                                <div class="book-title">Introduction to Artificial...</div>
-                                <div class="book-author">Stuart Russell</div>
-                            </div>
-
-                            <div class="book-card">
-                                <div class="book-cover bg-cover-orange">
-                                    <div class="book-cover-title">Clean Code: A Handbook of Agile Software</div>
-                                    <div class="book-cover-author">Robert C. Martin</div>
-                                </div>
-                                <div class="book-title">Clean Code: A Handbook of...</div>
-                                <div class="book-author">Robert C. Martin</div>
-                            </div>
-
-                            <div class="book-card">
-                                <div class="book-cover bg-cover-purple">
-                                    <div class="book-cover-title">Computer Networks</div>
-                                    <div class="book-cover-author">Andrew S. Tanenbaum</div>
-                                </div>
-                                <div class="book-title">Computer Networks</div>
-                                <div class="book-author">Andrew S. Tanenbaum</div>
-                            </div>
-
-                            <div class="book-card">
-                                <div class="book-cover bg-cover-green">
-                                    <div class="book-cover-title">Database System Concepts</div>
-                                    <div class="book-cover-author">Abraham Silberschatz</div>
-                                </div>
-                                <div class="book-title">Database System...</div>
-                                <div class="book-author">Abraham Silberschatz</div>
-                            </div>
+                            @php
+                                $colors = ['bg-cover-blue', 'bg-cover-orange', 'bg-cover-purple', 'bg-cover-green', 'bg-cover-red', 'bg-cover-yellow'];
+                            @endphp
+                            @foreach($recommendedBooks as $book)
+                            @php
+                                $bgColor = $colors[$book->id % count($colors)];
+                            @endphp
+                            <a href="{{ route('library.show', $book->id) }}" class="book-card" style="text-decoration: none; color: inherit;">
+                                @if($book->book_cover)
+                                    <img src="{{ asset('storage/' . $book->book_cover) }}" alt="Cover" class="book-cover" style="object-fit: cover; padding: 0; border: none;">
+                                @else
+                                    <div class="book-cover {{ $bgColor }}">
+                                        <div class="book-cover-title">{{ Str::limit($book->title, 40) }}</div>
+                                        <div class="book-cover-author">{{ Str::limit($book->author, 20) }}</div>
+                                    </div>
+                                @endif
+                                <div class="book-title">{{ Str::limit($book->title, 30) }}</div>
+                                <div class="book-author">{{ Str::limit($book->author, 20) }}</div>
+                            </a>
+                            @endforeach
                         </div>
                     </div>
                 </div>

@@ -64,7 +64,7 @@
                     @endphp
                     <div class="loan-card {{ $borderClass }}">
                         @if($book->book_cover)
-                            <img src="{{ $book->book_cover }}" alt="Cover" class="loan-cover" style="object-fit: cover; padding: 0; border: none;">
+                            <img src="{{ asset('storage/' . $book->book_cover) }}" alt="Cover" class="loan-cover" style="object-fit: cover; padding: 0; border: none;">
                         @else
                             <div class="loan-cover {{ $bgColor }}">
                                 <div class="cover-badge">{{ strtoupper(Str::limit($book->category->name ?? 'Category', 10)) }}</div>
@@ -123,7 +123,7 @@
                     @endphp
                     <div class="loan-card {{ $returnedLate ? 'overdue-border' : '' }}">
                         @if($book->book_cover)
-                            <img src="{{ $book->book_cover }}" alt="Cover" class="loan-cover" style="object-fit: cover; padding: 0; border: none;">
+                            <img src="{{ asset('storage/' . $book->book_cover) }}" alt="Cover" class="loan-cover" style="object-fit: cover; padding: 0; border: none;">
                         @else
                             <div class="loan-cover {{ $bgColor }}">
                                 <div class="cover-title" style="margin-top:20px;">{{ Str::limit($book->title, 40) }}</div>

@@ -86,7 +86,7 @@
                     @endphp
                     <div class="reservation-card">
                         @if($book->book_cover)
-                            <img src="{{ $book->book_cover }}" alt="Cover" class="res-cover" style="object-fit: cover; padding: 0; border: none;">
+                            <img src="{{ asset('storage/' . $book->book_cover) }}" alt="Cover" class="res-cover" style="object-fit: cover; padding: 0; border: none;">
                         @else
                             <div class="res-cover {{ $bgColor }}">
                                 <div class="cover-badge">{{ strtoupper(Str::limit($book->category->name ?? 'Category', 10)) }}</div>
