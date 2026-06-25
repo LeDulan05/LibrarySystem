@@ -12,6 +12,28 @@ Route::get('/dashboard', function () {
     return view('user.overviewPage');
 })->middleware(['auth', 'verified'])->name('dashboard');
 
+Route::get('/notifications', function () {
+    return view('user.notificationsPage');
+})->middleware(['auth', 'verified'])->name('notifications');
+
+use App\Http\Controllers\Member\CatalogController;
+use App\Http\Controllers\Member\BorrowController;
+use App\Http\Controllers\Member\ReservationController;
+
+Route::get('/library', [CatalogController::class, 'index'])->middleware(['auth', 'verified'])->name('library');
+Route::get('/library/{book}', [CatalogController::class, 'show'])->middleware(['auth', 'verified'])->name('library.show');
+Route::get('/library/{book}/details', [CatalogController::class, 'details'])->middleware(['auth', 'verified'])->name('library.details');
+
+Route::get('/borrowed', [BorrowController::class, 'index'])->middleware(['auth', 'verified'])->name('borrowed');
+
+use App\Http\Controllers\Member\PenaltyController;
+
+Route::get('/reservations', [ReservationController::class, 'index'])->middleware(['auth', 'verified'])->name('reservations');
+Route::get('/penalties', [PenaltyController::class, 'index'])->middleware(['auth', 'verified'])->name('penalties');
+
+Route::post('/library/{book}/borrow', [BorrowController::class, 'store'])->middleware(['auth', 'verified'])->name('library.borrow');
+Route::post('/library/{book}/reserve', [ReservationController::class, 'store'])->middleware(['auth', 'verified'])->name('library.reserve');
+
 Route::middleware('auth')->group(function () {
     Route::get('/profile', [ProfileController::class, 'edit'])->name('profile.edit');
     Route::patch('/profile', [ProfileController::class, 'update'])->name('profile.update');

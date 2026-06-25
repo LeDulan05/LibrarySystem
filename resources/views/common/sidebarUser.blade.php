@@ -12,37 +12,37 @@
     </div>
 
     <nav class="sidebar-nav">
-        <div class="nav-item active">
+        <a href="{{ route('dashboard') }}" class="nav-item {{ request()->routeIs('dashboard') ? 'active' : '' }}" style="text-decoration:none;">
             <i class="bi bi-grid sidebar-icon"></i>
             <span>Overview</span>
-        </div>
+        </a>
 
-        <div class="nav-item">
+        <a href="{{ route('library') }}" class="nav-item {{ request()->routeIs('library') ? 'active' : '' }}" style="text-decoration:none;">
             <i class="bi bi-book sidebar-icon"></i>
             <span>Library</span>
-        </div>
+        </a>
 
-        <div class="nav-item">
+        <a href="{{ route('borrowed') }}" class="nav-item {{ request()->routeIs('borrowed') ? 'active' : '' }}" style="text-decoration:none;">
             <i class="bi bi-journal-text sidebar-icon"></i>
             <span>Borrowed</span>
-        </div>
+        </a>
 
-        <div class="nav-item">
+        <a href="{{ route('reservations') }}" class="nav-item {{ request()->routeIs('reservations') ? 'active' : '' }}" style="text-decoration:none;">
             <i class="bi bi-calendar-event sidebar-icon"></i>
             <span>Reservations</span>
-        </div>
+        </a>
 
-        <div class="nav-item">
+        <a href="{{ route('penalties') }}" class="nav-item {{ request()->routeIs('penalties') ? 'active' : '' }}" style="text-decoration:none;">
             <i class="bi bi-exclamation-circle sidebar-icon"></i>
             <span>Penalties</span>
-        </div>
+        </a>
     </nav>
 
     <div class="sidebar-footer">
-        <div class="nav-item">
+        <a href="{{ route('profile.edit') }}" class="nav-item {{ request()->routeIs('profile.edit') ? 'active' : '' }}" style="text-decoration:none;">
             <i class="bi bi-gear sidebar-icon"></i>
             <span>Settings</span>
-        </div>
+        </a>
         <div class="nav-item btn-signout">
             <i class="bi bi-box-arrow-right sidebar-icon"></i>
             <span>Sign Out</span>

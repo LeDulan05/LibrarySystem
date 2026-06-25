@@ -11,19 +11,37 @@ class CatalogController extends Controller
     // TODO: searchable, filterable by category, matches "Book Catalog" screen
     public function index(Request $request)
     {
-        $books = Book::with('category')->get();
+        $query = Book::with('category');
 
-        return response()->json(['stub' => 'catalog index', 'books' => $books]);
+        if ($request->filled('search')) {
+            $search = $request->input('search');
+            $query->where(function($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                  ->orWhere('author', 'like', "%{$search}%")
+                  ->orWhere('isbn', 'like', "%{$search}%");
+            });
+        }
+
+        if ($request->filled('sort')) {
+            $sort = $request->input('sort') === 'desc' ? 'desc' : 'asc';
+            $query->orderBy('title', $sort);
+        } else {
+            // default order
+            $query->orderBy('created_at', 'desc');
+        }
+
+        $books = $query->get();
+
+        return view('user.libraryPage', compact('books'));
     }
 
-    // TODO: matches "Book Details" screen, this is where the
-    // borrow-vs-reserve button decision happens: $book->isAvailable()
     public function show(Book $book)
     {
-        return response()->json([
-            'stub' => 'book details',
-            'book' => $book,
-            'available' => $book->isAvailable(),
-        ]);
+        return view('user.bookCatalogCard', compact('book'));
+    }
+
+    public function details(Book $book)
+    {
+        return view('user.bookDetails', compact('book'));
     }
 }

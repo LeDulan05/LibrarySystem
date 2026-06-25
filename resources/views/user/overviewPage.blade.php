@@ -19,11 +19,15 @@
             <div class="dashboard-header">
                 <h1 class="dashboard-title">Overview</h1>
                 <div class="header-right">
-                    <div class="notification-icon">
+                    <a href="{{ url('/notifications') }}" class="notification-icon">
                         <i class="bi bi-bell"></i>
                         <span class="notification-badge">2</span>
-                    </div>
-                    <div class="profile-avatar">JD</div>
+                    </a>
+                    @if(Auth::check())
+                        <div class="profile-avatar">{{ strtoupper(substr(Auth::user()->first_name ?? 'J', 0, 1)) }}{{ strtoupper(substr(Auth::user()->last_name ?? 'D', 0, 1)) }}</div>
+                    @else
+                        <div class="profile-avatar">JD</div>
+                    @endif
                 </div>
             </div>
 
@@ -33,8 +37,13 @@
                 <div class="welcome-banner">
                     <div class="welcome-content">
                         <p class="welcome-greeting">Welcome back,</p>
-                        <h2 class="welcome-name">Juan dela Cruz</h2>
-                        <p class="welcome-details">BS Computer Science &middot; Student ID: 2024-00001</p>
+                        @if(Auth::check())
+                            <h2 class="welcome-name">{{ Auth::user()->first_name }} {{ Auth::user()->last_name }}</h2>
+                            <p class="welcome-details">{{ Auth::user()->course ?? 'BS Computer Science' }} &middot; Student ID: {{ Auth::user()->student_id ?? '2024-00001' }}</p>
+                        @else
+                            <h2 class="welcome-name">Juan dela Cruz</h2>
+                            <p class="welcome-details">BS Computer Science &middot; Student ID: 2024-00001</p>
+                        @endif
                         
                         <div class="welcome-notifications">
                             <i class="bi bi-bell-fill"></i>
