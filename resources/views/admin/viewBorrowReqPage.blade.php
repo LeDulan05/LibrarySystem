@@ -29,7 +29,7 @@
                             <span class="label-heading">REQUEST ID</span>
                             <h2 class="mono-id-text">BRW-{{ \Carbon\Carbon::parse($requestData->request_date)->year }}-{{ str_pad($requestData->id, 3, '0', STR_PAD_LEFT) }}</h2>
                         </div>
-                        <span class="status-badge badge-pending">{{ ucfirst($requestData->status) }}</span>
+                        <span class="status-badge badge-{{ $requestData->status }}">{{ ucfirst($requestData->status) }}</span>
                     </div>
 
                     <div class="details-info-grid">
@@ -39,7 +39,7 @@
                         </div>
                         <div class="info-data-cell">
                             <span class="label-heading">STUDENT NUMBER</span>
-                            <span class="value-text mono-text">{{ $requestData->student_number }}</span>
+                            <span class="value-text mono-text">{{ $requestData->student_number ?? 'N/A' }}</span>
                         </div>
                         <div class="info-data-cell grid-col-span-2">
                             <span class="label-heading">BOOK TITLE</span>
@@ -47,18 +47,24 @@
                         </div>
                         <div class="info-data-cell">
                             <span class="label-heading">ISBN</span>
-                            <span class="value-text text-zinc">{{ $requestData->isbn }}</span>
+                            <span class="value-text text-zinc">{{ $requestData->isbn ?? 'N/A' }}</span>
                         </div>
                         <div class="info-data-cell">
                             <span class="label-heading">AVAILABLE COPIES</span>
                             <span class="value-text {{ $requestData->available_copies > 0 ? 'text-green' : 'text-red' }}">
-                                {{ $requestData->available_copies }}
+                                {{ $requestData->available_copies ?? 0 }}
                             </span>
                         </div>
                         <div class="info-data-cell">
                             <span class="label-heading">REQUEST DATE</span>
                             <span class="value-text text-zinc">{{ \Carbon\Carbon::parse($requestData->request_date)->format('M d, Y') }}</span>
                         </div>
+                        @if($requestData->status === 'rejected' && isset($requestData->notes))
+                        <div class="info-data-cell grid-col-span-2">
+                            <span class="label-heading">REJECTION REASON</span>
+                            <span class="value-text text-red">{{ $requestData->notes }}</span>
+                        </div>
+                        @endif
                     </div>
                 </div>
 
@@ -71,6 +77,12 @@
                     <button type="button" class="btn-decision-action btn-reject" onclick="openRejectModal()">
                         <i class="bi bi-x-circle"></i> Reject Request
                     </button>
+                </div>
+                @elseif($requestData->status === 'approved' || $requestData->status === 'active')
+                <div class="actions-decision-row" style="justify-content: center;">
+                    <a href="{{ route('admin.borrow.receipt', $requestData->id) }}" class="btn-decision-action" style="flex: 0 1 auto; padding: 0 32px; background-color: #F4F1EA; color: #1A1A1A; text-decoration: none; border: 1px solid #EAE6DF;">
+                        <i class="bi bi-printer"></i> View Receipt
+                    </a>
                 </div>
                 @endif
             </div>
@@ -184,11 +196,16 @@
     .mono-id-text { font-family: 'JetBrains Mono', monospace; font-size: 1.15rem; font-weight: 700; color: #71717A; }
     .status-badge { padding: 6px 14px; border-radius: 9999px; font-size: 0.75rem; font-weight: 700; display: inline-block; }
     .badge-pending { background-color: #FEF3C6; color: #BB4D00; }
+    .badge-approved { background-color: #DCFCE7; color: #15803D; }
+    .badge-active { background-color: #DCFCE7; color: #15803D; }
+    .badge-rejected { background-color: #FEE2E2; color: #991B1B; }
+    .badge-returned { background-color: #E5E7EB; color: #4B5563; }
 
     /* Grid Layout */
     .details-info-grid { display: grid; grid-template-columns: repeat(2, 1fr); row-gap: 28px; column-gap: 40px; }
     .grid-col-span-2 { grid-column: span 2; }
     .value-text { font-size: 0.95rem; font-weight: 700; color: #1A1A1A; display: block; }
+    .book-title-highlight { font-size: 1.05rem !important; color: #212B05 !important; }
     .mono-text { font-family: 'JetBrains Mono', monospace; font-size: 0.95rem; }
     .text-zinc { color: #71717A; font-weight: 600; }
     .text-green { color: #008236; font-weight: 800; }
@@ -205,7 +222,9 @@
     .modal-overlay { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background-color: rgba(0, 0, 0, 0.4); display: none; align-items: center; justify-content: center; z-index: 10000; opacity: 0; transition: opacity 0.2s ease; }
     .modal-overlay.modal-visible { display: flex !important; opacity: 1; }
     
+    .suspend-modal-card,
     .decision-modal-card { background-color: #FFFFFF; border-radius: 24px; padding: 40px 32px; width: 100%; max-width: 420px; box-shadow: 0 12px 40px rgba(0,0,0,0.15); text-align: center; display: flex; flex-direction: column; align-items: center; transform: scale(0.95); transition: transform 0.2s ease; }
+    .modal-overlay.modal-visible .suspend-modal-card,
     .modal-overlay.modal-visible .decision-modal-card { transform: scale(1); }
 
     .modal-round-icon-frame { width: 64px; height: 64px; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 1.75rem; margin-bottom: 24px; }
