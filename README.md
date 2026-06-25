@@ -35,6 +35,7 @@ php artisan db:seed --class=AdminUserSeeder
 # Scrape using Laravel command 
 php artisan app:scrape-books --count=5
 
+# Start Application
 Terminal 1 - Laravel Server:
 php artisan serve
 
