@@ -17,7 +17,7 @@
         <main class="main-canvas">
             
             <div class="dashboard-header">
-                <h1 class="dashboard-title">Reservations</h1>
+                <h1 class="dashboard-title">Reservation Requests</h1>
                 <div class="profile-avatar">LA</div>
             </div>
 
@@ -43,57 +43,51 @@
                     </div>
                 </div>
 
+                <div class="member-search-container">
+                    <form action="{{ route('admin.reservationRequest') }}" method="GET" class="search-box-wrapper">
+                        <i class="bi bi-search search-icon"></i>
+                        <input type="text" name="search" class="search-input" placeholder="Search reservations by member or book title..." value="{{ request('search') }}" onkeypress="if(event.key === 'Enter') this.form.submit();">
+                    </form>
+                </div>
+
                 <div class="queue-panel">
+                    <h2 class="panel-section-heading">Reservation Queue</h2>
+                    
                     <div class="table-responsive-wrapper">
                         <table class="queue-data-table">
                             <thead>
                                 <tr>
-                                    <th>RES. ID</th>
-                                    <th>MEMBER</th>
-                                    <th>BOOK</th>
+                                    <th>RESERVATION ID</th>
+                                    <th>MEMBER NAME</th>
+                                    <th>BOOK TITLE</th>
                                     <th>RESERVED ON</th>
-                                    <th>PICKUP DATE</th>
                                     <th>STATUS</th>
                                     <th style="width: 140px; text-align: center;">ACTIONS</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse($reservations as $res)
+                                @forelse($reservations as $req)
                                     <tr>
-                                        <td class="mono-text">RES-{{ \Carbon\Carbon::parse($res->created_at)->year }}-{{ str_pad($res->id, 3, '0', STR_PAD_LEFT) }}</td>
-                                        <td class="member-name-text" id="member-name-{{ $res->id }}">{{ $res->member_name }}</td>
-                                        <td class="book-title-text" id="book-title-{{ $res->id }}">{{ $res->book_title }}</td>
-                                        <td class="date-text">{{ \Carbon\Carbon::parse($res->reservation_date ?? $res->created_at)->format('M d, Y') }}</td>
-                                        <td class="date-text">
-                                            {{ $res->hold_expires_at ? \Carbon\Carbon::parse($res->hold_expires_at)->format('M d, Y') : 'Pending Hold' }}
+                                        <td class="mono-text">
+                                            {{ $req->reservation_code ?? 'RES-' . \Carbon\Carbon::parse($req->created_at)->year . '-' . str_pad($req->id, 3, '0', STR_PAD_LEFT) }}
                                         </td>
+                                        <td class="member-name-text">{{ $req->member_name }}</td>
+                                        <td class="book-title-text">{{ $req->book_title }}</td>
+                                        <td class="date-text">{{ \Carbon\Carbon::parse($req->created_at)->format('M d, Y') }}</td>
                                         <td>
-                                            <span class="status-badge badge-{{ $res->status }}">
-                                                {{ ucfirst($res->status) }}
+                                            <span class="status-badge badge-{{ $req->status }}">
+                                                {{ ucfirst($req->status) }}
                                             </span>
                                         </td>
                                         <td class="actions-cell-row">
-                                            <a href="{{ route('admin.reservation.show', $res->id) }}" class="action-btn-view">
+                                            <a href="{{ route('admin.reservation.show', $req->id) }}" class="action-btn-view">
                                                 <img src="{{ asset('AdminAssets/CategoriesAssets/viewIcon.svg') }}" alt="View">
                                             </a>
-                                            
-                                            @if($res->status === 'pending')
-                                                <button type="button" class="action-btn-approve" onclick="triggerApproveModal({{ $res->id }})">
-                                                    <img src="{{ asset('AdminAssets/BorrowAssets/approveIcon.svg') }}" alt="Approve">
-                                                </button>
-                                                <button type="button" class="action-btn-reject" onclick="triggerRejectModal({{ $res->id }})">
-                                                    <img src="{{ asset('AdminAssets/BorrowAssets/rejectIcon.svg') }}" alt="Reject">
-                                                </button>
-                                            @else
-                                                <span style="color: #A1A1AA; font-size: 0.8rem; font-weight: 700;">Processed</span>
-                                            @endif
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="7" class="empty-table-text-row">
-                                            No library book reservation requests currently logged.
-                                        </td>
+                                        <td colspan="6" class="empty-table-text-row">No reservation records match the current filters.</td>
                                     </tr>
                                 @endforelse
                             </tbody>
@@ -102,7 +96,7 @@
 
                     @if ($reservations->hasPages())
                         <div class="catalog-pagination-row">
-                            <div class="text-zinc">
+                            <div class="text-zinc" style="font-size: 0.85rem; font-weight: 600;">
                                 Showing {{ $reservations->firstItem() }}-{{ $reservations->lastItem() }} of {{ $reservations->total() }}
                             </div>
                             <div class="pagination-nav">
@@ -133,68 +127,6 @@
             </div>
         </main>
     </div>
-
-    <div class="modal-overlay" id="approveReservationModalOverlay">
-        <form id="approveForm" method="POST" class="action-modal-card">
-            @csrf
-            <div class="modal-round-icon-frame success-frame"><i class="bi bi-check-circle"></i></div>
-            <h3 class="modal-main-title">Approve Reservation Request?</h3>
-            <p class="modal-warning-body">
-                Confirm approval for <strong id="approveMemberTarget">Member</strong> to reserve <strong id="approveBookTarget">"Book"</strong>.
-            </p>
-            <div class="modal-actions-footer">
-                <button type="button" class="btn-modal-cancel" onclick="closeApproveModal()">Cancel</button>
-                <button type="submit" class="btn-modal-confirm">Confirm</button>
-            </div>
-        </form>
-    </div>
-
-    <div class="modal-overlay" id="rejectReservationModalOverlay">
-        <form id="rejectForm" method="POST" class="action-modal-card">
-            @csrf
-            <div class="modal-round-icon-frame danger-frame"><i class="bi bi-x-circle"></i></div>
-            <h3 class="modal-main-title">Reject Reservation Request?</h3>
-            <p class="modal-warning-body">
-                Reject reservation for <strong id="rejectMemberTarget">Member</strong> &mdash; <strong id="rejectBookTarget">"Book"</strong>?
-            </p>
-            <div class="modal-actions-footer">
-                <button type="button" class="btn-modal-cancel" onclick="closeRejectModal()">Cancel</button>
-                <button type="submit" class="btn-modal-danger">Reject</button>
-            </div>
-        </form>
-    </div>
-
-    <script>
-        function triggerApproveModal(id) {
-            const member = document.getElementById('member-name-' + id).innerText;
-            const book = document.getElementById('book-title-' + id).innerText;
-            
-            document.getElementById('approveMemberTarget').innerText = member;
-            document.getElementById('approveBookTarget').innerText = `"${book}"`;
-            
-            document.getElementById('approveForm').action = "/admin/reservation/" + id + "/approve";
-            document.getElementById('approveReservationModalOverlay').classList.add('modal-visible');
-        }
-
-        function closeApproveModal() {
-            document.getElementById('approveReservationModalOverlay').classList.remove('modal-visible');
-        }
-
-        function triggerRejectModal(id) {
-            const member = document.getElementById('member-name-' + id).innerText;
-            const book = document.getElementById('book-title-' + id).innerText;
-            
-            document.getElementById('rejectMemberTarget').innerText = member;
-            document.getElementById('rejectBookTarget').innerText = `"${book}"`;
-            
-            document.getElementById('rejectForm').action = "/admin/reservation/" + id + "/reject";
-            document.getElementById('rejectReservationModalOverlay').classList.add('modal-visible');
-        }
-
-        function closeRejectModal() {
-            document.getElementById('rejectReservationModalOverlay').classList.remove('modal-visible');
-        }
-    </script>
 </body>
 </html>
 
@@ -215,6 +147,7 @@
         width: 100vw;
         overflow: hidden;
     }
+
     .main-canvas {
         flex: 1;
         background-color: #F9F6F0;
@@ -229,7 +162,7 @@
         background-color: #FFFFFF;
         padding: 20px 40px;
         border-bottom: 1px solid #EAE6DF;
-        flex-wrap: wrap;
+        flex-wrap: wrap; 
         gap: 16px;
     }
     .canvas-content {
@@ -254,6 +187,7 @@
         align-items: center;
         justify-content: center;
     }
+
     .summary-metrics-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -285,12 +219,55 @@
         color: #71717A;
         font-weight: 600;
     }
+
+    .member-search-container {
+        background-color: #FFFFFF;
+        border: 1px solid #EAE6DF;
+        border-radius: 16px;
+        padding: 16px 24px;
+        margin-bottom: 24px;
+        width: 100%;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.01);
+    }
+    .search-box-wrapper {
+        position: relative; 
+        display: flex;
+        align-items: center;
+        width: 100%;
+    }
+    .search-icon {
+        position: absolute;
+        left: 18px; 
+        font-size: 1.1rem;
+        color: #A1A1AA; 
+        pointer-events: none; 
+    }
+    .search-input {
+        width: 100%;
+        padding: 12px 16px 12px 48px;
+        background-color: #F4F1EA;
+        border: none;
+        border-radius: 12px;
+        font-size: 0.925rem;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        color: #1A1A1A;
+        font-weight: 500;
+        outline: none;
+    }
+
     .queue-panel {
         background-color: #FFFFFF;
         border: 1px solid #EAE6DF;
         border-radius: 16px;
         padding: 24px;
         margin-bottom: 24px;
+    }
+    .panel-section-heading {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #1A1A1A;
+        letter-spacing: -0.01em;
+        margin-bottom: 20px;
     }
     .table-responsive-wrapper {
         width: 100%;
@@ -300,7 +277,7 @@
     .queue-data-table {
         width: 100%;
         border-collapse: collapse;
-        min-width: 900px;
+        min-width: 900px; 
     }
     .queue-data-table th {
         background-color: #FDFBF7;
@@ -323,6 +300,8 @@
     .queue-data-table tbody tr:last-child td {
         border-bottom: none;
     }
+
+    /* Column Cell Typography Layouts */
     .mono-text {
         font-family: 'JetBrains Mono', monospace;
         font-weight: 400;
@@ -346,17 +325,21 @@
         padding: 40px 0 !important;
         font-weight: 600;
     }
+
     .status-badge {
         padding: 6px 14px;
         border-radius: 9999px;
         font-size: 0.75rem;
         font-weight: 700;
         display: inline-block;
-        text-transform: capitalize;
     }
-    .badge-pending { background-color: #FEF3C6; color: #BB4D00; }
-    .badge-approved { background-color: #DCFCE7; color: #008236; }
+    .badge-pending { background-color: #FEF3C6; color: #BB4000; } 
+    .badge-approved { background-color: #DCFCE7; color: #008236; } 
     .badge-rejected { background-color: #FFE2E2; color: #C10007; }
+    .badge-fulfilled { background-color: #DCFCE7; color: #008236; }
+    .badge-closed { background-color: #E5E7EB; color: #4B5563; }
+
+    /* Action Controllers */
     .actions-cell-row {
         display: flex;
         align-items: center;
@@ -379,108 +362,7 @@
         width: 20px;
         height: 20px;
     }
-    .modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100vw;
-        height: 100vh;
-        background-color: rgba(0, 0, 0, 0.4);
-        display: none;
-        align-items: center;
-        justify-content: center;
-        z-index: 9999;
-        opacity: 0;
-        transition: opacity 0.2s ease;
-    }
-    .modal-overlay.modal-visible {
-        display: flex;
-        opacity: 1;
-    }
-    .action-modal-card {
-        background-color: #FFFFFF;
-        border-radius: 24px;
-        padding: 32px;
-        width: 100%;
-        max-width: 440px;
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        text-align: center;
-        transform: scale(0.95);
-        transition: transform 0.2s ease;
-    }
-    .modal-overlay.modal-visible .action-modal-card {
-        transform: scale(1);
-    }
-    .modal-round-icon-frame {
-        width: 50px;
-        height: 50px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 1.35rem;
-        margin: 0 auto 16px auto;
-    }
-    .success-frame { background-color: #DCFCE7; color: #008236; }
-    .danger-frame { background-color: #FFE2E2; color: #C10007; }
-    .modal-main-title {
-        font-size: 1.25rem;
-        font-weight: 800;
-        color: #1A1A1A;
-        margin-bottom: 12px;
-        letter-spacing: -0.01em;
-    }
-    .modal-warning-body {
-        font-size: 0.9rem;
-        color: #71717A;
-        line-height: 1.5;
-        margin-bottom: 24px;
-        font-weight: 500;
-    }
-    .modal-warning-body strong {
-        color: #1A1A1A;
-        font-weight: 700;
-    }
-    .modal-actions-footer {
-        display: flex;
-        gap: 12px;
-    }
-    .btn-modal-cancel {
-        flex: 1;
-        height: 44px;
-        background-color: #FFFFFF;
-        border: 1px solid #E5E7EB;
-        border-radius: 12px;
-        font-family: inherit;
-        font-size: 0.9rem;
-        font-weight: 700;
-        color: #4B5563;
-        cursor: pointer;
-    }
-    .btn-modal-confirm {
-        flex: 1;
-        height: 44px;
-        background-color: #008236;
-        border: none;
-        border-radius: 12px;
-        font-family: inherit;
-        font-size: 0.9rem;
-        font-weight: 700;
-        color: #FFFFFF;
-        cursor: pointer;
-    }
-    .btn-modal-danger {
-        flex: 1;
-        height: 44px;
-        background-color: #C10007;
-        border: none;
-        border-radius: 12px;
-        font-family: inherit;
-        font-size: 0.9rem;
-        font-weight: 700;
-        color: #FFFFFF;
-        cursor: pointer;
-    }
+
     .catalog-pagination-row {
         display: flex;
         justify-content: space-between;

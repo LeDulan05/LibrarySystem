@@ -57,30 +57,32 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse($returns as $ret)
+                                @forelse($returns as $return)
                                     <tr>
                                         <td class="mono-text">
-                                            {{ $ret->transaction_code ?? 'RET-' . \Carbon\Carbon::parse($ret->return_date)->year . '-' . str_pad($ret->id, 3, '0', STR_PAD_LEFT) }}
+                                            {{ $return->transaction_code ?? 'TXN-' . str_pad($return->id, 5, '0', STR_PAD_LEFT) }}
                                         </td>
-                                        <td class="member-name-text">{{ $ret->member_name }}</td>
-                                        <td class="book-title-text">{{ $ret->book_title }}</td>
-                                        <td class="date-text">{{ \Carbon\Carbon::parse($ret->return_date)->format('M d, Y') }}</td>
-                                        
-                                        <td class="penalty-text {{ $ret->penalty_amount > 0 ? 'penalty-active' : 'penalty-none' }}">
-                                            ₱{{ number_format($ret->penalty_amount, 2) }}
+                                        <td class="member-name-text">{{ $return->member_name }}</td>
+                                        <td class="book-title-text">{{ $return->book_title }}</td>
+                                        <td class="date-text">{{ \Carbon\Carbon::parse($return->borrow_date)->format('M d, Y') }}</td>
+                                        <td class="date-text">{{ \Carbon\Carbon::parse($return->return_date)->format('M d, Y') }}</td>
+                                        <td>
+                                            @if($return->penalty_amount > 0)
+                                                <span class="penalty-text penalty-active">₱{{ number_format($return->penalty_amount, 2) }}</span>
+                                            @else
+                                                <span class="penalty-text penalty-none">None</span>
+                                            @endif
                                         </td>
                                         <td>
-                                            @if($ret->penalty_amount > 0)
-                                                <span class="status-badge badge-due">Late</span>
-                                            @else
-                                                <span class="status-badge badge-success">On Time</span>
-                                            @endif
+                                            <span class="status-badge badge-success">
+                                                {{ ucfirst($return->status) }}
+                                            </span>
                                         </td>
                                     </tr>
                                 @empty
                                     <tr>
-                                        <td colspan="6" class="empty-table-text-row" style="text-align: center; color: #71717A; padding: 40px 0; font-weight: 600;">
-                                            No completed book return logs discovered matching database records.
+                                        <td colspan="7" style="text-align: center; color: #71717A; padding: 40px 0;">
+                                            No completed book returns found in records.
                                         </td>
                                     </tr>
                                 @endforelse

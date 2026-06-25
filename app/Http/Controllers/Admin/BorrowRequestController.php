@@ -12,122 +12,122 @@ class BorrowRequestController extends Controller
     /**
      * Display a listing of transaction queues filtering by pending/active states.
      */
-    public function index(Request $request)
-    {
-        // ERD FIX: Switched base table from 'borrow_requests' to 'transactions'
-        $query = DB::table('transactions')
-            ->join('users', 'transactions.user_id', '=', 'users.id')
-            ->join('books', 'transactions.book_id', '=', 'books.id')
-            ->select(
-                'transactions.*',
-                // Using created_at or borrow_date as the request date indicator
-                'transactions.created_at as request_date', 
-                DB::raw("CONCAT(users.first_name, ' ', users.last_name) as member_name"),
-                'books.title as book_title'
-            );
+public function index(Request $request)
+{
+    $query = DB::table('transactions')
+        ->join('users', 'transactions.user_id', '=', 'users.id')
+        ->join('books', 'transactions.book_id', '=', 'books.id')
+        ->select(
+            'transactions.*',
+            'transactions.created_at as request_date', 
+            DB::raw("CONCAT(users.first_name, ' ', users.last_name) as member_name"),
+            'books.title as book_title'
+        );
 
-        if ($request->has('search') && $request->search != '') {
-            $query->where(function($q) use ($request) {
-                $q->where('users.first_name', 'like', '%' . $request->search . '%')
-                  ->orWhere('users.last_name', 'like', '%' . $request->search . '%')
-                  ->orWhere('books.title', 'like', '%' . $request->search . '%')
-                  ->orWhere('transactions.transaction_code', 'like', '%' . $request->search . '%');
-            });
-        }
-
-        $requests = $query->orderBy('transactions.created_at', 'desc')->paginate(10);
-
-        // ERD FIX: Re-mapped metric indicators directly to the transaction status properties
-        $pendingCount = DB::table('transactions')->where('status', 'pending')->count();
-        $approvedToday = DB::table('transactions')
-            ->where('status', 'approved')
-            ->whereDate('updated_at', Carbon::today())
-            ->count();
-        $rejectedToday = DB::table('transactions')
-            ->where('status', 'rejected')
-            ->whereDate('updated_at', Carbon::today())
-            ->count();
-
-        return view('admin.borrowRequestPage', compact('requests', 'pendingCount', 'approvedToday', 'rejectedToday'));
-    }
-
-    /**
-     * Display contextual details from a single transaction entity row.
-     */
-    public function show($id)
-    {
-        // ERD FIX: Changed targeted lookup reference parameters to 'transactions'
-        $requestData = DB::table('transactions')
-            ->join('users', 'transactions.user_id', '=', 'users.id')
-            ->join('books', 'transactions.book_id', '=', 'books.id')
-            ->select(
-                'transactions.*',
-                'transactions.created_at as request_date',
-                DB::raw("CONCAT(users.first_name, ' ', users.last_name) as member_name"),
-                'users.student_number',
-                'books.title as book_title',
-                'books.isbn',
-                'books.available_copies'
-            )
-            ->where('transactions.id', $id)
-            ->first();
-
-        if (!$requestData) {
-            abort(404, 'Transaction log data point not found.');
-        }
-
-        return view('admin.viewBorrowRequestPage', compact('requestData'));
-    }
-
-    /**
-     * Approve the request row directly within the table records block.
-     */
-    public function approve($id)
-    {
-        $transaction = DB::table('transactions')->where('id', $id)->first();
-        if (!$transaction || $transaction->status !== 'pending') {
-            return redirect()->back()->with('error', 'Request cannot be processed.');
-        }
-
-        $book = DB::table('books')->where('id', $transaction->book_id)->first();
-        if ($book->available_copies <= 0) {
-            return redirect()->back()->with('error', 'No available copies left on shelf stacks.');
-        }
-
-        DB::transaction(function () use ($transaction, $id) {
-            // ERD FIX: Transition the single row state and allocate parameters right here
-            DB::table('transactions')->where('id', $id)->update([
-                'transaction_code' => 'TXN-' . Carbon::now()->year . '-' . str_pad($id, 3, '0', STR_PAD_LEFT),
-                'status' => 'approved',
-                'borrow_date' => Carbon::now(),
-                'due_date' => Carbon::now()->addDays(14),
-                'updated_at' => Carbon::now()
-            ]);
-
-            DB::table('books')->where('id', $transaction->book_id)->decrement('available_copies');
+    if ($request->has('search') && $request->search != '') {
+        $query->where(function($q) use ($request) {
+            $q->where('users.first_name', 'like', '%' . $request->search . '%')
+              ->orWhere('users.last_name', 'like', '%' . $request->search . '%')
+              ->orWhere('books.title', 'like', '%' . $request->search . '%');
         });
-
-        return redirect()->route('admin.borrow.receipt', $id);
     }
 
+    $borrowRequests = $query->orderBy('transactions.created_at', 'desc')
+                            ->paginate(10)
+                            ->appends($request->all());
+
+    $pendingCount = DB::table('transactions')->where('status', 'pending')->count();
+    $approvedCount = DB::table('transactions')->whereIn('status', ['approved', 'active'])->count();
+    $rejectedCount = DB::table('transactions')->where('status', 'rejected')->count();
+    $returnedCount = DB::table('transactions')->where('status', 'returned')->count();
+
+    return view('admin.borrowRequestPage', compact(
+        'borrowRequests',
+        'pendingCount',
+        'approvedCount',
+        'rejectedCount',
+        'returnedCount',
+    ));
+}
+
+
+public function show($id)
+{
+    $requestData = DB::table('transactions')
+        ->join('users', 'transactions.user_id', '=', 'users.id')
+        ->join('books', 'transactions.book_id', '=', 'books.id')
+        ->select(
+            'transactions.id',
+            'transactions.status', 
+            'transactions.borrow_date',
+            'transactions.due_date',
+            'transactions.return_date',
+            'transactions.rejection_reason',
+            'transactions.created_at as request_date',
+            
+            // User Details
+            DB::raw("CONCAT(users.first_name, ' ', users.last_name) as member_name"),
+            'users.student_id as student_number',
+
+            // Book Details
+            'books.title as book_title',
+            'books.isbn',
+            'books.available_copies'
+        )
+        ->where('transactions.id', $id)
+        ->first();
+
+    if (!$requestData) {
+        abort(404, 'Transaction record not found.');
+    }
+
+    return view('admin.viewBorrowReqPage', compact('requestData'));
+}
+
     /**
-     * Terminate transaction execution and attach rejection messages.
+     * Handle verification approval transition logic patterns.
+     */
+    public function approve(Request $request, $id)
+{
+    $transaction = DB::table('transactions')->where('id', $id)->first();
+    if (!$transaction) {
+        abort(404);
+    }
+
+    DB::table('transactions')
+        ->where('id', $id)
+        ->update([
+            'status' => 'active', 
+            'borrow_date' => Carbon::now()->toDateString(),
+            'due_date' => Carbon::now()->addDays(14)->toDateString(), 
+            'updated_at' => Carbon::now(),
+        ]);
+
+    return redirect()->route('admin.borrow.receipt', $id)->with('success', 'Borrow transaction has been logged successfully.');
+}
+
+    /**
+     * Handle denial operations routing parameters.
      */
     public function reject(Request $request, $id)
     {
-        $request->validate(['reason' => 'required|string|max:255']);
+        $request->validate([
+            'reason' => 'nullable|string|max:255'
+        ]);
 
         $transaction = DB::table('transactions')->where('id', $id)->first();
-        if (!$transaction || $transaction->status !== 'pending') {
-            return redirect()->back()->with('error', 'Request cannot be processed.');
+
+        if (!$transaction) {
+            abort(404);
         }
 
-        // ERD FIX: Updates the rejection_reason field explicitly present on your schema mapping
-        DB::table('transactions')->where('id', $id)->update([
-            'status' => 'rejected',
-            'rejection_reason' => $request->reason,
-            'updated_at' => Carbon::now()
-        ]);
+        DB::table('transactions')
+            ->where('id', $id)
+            ->update([
+                'status' => 'rejected',
+                'rejection_reason' => $request->input('reason', 'Administrative decision/unspecified'),
+                'updated_at' => Carbon::now(),
+            ]);
 
         return redirect()->route('admin.borrow.rejection', $id);
     }
@@ -141,18 +141,20 @@ class BorrowRequestController extends Controller
             ->join('users', 'transactions.user_id', '=', 'users.id')
             ->join('books', 'transactions.book_id', '=', 'books.id')
             ->select(
-                'transactions.*',
+                'transactions.id', 
+                'transactions.borrow_date',
+                'transactions.due_date',
+                'transactions.status',
                 DB::raw("CONCAT(users.first_name, ' ', users.last_name) as member_name"),
-                'users.student_number',
+                'users.student_id',
                 'books.title as book_title',
                 'books.isbn'
             )
             ->where('transactions.id', $id)
             ->first();
 
-        return view('admin.borrowTransactionSlipPage', compact('slip'));
+        return view('admin.borrowTransactionSlip', compact('slip'));
     }
-
     /**
      * Render denial summary message sheet template window.
      */
@@ -165,12 +167,13 @@ class BorrowRequestController extends Controller
                 'transactions.*',
                 'transactions.created_at as request_date',
                 DB::raw("CONCAT(users.first_name, ' ', users.last_name) as member_name"),
-                'users.student_number',
-                'books.title as book_title'
+                'users.student_id',
+                'books.title as book_title',
+                'books.isbn'
             )
             ->where('transactions.id', $id)
             ->first();
 
-        return view('admin.borrowRejectionPage', compact('rejection'));
+        return view('admin.borrowTransactionSlip', compact('rejection'));
     }
 }

@@ -1,5 +1,6 @@
 <?php
 use App\Http\Controllers\ProfileController;
+use App\Http\Controllers\Admin\AuthController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\BookController;
 use App\Http\Controllers\Admin\CategoryController as AdminCategoryController; 
@@ -15,16 +16,21 @@ use App\Http\Controllers\Member\BorrowController;
 use App\Http\Controllers\Member\ReservationController;
 use App\Http\Controllers\Member\PenaltyController;
 
+use App\Http\Controllers\Auth\AuthenticatedSessionController;
+use App\Http\Controllers\Auth\RegisteredUserController;
 
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
-    return view('welcome');
+    return redirect()->route('login');
 });
 
 Route::get('/dashboard', function (Illuminate\Http\Request $request) {
     $totalBooks = \App\Models\Book::count();
-    $totalStudents = \App\Models\User::count(); // Assuming all users are students muna habang wala pa si admin side
+    
+    $totalStudents = \App\Models\User::where('role', 'member')
+                                     ->where('status', 'active')
+                                     ->count(); 
     
     $user = clone $request->user();
     $user->load(['transactions.book', 'reservations.book', 'transactions.penalty']);
@@ -71,6 +77,11 @@ Route::get('/notifications', function (\Illuminate\Http\Request $request) {
     return view('user.notificationsPage', compact('notifications'));
 })->middleware(['auth', 'verified'])->name('notifications');
 
+Route::get('/login', [AuthenticatedSessionController::class, 'create'])->name('login');
+Route::post('/login', [AuthenticatedSessionController::class, 'store']);
+
+Route::get('/register', [RegisteredUserController::class, 'create'])->name('register');
+Route::post('/register', [RegisteredUserController::class, 'store']);
 
 Route::get('/library', [CatalogController::class, 'index'])->middleware(['auth', 'verified'])->name('library');
 Route::get('/library/{book}', [CatalogController::class, 'show'])->middleware(['auth', 'verified'])->name('library.show');
@@ -94,8 +105,6 @@ Route::middleware('auth')->group(function () {
 
 require __DIR__.'/auth.php';
 
-use App\Http\Controllers\Admin\AuthController;
-
 Route::middleware('guest')->group(function () {
     Route::get('/admin/login', [AuthController::class, 'create'])->name('admin.login');
     Route::post('/admin/login', [AuthController::class, 'store']);
@@ -114,6 +123,9 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
 
     Route::get('/categories', [AdminCategoryController::class, 'index'])->name('admin.bookCategories');
     Route::get('/categories/{id}', [AdminCategoryController::class, 'show'])->name('admin.categories.show');
+    Route::get('/categories/{id}/edit', [AdminCategoryController::class, 'edit'])->name('admin.categories.edit');
+    Route::put('/categories/{id}', [AdminCategoryController::class, 'update'])->name('admin.categories.update');
+    Route::delete('/categories/{id}', [AdminCategoryController::class, 'destroy'])->name('admin.categories.destroy');
 
     Route::get('/members', [MemberController::class, 'index'])->name('admin.memberManagement');
     Route::get('/members/{id}', [MemberController::class, 'show'])->name('admin.members.show');
@@ -121,16 +133,16 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
 
     Route::get('/borrow', [BorrowRequestController::class, 'index'])->name('admin.borrowRequest');
     Route::get('/borrow/{id}', [BorrowRequestController::class, 'show'])->name('admin.borrow.show');
-    Route::post('/borrow/{id}/approve', [BorrowRequestController::class, 'approve'])->name('admin.borrow.approve');
     Route::post('/borrow/{id}/reject', [BorrowRequestController::class, 'reject'])->name('admin.borrow.reject');
-    
-    Route::get('/borrow/{id}/receipt', [BorrowRequestController::class, 'receipt'])->name('admin.borrow.receipt');
+    Route::post('/borrow/{id}/approve', [BorrowRequestController::class, 'approve'])->name('admin.borrow.approve');
     Route::get('/borrow/{id}/rejection', [BorrowRequestController::class, 'rejectionNotice'])->name('admin.borrow.rejection');
+    Route::get('/borrow/{id}/receipt', [BorrowRequestController::class, 'receipt'])->name('admin.borrow.receipt');
 
     Route::get('/reservation', [AdminReservationController::class, 'index'])->name('admin.reservationRequest');
     Route::get('/reservation/{id}', [AdminReservationController::class, 'show'])->name('admin.reservation.show');
     Route::post('/reservation/{id}/approve', [AdminReservationController::class, 'approve'])->name('admin.reservation.approve');
     Route::post('/reservation/{id}/reject', [AdminReservationController::class, 'reject'])->name('admin.reservation.reject');
+    Route::get('/reservation/{id}/receipt', [AdminReservationController::class, 'receipt'])->name('admin.reservation.receipt');
 
     Route::get('/return', [ReturnController::class, 'index'])->name('admin.bookReturn');
 

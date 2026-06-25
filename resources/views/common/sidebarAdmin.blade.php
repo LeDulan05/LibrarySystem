@@ -59,14 +59,14 @@
     </nav>
 
     <div class="sidebar-footer">
-        <a href="#" class="nav-item">
-            <img src="{{ asset('AdminAssets/SidebarAssets/settingIcon.svg') }}" alt="Settings Icon" class="sidebar-svg-icon">
-            <span>Settings</span>
-        </a>
-        <a href="#" class="nav-item btn-signout">
+        <a href="#" class="nav-item" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
             <img src="{{ asset('AdminAssets/SidebarAssets/signoutIcon.svg') }}" alt="Sign Out Icon" class="sidebar-svg-icon">
             <span>Sign Out</span>
         </a>
+
+        <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
+            @csrf
+        </form>
     </div>
 </aside>
 

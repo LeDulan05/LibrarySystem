@@ -9,16 +9,14 @@ use Carbon\Carbon;
 
 class MemberController extends Controller
 {
-    /**
-     * Display a listing of library members with dynamic metrics and live search.
-     */
+    /* Display a listing of library members */
     public function index(Request $request)
     {
-        // 1. Build query counting current active borrows per user
         $query = DB::table('users')
+            ->where('role', 'member') // Filter applied here
             ->leftJoin('transactions', function($join) {
                 $join->on('users.id', '=', 'transactions.user_id')
-                     ->where('transactions.status', '=', 'active');
+                    ->where('transactions.status', '=', 'active');
             })
             ->select(
                 'users.*',
@@ -26,26 +24,24 @@ class MemberController extends Controller
             )
             ->groupBy('users.id');
 
-        // 2. Filter by search input
         if ($request->has('search') && $request->search != '') {
             $query->where(function($q) use ($request) {
                 $q->where('users.first_name', 'like', '%' . $request->search . '%')
-                  ->orWhere('users.last_name', 'like', '%' . $request->search . '%')
-                  ->orWhere('users.student_number', 'like', '%' . $request->search . '%')
-                  ->orWhere('users.email', 'like', '%' . $request->search . '%');
+                ->orWhere('users.last_name', 'like', '%' . $request->search . '%')
+                ->orWhere('users.student_id', 'like', '%' . $request->search . '%')
+                ->orWhere('users.email', 'like', '%' . $request->search . '%');
             });
         }
 
-        // 3. Finalize pagination
         $members = $query->orderBy('users.created_at', 'desc')
-                         ->paginate(10)
-                         ->appends($request->all());
+                        ->paginate(10)
+                        ->appends($request->all());
 
-        // 4. Compute dashboard metric analytics summary cards
-        $totalMembersCount = DB::table('users')->count();
-        $activeCount = DB::table('users')->where('status', 'active')->count();
-        $suspendedCount = DB::table('users')->where('status', 'suspended')->count();
+        $totalMembersCount = DB::table('users')->where('role', 'member')->count();
+        $activeCount = DB::table('users')->where('role', 'member')->where('status', 'active')->count();
+        $suspendedCount = DB::table('users')->where('role', 'member')->where('status', 'suspended')->count();
         $newThisMonthCount = DB::table('users')
+            ->where('role', 'member')
             ->where('created_at', '>=', Carbon::now()->startOfMonth())
             ->count();
 
@@ -58,9 +54,7 @@ class MemberController extends Controller
         ));
     }
 
-    /**
-     * Display a single member's dashboard with logs.
-     */
+    /* Display a single member's dashboard with logs. */
     public function show(Request $request, $id)
     {
         $member = DB::table('users')->where('id', $id)->first();
@@ -94,16 +88,13 @@ class MemberController extends Controller
         return view('admin.viewMemberPage', compact('member', 'borrowHistory', 'penaltyHistory', 'currentBorrowed'));
     }
 
-    /**
-     * Suspend a member's account.
-     */
+    /* Suspend a member's account */
     public function suspend(Request $request, $id)
     {
         $request->validate([
             'reason' => 'required|string|max:500',
         ]);
 
-        // Find user and transition status parameters 
         $user = DB::table('users')->where('id', $id)->first();
         if (!$user) {
             abort(404);
@@ -116,9 +107,28 @@ class MemberController extends Controller
                 'updated_at' => Carbon::now(),
             ]);
 
-        // Optional: Log $request->reason to a system log table if desired
-
         return redirect()->route('admin.memberManagement')->with('success', 'Account suspended successfully.');
     }
+
+    public function edit($id)
+{
+    $member = DB::table('users')->where('id', $id)->first();
+    
+    $currentBorrowed = DB::table('transactions')
+        ->join('books', 'transactions.book_id', '=', 'books.id')
+        ->where('transactions.user_id', $id)
+        ->where('transactions.status', 'active')
+        ->select('books.title')
+        ->get();
+
+    $penaltyHistory = DB::table('penalties')
+        ->join('transactions', 'penalties.transaction_id', '=', 'transactions.id')
+        ->join('books', 'transactions.book_id', '=', 'books.id')
+        ->select('books.title', 'penalties.amount', 'penalties.created_at as date', 'penalties.status')
+        ->where('transactions.user_id', $id)
+        ->get();
+
+    return view('admin.editMemberPage', compact('member', 'currentBorrowed', 'penaltyHistory'));
+}
 }
 

@@ -10,7 +10,6 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@100;200;400&display=swap" rel="stylesheet">    
     <title>IskoLib - Member Profile</title>
-
 </head>
 
 <body>
@@ -49,20 +48,16 @@
                             
                             <div class="metadata-rows-strip">
                                 <div class="metadata-row">
-                                    <span class="meta-label">Student No.</span>
-                                    <span class="meta-value mono-text">{{ $member->student_number ?? 'N/A' }}</span>
+                                    <span class="meta-label">Student ID</span>
+                                    <span class="meta-value mono-text">{{ $member->student_id ?? 'N/A' }}</span>
                                 </div>
                                 <div class="metadata-row">
-                                    <span class="meta-label">Year Level</span>
-                                    <span class="meta-value">{{ $member->year_level ?? 'N/A' }}</span>
+                                    <span class="meta-label">Course</span>
+                                    <span class="meta-value">{{ $member->course ?? 'N/A' }}</span>
                                 </div>
                                 <div class="metadata-row">
                                     <span class="meta-label">Email</span>
                                     <span class="meta-value" style="text-transform: lowercase;">{{ $member->email }}</span>
-                                </div>
-                                <div class="metadata-row">
-                                    <span class="meta-label">Phone</span>
-                                    <span class="meta-value">{{ $member->phone ?? 'N/A' }}</span>
                                 </div>
                             </div>
                         </div>
@@ -157,289 +152,537 @@
                             </div>
                         </div>
 
+                        @if(($member->status ?? 'active') == 'active')
+                            <div class="account-actions-footer">
+                                <button type="button" class="btn-suspend-action" onclick="openSuspendModal()">
+                                    <i class="bi bi-slash-circle"></i> Suspend Account
+                                </button>
+                            </div>
+                        @endif
+
                     </div>
-
                 </div>
-
             </div>
         </main>
     </div>
+
+    <div class="modal-overlay" id="suspendAccountModalOverlay">
+        <form action="{{ route('admin.members.suspend', $member->id) }}" method="POST" class="suspend-modal-card">
+            @csrf
+            <div class="modal-round-icon-frame">
+                <i class="bi bi-slash-circle"></i>
+            </div>
+            
+            <h3 class="modal-main-title">Suspend Account</h3>
+            <p class="modal-warning-body">This will block the member from borrowing and reserving books.</p>
+            
+            <div class="modal-info-grid-box">
+                <div class="info-grid-row">
+                    <span class="label">Member</span>
+                    <span class="value">{{ $member->first_name }} {{ $member->last_name }}</span>
+                </div>
+                <div class="info-grid-row">
+                    <span class="label">Student ID</span>
+                    <span class="value">{{ $member->student_id ?? 'N/A' }}</span>
+                </div>
+                <div class="info-grid-row">
+                    <span class="label">Current Status</span>
+                    <span class="value" style="color: #008236;">Active</span>
+                </div>
+                <div class="info-grid-row">
+                    <span class="label">Total Unpaid Penalties</span>
+                    <span class="value">₱{{ number_format($penaltyHistory->where('status', 'due')->sum('amount'), 2) }}</span>
+                </div>
+            </div>
+
+            <div class="reason-entry-group">
+                <label class="textarea-label">Suspension Reason <span>*</span></label>
+                <textarea name="reason" class="modal-textarea-input" placeholder="e.g. Unpaid penalties exceed the allowed limit" rows="3" required></textarea>
+            </div>
+            
+            <div class="modal-actions-footer">
+                <button type="button" class="btn-modal-cancel" onclick="closeSuspendModal()">Cancel</button>
+                <button type="submit" class="btn-modal-delete">Suspend</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function openSuspendModal() {
+            document.getElementById('suspendAccountModalOverlay').classList.add('modal-visible');
+        }
+
+        function closeSuspendModal() {
+            document.getElementById('suspendAccountModalOverlay').classList.remove('modal-visible');
+        }
+    </script>
 </body>
 </html>
 
-    <style>
-        /* Baseline Overrides & Viewport Resets */
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-        }
-        body {
-            font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            background-color: #1C1C1C;
-            -webkit-font-smoothing: antialiased;
-        }
-        .layout-container {
-            display: flex;
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden;
-        }
+<style>
+    /* Baseline Overrides & Viewport Resets */
+    * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+    }
+    body {
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+        background-color: #1C1C1C;
+        -webkit-font-smoothing: antialiased;
+    }
+    .layout-container {
+        display: flex;
+        height: 100vh;
+        width: 100vw;
+        overflow: hidden;
+    }
 
-        /* Main Canvas Context */
-        .main-canvas {
-            flex: 1;
-            background-color: #F9F6F0;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-        }
-        .dashboard-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            background-color: #FFFFFF;
-            padding: 20px 40px;
-            border-bottom: 1px solid #EAE6DF;
-            flex-wrap: wrap; 
-            gap: 16px;
-        }
-        .canvas-content {
-            padding: 32px 40px;
-            flex: 1;
-        }
-        .dashboard-title {
-            font-size: 1.5rem;
-            font-weight: 800;
-            color: #1A1A1A;
-            letter-spacing: -0.02em;
-        }
-        .profile-avatar {
-            width: 40px;
-            height: 40px;
-            background-color: #212B05;
-            color: white;
-            font-weight: 700;
-            font-size: 14px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+    /* Main Canvas Context */
+    .main-canvas {
+        flex: 1;
+        background-color: #F9F6F0;
+        overflow-y: auto;
+        display: flex;
+        flex-direction: column;
+    }
+    .dashboard-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background-color: #FFFFFF;
+        padding: 20px 40px;
+        border-bottom: 1px solid #EAE6DF;
+        flex-wrap: wrap; 
+        gap: 16px;
+    }
+    .canvas-content {
+        padding: 32px 40px;
+        flex: 1;
+    }
+    .dashboard-title {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #1A1A1A;
+        letter-spacing: -0.02em;
+    }
+    .profile-avatar {
+        width: 40px;
+        height: 40px;
+        background-color: #212B05;
+        color: white;
+        font-weight: 700;
+        font-size: 14px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
 
-        /* Back Navigation Link */
-        .back-navigation-link {
-            font-size: 0.875rem;
-            color: #71717A;
-            font-weight: 700;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            gap: 6px;
-            margin-bottom: 24px;
-            width: max-content;
-            transition: color 0.15s ease;
-        }
-        .back-navigation-link:hover {
-            color: #1A1A1A;
-        }
-        .left-arrow-chevron {
-            font-size: 1.35rem;
-            line-height: 1;
-            font-weight: 500;
-            margin-top: -2px;
-        }
+    /* Back Navigation Link */
+    .back-navigation-link {
+        font-size: 0.875rem;
+        color: #71717A;
+        font-weight: 700;
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        margin-bottom: 24px;
+        width: max-content;
+        transition: color 0.15s ease;
+    }
+    .back-navigation-link:hover {
+        color: #1A1A1A;
+    }
+    .left-arrow-chevron {
+        font-size: 1.35rem;
+        line-height: 1;
+        font-weight: 500;
+        margin-top: -2px;
+    }
 
-        /* Grid System Split */
-        .profile-layout-grid {
-            display: grid;
-            grid-template-columns: 340px 1fr;
-            gap: 24px;
-            align-items: start;
-            width: 100%;
-        }
-        .left-profile-sidebar-wrapper, .right-history-tables-wrapper {
-            display: flex;
-            flex-direction: column;
-            gap: 24px;
-        }
+    /* Grid System Split */
+    .profile-layout-grid {
+        display: grid;
+        grid-template-columns: 340px 1fr;
+        gap: 24px;
+        align-items: start;
+        width: 100%;
+    }
+    .left-profile-sidebar-wrapper, .right-history-tables-wrapper {
+        display: flex;
+        flex-direction: column;
+        gap: 24px;
+    }
 
-        /* Card Container Panel Blocks */
-        .profile-meta-card, .current-borrowed-panel-card, .directory-panel {
-            background-color: #FFFFFF;
-            border: 1px solid #EAE6DF;
-            border-radius: 16px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.01);
-        }
+    /* Card Container Panel Blocks */
+    .profile-meta-card, .current-borrowed-panel-card, .directory-panel {
+        background-color: #FFFFFF;
+        border: 1px solid #EAE6DF;
+        border-radius: 16px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.01);
+    }
 
-        /* Profile Left Meta Sidebar Card */
-        .profile-meta-card {
-            padding: 32px 24px;
-            text-align: center;
-        }
-        .avatar-circle-display {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: #FFFFFF;
-            margin: 0 auto 16px auto;
-            background-color: #2E3A14; 
-        }
-        .member-fullname {
-            font-size: 1.15rem;
-            font-weight: 800;
-            color: #1A1A1A;
-            margin-bottom: 4px;
-            display: block;
-        }
-        .course-text {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: #71717A;
-            display: block;
-            margin-bottom: 16px;
-        }
+    /* Profile Left Meta Sidebar Card */
+    .profile-meta-card {
+        padding: 32px 24px;
+        text-align: center;
+    }
+    .avatar-circle-display {
+        width: 80px;
+        height: 80px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: #FFFFFF;
+        margin: 0 auto 16px auto;
+        background-color: #2E3A14; 
+    }
+    .member-fullname {
+        font-size: 1.15rem;
+        font-weight: 800;
+        color: #1A1A1A;
+        margin-bottom: 4px;
+        display: block;
+    }
+    .course-text {
+        font-size: 0.85rem;
+        font-weight: 600;
+        color: #71717A;
+        display: block;
+        margin-bottom: 16px;
+    }
 
-        /* Metadata Details List Block Structure */
-        .metadata-rows-strip {
-            display: flex;
-            flex-direction: column;
-            gap: 14px;
-            margin-top: 24px;
-            text-align: left;
-            border-top: 1px solid #F4F1EA;
-            padding-top: 20px;
-        }
-        .metadata-row {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            font-size: 0.85rem;
-        }
-        .meta-label {
-            font-weight: 700;
-            color: #71717A;
-        }
-        .meta-value {
-            font-weight: 600;
-            color: #1A1A1A;
-        }
+    /* Metadata Details List Block Structure */
+    .metadata-rows-strip {
+        display: flex;
+        flex-direction: column;
+        gap: 14px;
+        margin-top: 24px;
+        text-align: left;
+        border-top: 1px solid #F4F1EA;
+        padding-top: 20px;
+    }
+    .metadata-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.85rem;
+    }
+    .meta-label {
+        font-weight: 700;
+        color: #71717A;
+    }
+    .meta-value {
+        font-weight: 600;
+        color: #1A1A1A;
+    }
 
-        /* Current Checked-out Shelf Cards List */
-        .current-borrowed-panel-card {
-            padding: 24px;
-        }
-        .panel-card-subtitle {
-            font-size: 0.9rem;
-            font-weight: 800;
-            color: #1A1A1A;
-            letter-spacing: 0.04em;
-            text-transform: uppercase;
-            margin-bottom: 16px;
-        }
-        .borrowed-badges-stack {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .active-borrow-book-badge {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 12px 14px;
-            background-color: #F4F1EA;
-            border-radius: 12px;
-            border: 1px solid #EAE6DF;
-        }
-        .book-badge-icon {
-            color: #71717A;
-            font-size: 1rem;
-        }
-        .active-badge-title-text {
-            font-size: 0.85rem;
-            font-weight: 700;
-            color: #1A1A1A;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            white-space: nowrap;
-        }
+    /* Current Checked-out Shelf Cards List */
+    .current-borrowed-panel-card {
+        padding: 24px;
+    }
+    .panel-card-subtitle {
+        font-size: 0.9rem;
+        font-weight: 800;
+        color: #1A1A1A;
+        letter-spacing: 0.04em;
+        text-transform: uppercase;
+        margin-bottom: 16px;
+    }
+    .borrowed-badges-stack {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+    .active-borrow-book-badge {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 14px;
+        background-color: #F4F1EA;
+        border-radius: 12px;
+        border: 1px solid #EAE6DF;
+    }
+    .book-badge-icon {
+        color: #71717A;
+        font-size: 1rem;
+    }
+    .active-badge-title-text {
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #1A1A1A;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
 
-        /* Right Panel History Content Cards */
-        .directory-panel {
-            padding: 24px;
-        }
+    /* Right Panel History Content Cards */
+    .directory-panel {
+        padding: 24px;
+    }
 
-        /* Table Resets & Typography Foundations */
-        .table-responsive-wrapper {
-            width: 100%;
-            overflow-x: auto;
-            -webkit-overflow-scrolling: touch;
-        }
-        .directory-data-table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 650px; 
-        }
-        .directory-data-table th {
-            background-color: #FDFBF7;
-            font-size: 0.75rem;
-            font-weight: 700;
-            color: #71717A;
-            letter-spacing: 0.06em;
-            padding: 16px;
-            border-bottom: 1px solid #F4F1EA;
-            text-align: left;
-        }
-        .directory-data-table td {
-            padding: 14px 16px;
-            font-size: 0.875rem;
-            color: #71717A;
-            border-bottom: 1px solid #F4F1EA;
-            font-weight: 500;
-            vertical-align: middle;
-        }
-        .directory-data-table tbody tr:last-child td {
-            border-bottom: none;
-        }
+    /* Table Resets & Typography Foundations */
+    .table-responsive-wrapper {
+        width: 100%;
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .directory-data-table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 650px; 
+    }
+    .directory-data-table th {
+        background-color: #FDFBF7;
+        font-size: 0.75rem;
+        font-weight: 700;
+        color: #71717A;
+        letter-spacing: 0.06em;
+        padding: 16px;
+        border-bottom: 1px solid #F4F1EA;
+        text-align: left;
+    }
+    .directory-data-table td {
+        padding: 14px 16px;
+        font-size: 0.875rem;
+        color: #71717A;
+        border-bottom: 1px solid #F4F1EA;
+        font-weight: 500;
+        vertical-align: middle;
+    }
+    .directory-data-table tbody tr:last-child td {
+        border-bottom: none;
+    }
 
-        /* Unique Cell Modifiers */
-        .table-book-title-text {
-            font-size: 0.9rem;
-            font-weight: 700;
-            color: #1A1A1A;
-        }
-        .mono-text {
-            font-family: 'JetBrains Mono', monospace;
-            font-weight: 400;
-            font-size: 0.85rem;
-        }
-        .currency-text {
-            font-weight: 800;
-            color: #FF5722;
-            font-size: 0.95rem;
-        }
+    /* Unique Cell Modifiers */
+    .table-book-title-text {
+        font-size: 0.9rem;
+        font-weight: 700;
+        color: #1A1A1A;
+    }
+    .mono-text {
+        font-family: 'JetBrains Mono', monospace;
+        font-weight: 400;
+        font-size: 0.85rem;
+    }
+    .currency-text {
+        font-weight: 800;
+        color: #FF5722;
+        font-size: 0.95rem;
+    }
 
-        /* Custom Dynamic Status Capsule Matrix Context */
-        .status-badge {
-            padding: 6px 14px;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 700;
-            display: inline-block;
-        }
-        .badge-success { background-color: #DCFCE7; color: #008236; }
-        .badge-suspended { background-color: #FFE2E2; color: #C10007; }
-        .badge-active { background-color: #EFF6FF; color: #2563EB; }
+    /* Custom Dynamic Status Capsule Matrix Context */
+    .status-badge {
+        padding: 6px 14px;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        display: inline-block;
+    }
+    .badge-success {
+        background-color: #DCFCE7;
+        color: #008236;
+    }
+    .badge-suspended {
+        background-color: #FFE2E2;
+        color: #C10007;
+    }
+    .badge-active {
+        background-color: #EFF6FF;
+        color: #2563EB;
+    }
 
-        .empty-table-text-row {
-            text-align: center;
-            color: #71717A;
-            padding: 32px 0 !important;
-            font-weight: 600;
-        }
-    </style>
+    .empty-table-text-row {
+        text-align: center;
+        color: #71717A;
+        padding: 32px 0 !important;
+        font-weight: 600;
+    }
+
+    /* Account Actions Footer & Primary Trigger Button */
+    .account-actions-footer {
+        background-color: #FFFFFF;
+        border: 1px solid #EAE6DF;
+        border-radius: 16px;
+        padding: 20px 24px;
+        display: flex;
+    }
+    .btn-suspend-action {
+        width: 100%;
+        border: none;
+        background-color: #C10007;
+        color: #FFFFFF;
+        font-weight: 700;
+        font-size: 0.875rem;
+        font-family: inherit;
+        padding: 16px 24px;
+        border-radius: 12px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px;
+        cursor: pointer;
+        transition: background-color 0.15s ease;
+    }
+    .btn-suspend-action:hover {
+        background-color: #A00005;
+    }
+
+    /* Modal Backdrop Layer Properties */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.4);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+    }
+    .modal-overlay.modal-visible {
+        display: flex !important;
+    }
+
+    /* Modal Surface Card Design Context */
+    .suspend-modal-card {
+        background-color: #FFFFFF;
+        border-radius: 16px;
+        padding: 32px;
+        width: 100%;
+        max-width: 440px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .modal-round-icon-frame {
+        width: 56px;
+        height: 56px;
+        background-color: #FFE2E2;
+        color: #C10007;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 16px;
+    }
+    .modal-main-title {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: #1A1A1A;
+        margin-bottom: 8px;
+    }
+    .modal-warning-body {
+        font-size: 0.875rem;
+        color: #71717A;
+        margin-bottom: 24px;
+        line-height: 1.4;
+        padding: 0 16px;
+    }
+
+    /* Info Field Rows Box Layer */
+    .modal-info-grid-box {
+        width: 100%;
+        background-color: #FAF8F5;
+        border-radius: 12px;
+        padding: 16px;
+        border: 1px solid #F4F1EA;
+        margin-bottom: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        text-align: left;
+    }
+    .info-grid-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.85rem;
+    }
+    .info-grid-row .label {
+        font-weight: 600;
+        color: #71717A;
+    }
+    .info-grid-row .value {
+        font-weight: 600;
+        color: #52525B;
+    }
+
+    /* Form Fields Entry Components */
+    .reason-entry-group {
+        width: 100%;
+        text-align: left;
+        margin-bottom: 24px;
+    }
+    .textarea-label {
+        font-size: 0.825rem;
+        font-weight: 700;
+        color: #1A1A1A;
+        display: block;
+        margin-bottom: 8px;
+    }
+    .modal-textarea-input {
+        width: 100%;
+        padding: 12px 14px;
+        background-color: #FFFFFF;
+        border: 1px solid #EAE6DF;
+        border-radius: 12px;
+        font-family: inherit;
+        font-size: 0.875rem;
+        color: #1A1A1A;
+        outline: none;
+        resize: none;
+        transition: border-color 0.15s;
+    }
+    .modal-textarea-input:focus {
+        border-color: #A1A1AA;
+    }
+
+    /* Actions Footer Layout Controls */
+    .modal-actions-footer {
+        width: 100%;
+        display: flex;
+        gap: 12px;
+    }
+    .btn-modal-cancel {
+        flex: 1;
+        background-color: #FFFFFF;
+        border: 1px solid #EAE6DF;
+        color: #1A1A1A;
+        border-radius: 12px;
+        padding: 12px;
+        font-size: 0.875rem;
+        font-weight: 700;
+        font-family: inherit;
+        cursor: pointer;
+        transition: background-color 0.15s;
+    }
+    .btn-modal-cancel:hover {
+        background-color: #F9F6F0;
+    }
+    .btn-modal-delete {
+        flex: 1;
+        background-color: #C10007;
+        border: none;
+        color: #FFFFFF;
+        border-radius: 12px;
+        padding: 12px;
+        font-size: 0.875rem;
+        font-weight: 700;
+        font-family: inherit;
+        cursor: pointer;
+        transition: background-color 0.15s;
+    }
+    .btn-modal-delete:hover {
+        background-color: #A00005;
+    }
+</style>

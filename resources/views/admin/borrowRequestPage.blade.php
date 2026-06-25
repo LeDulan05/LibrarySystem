@@ -32,14 +32,14 @@
                         
                     <div class="summary-card">
                         <img src="{{ asset('AdminAssets/BorrowAssets/approvedTodayIcon.svg') }}" alt="Approved" class="icon-wrapper">
-                        <div class="sum-value">{{ number_format($approvedToday) }}</div>
-                        <div class="sum-label">Approved Today</div>
+                        <div class="sum-value">{{ number_format($approvedCount) }}</div>
+                        <div class="sum-label">Approved</div>
                     </div>
 
                     <div class="summary-card">
                         <img src="{{ asset('AdminAssets/BorrowAssets/rejectedTodayIcon.svg') }}" alt="Rejected" class="icon-wrapper">
-                        <div class="sum-value">{{ number_format($rejectedToday) }}</div>
-                        <div class="sum-label">Rejected Today</div>
+                        <div class="sum-value">{{ number_format($rejectedCount) }}</div>
+                        <div class="sum-label">Rejected</div>
                     </div>
                 </div>
 
@@ -66,7 +66,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                @forelse($requests as $req)
+                                @forelse($borrowRequests as $req)
                                     <tr>
                                         <td class="mono-text">
                                             {{ $req->request_code ?? 'BRW-' . \Carbon\Carbon::parse($req->created_at)->year . '-' . str_pad($req->id, 3, '0', STR_PAD_LEFT) }}
@@ -83,21 +83,6 @@
                                             <a href="{{ route('admin.borrow.show', $req->id) }}" class="action-btn-view">
                                                 <img src="{{ asset('AdminAssets/CategoriesAssets/viewIcon.svg') }}" alt="View">
                                             </a>
-                                            
-                                            @if($req->status === 'pending')
-                                                <form action="{{ route('admin.borrow.approve', $req->id) }}" method="POST" style="display: inline;">
-                                                    @csrf
-                                                    <button type="submit" class="action-btn-approve" title="Approve Request">
-                                                        <img src="{{ asset('AdminAssets/BorrowAssets/approveIcon.svg') }}" alt="Approve">
-                                                    </button>
-                                                </form>
-                                                
-                                                <a href="{{ route('admin.borrow.show', $req->id) }}" class="action-btn-reject" title="Reject Request">
-                                                    <img src="{{ asset('AdminAssets/BorrowAssets/rejectIcon.svg') }}" alt="Reject">
-                                                </a>
-                                            @else
-                                                <span style="color: #A1A1AA; font-size: 0.8rem; font-weight: 700;">Processed</span>
-                                            @endif
                                         </td>
                                     </tr>
                                 @empty
@@ -109,28 +94,28 @@
                         </table>
                     </div>
 
-                    @if ($requests->hasPages())
+                    @if ($borrowRequests->hasPages())
                         <div class="catalog-pagination-row">
                             <div class="text-zinc" style="font-size: 0.85rem; font-weight: 600;">
-                                Showing {{ $requests->firstItem() }}-{{ $requests->lastItem() }} of {{ $requests->total() }}
+                                Showing {{ $borrowRequests->firstItem() }}-{{ $borrowRequests->lastItem() }} of {{ $borrowRequests->total() }}
                             </div>
                             <div class="pagination-nav">
-                                @if ($requests->onFirstPage())
-                                    <span class="page-link disabled" style="opacity: 0.4; cursor: not-allowed;&laquo;">&laquo;</span>
+                                @if ($borrowRequests->onFirstPage())
+                                    <span class="page-link disabled" style="opacity: 0.4; cursor: not-allowed;">&laquo;</span>
                                 @else
-                                    <a href="{{ $requests->previousPageUrl() }}" class="page-link" style="text-decoration: none;">&laquo;</a>
+                                    <a href="{{ $borrowRequests->previousPageUrl() }}" class="page-link" style="text-decoration: none;">&laquo;</a>
                                 @endif
 
-                                @foreach ($requests->getUrlRange(1, $requests->lastPage()) as $page => $url)
-                                    @if ($page == $requests->currentPage())
+                                @foreach ($borrowRequests->getUrlRange(1, $borrowRequests->lastPage()) as $page => $url)
+                                    @if ($page == $borrowRequests->currentPage())
                                         <span class="page-link active">{{ $page }}</span>
                                     @else
                                         <a href="{{ $url }}" class="page-link" style="text-decoration: none;">{{ $page }}</a>
                                     @endif
                                 @endforeach
 
-                                @if ($requests->hasMorePages())
-                                    <a href="{{ $requests->nextPageUrl() }}" class="page-link" style="text-decoration: none;">&raquo;</a>
+                                @if ($borrowRequests->hasMorePages())
+                                    <a href="{{ $borrowRequests->nextPageUrl() }}" class="page-link" style="text-decoration: none;">&raquo;</a>
                                 @else
                                     <span class="page-link disabled" style="opacity: 0.4; cursor: not-allowed;">&raquo;</span>
                                 @endif

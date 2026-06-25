@@ -116,20 +116,18 @@
                             <tbody>
                                 @foreach($recentTransactions as $transaction)
                                     <tr>
-                                        <!-- Concatenating user attributes matching the ERD schema table fields -->
-                                        <td>{{ $transaction->user->first_name }} {{ $transaction->user->last_name }}</td>
-                                        <!-- Pulling relational book title field attribute -->
-                                        <td>{{ $transaction->book->title }}</td>
+                                        <!-- Swapped relationship metrics with flat standard aliases to fix stdClass property crashes -->
+                                        <td>{{ $transaction->first_name ?? '' }} {{ $transaction->last_name ?? '' }}</td>
+                                        <td>{{ $transaction->book_title ?? $transaction->title ?? '' }}</td>
                                         <td>{{ $transaction->status }}</td>
                                         <td>{{ \Carbon\Carbon::parse($transaction->borrow_date)->format('M d') }}</td>
                                         <td>
-                                            <!-- Badge status highlighting conditional mapping -->
                                             @if($transaction->status == 'Returned')
                                                 <span class="status-badge badge-success">Returned</span>
-                                            @elseif($transaction->status == 'Borrowed')
+                                            @elseif($transaction->status == 'Borrowed' || $transaction->status == 'active')
                                                 <span class="status-badge badge-success">Active</span>
                                             @else
-                                                <span class="status-badge badge-pending">{{ $transaction->status }}</span>
+                                                <span class="status-badge badge-pending">{{ ucfirst($transaction->status) }}</span>
                                             @endif
                                         </td>
                                     </tr>

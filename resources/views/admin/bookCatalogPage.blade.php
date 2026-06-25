@@ -75,41 +75,52 @@
                                 </tr>
                             </thead>
                                 <tbody>
-                                    @foreach($books as $book)
-                                        <tr>
-                                            <td class="mono-text">#{{ str_pad($book->id, 4, '0', STR_PAD_LEFT) }}</td>
-                                            <td>
-                                                <div class="book-title-cell">
-                                                    <img src="{{ asset('AdminAssets/CatalogAssets/blueBookIcon.svg') }}" alt="Book" class="table-book-icon">
-                                                    <span id="book-title-{{ $book->id }}">{{ $book->title }}</span>
-                                                </div>
-                                            </td>
-                                            <td>{{ $book->author }}</td>
-                                            <td><span class="cat-badge badge-blue">{{ $book->category_name }}</span></td>
-                                            <td>
-                                                @if($book->available_copies > 0)
-                                                    <span class="status-badge badge-success">Available ({{ $book->available_copies }})</span>
-                                                @else
-                                                    <span class="status-badge badge-due">Unavailable</span>
-                                                @endif
-                                            </td>
-                                            <td class="actions-cell-row">
-                                                <a href="{{ route('admin.editBook', $book->id) }}" class="action-btn-edit">
-                                                    <img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit">
-                                                </a>
-                                                
-                                                <form id="delete-form-{{ $book->id }}" action="{{ route('admin.bookCatalog.destroy', $book->id) }}" method="POST" style="display:none;">
-                                                    @csrf
-                                                    @method('DELETE')
-                                                </form>
+                                @php
+                                    // Array of your asset icon variations
+                                    $bookIcons = [
+                                        'AdminAssets/CatalogAssets/blueBookIcon.svg',
+                                        'AdminAssets/CatalogAssets/orangeBookIcon.svg',
+                                        'AdminAssets/CatalogAssets/greenBookIcon.svg',
+                                        'AdminAssets/CatalogAssets/purpleBookIcon.svg'
+                                    ];
+                                @endphp
 
-                                                <button type="button" class="action-btn-delete" onclick="confirmDelete({{ $book->id }})">
-                                                    <img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete">
-                                                </button>
-                                            </td>
-                                        </tr>
-                                    @endforeach
-                                </tbody>
+                                @foreach($books as $index => $book)
+                                    <tr>
+                                        <td class="mono-text">#{{ str_pad($book->id, 4, '0', STR_PAD_LEFT) }}</td>
+                                        <td>
+                                            <div class="book-title-cell">
+                                                <!-- Dynamic sequential switching using modulo operator -->
+                                                <img src="{{ asset($bookIcons[$index % count($bookIcons)]) }}" alt="Book" class="table-book-icon">
+                                                <span id="book-title-{{ $book->id }}">{{ $book->title }}</span>
+                                            </div>
+                                        </td>
+                                        <td>{{ $book->author }}</td>
+                                        <td><span class="cat-badge badge-blue">{{ $book->category_name }}</span></td>
+                                        <td>
+                                            @if($book->available_copies > 0)
+                                                <span class="status-badge badge-success">Available ({{ $book->available_copies }})</span>
+                                            @else
+                                                <span class="status-badge badge-due">Unavailable</span>
+                                            @endif
+                                        </td>
+                                        <td class="actions-cell-row">
+                                            <a href="{{ route('admin.editBook', $book->id) }}" class="action-btn-edit">
+                                                <img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit">
+                                            </a>
+                                            
+                                            <form id="delete-form-{{ $book->id }}" action="{{ route('admin.bookCatalog.destroy', $book->id) }}" method="POST" style="display:none;">
+                                                @csrf
+                                                @method('DELETE')
+                                            </form>
+
+                                            <button type="button" class="action-btn-delete" onclick="confirmDelete({{ $book->id }})">
+                                                <img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete">
+                                            </button>
+                                        </td>
+                                    </tr>
+                                @endforeach
+                            </tbody>
                         </table>
                     </div>
 
@@ -125,13 +136,45 @@
                                     <a href="{{ $books->previousPageUrl() }}" class="page-link" style="text-decoration: none;">&laquo;</a>
                                 @endif
 
-                                @foreach ($books->getUrlRange(1, $books->lastPage()) as $page => $url)
-                                    @if ($page == $books->currentPage())
+                                @php
+                                    $currentPage = $books->currentPage();
+                                    $lastPage = $books->lastPage();
+                                    $maxLinks = 10;
+                                    
+                                    if ($lastPage <= $maxLinks) {
+                                        $start = 1;
+                                        $end = $lastPage;
+                                    } else {
+                                        $start = max(1, $currentPage - 4);
+                                        $end = min($lastPage, $start + $maxLinks - 1);
+                                        
+                                        if ($end - $start + 1 < $maxLinks) {
+                                            $start = max(1, $end - $maxLinks + 1);
+                                        }
+                                    }
+                                @endphp
+
+                                @if($start > 1)
+                                    <a href="{{ $books->url(1) }}" class="page-link" style="text-decoration: none;">1</a>
+                                    @if($start > 2)
+                                        <span class="text-zinc" style="padding: 0 4px; opacity: 0.6;">...</span>
+                                    @endif
+                                @endif
+
+                                @for ($page = $start; $page <= $end; $page++)
+                                    @if ($page == $currentPage)
                                         <span class="page-link active">{{ $page }}</span>
                                     @else
-                                        <a href="{{ $url }}" class="page-link" style="text-decoration: none;">{{ $page }}</a>
+                                        <a href="{{ $books->url($page) }}" class="page-link" style="text-decoration: none;">{{ $page }}</a>
                                     @endif
-                                @endforeach
+                                @endfor
+
+                                @if($end < $lastPage)
+                                    @if($end < $lastPage - 1)
+                                        <span class="text-zinc" style="padding: 0 4px; opacity: 0.6;">...</span>
+                                    @endif
+                                    <a href="{{ $books->url($lastPage) }}" class="page-link" style="text-decoration: none;">{{ $lastPage }}</a>
+                                @endif
 
                                 @if ($books->hasMorePages())
                                     <a href="{{ $books->nextPageUrl() }}" class="page-link" style="text-decoration: none;">&raquo;</a>
@@ -155,7 +198,7 @@
 <div class="modal-overlay" id="deleteModalOverlay">
     <div class="delete-modal-card">
         <div class="modal-icon-header">
-            <img src="{{ asset('AdminAssets/CatalogAssets/deleteBookConfirmationIcon.svg') }}" alt="Delete">
+            <img src="{{ asset('AdminAssets/CatalogAssets/deleteBookIcon.svg') }}" alt="Delete">
         </div>
         
         <h3 class="modal-main-title">Delete Book?</h3>

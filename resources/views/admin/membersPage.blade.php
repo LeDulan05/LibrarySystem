@@ -19,9 +19,6 @@
             <div class="dashboard-header">
                 <h1 class="dashboard-title">Member Management</h1>
                 <div class="header-right-actions">
-                    <button class="btn-add-member">
-                        <span class="btn-plus-symbol">&#43;</span> Add Member
-                    </button>
                     <div class="profile-avatar">LA</div>
                 </div>
             </div>
@@ -100,8 +97,10 @@
                                             <a href="{{ route('admin.members.show', $member->id) }}" class="action-btn">
                                                 <img src="{{ asset('AdminAssets/CategoriesAssets/viewIcon.svg') }}" alt="View">
                                             </a>
-                                            <button class="action-btn"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
-                                            <button class="action-btn"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
+                                            
+                                            <button class="action-btn" onclick="openDeleteModal({{ $member->id }}, '{{ $member->first_name }} {{ $member->last_name }}', '{{ $member->student_id ?? 'N/A' }}')">
+                                                <img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete">
+                                            </button>
                                         </td>
                                     </tr>
                                 @empty
@@ -146,6 +145,48 @@
             </div>
         </main>
     </div>
+
+    <div class="modal-overlay" id="deleteMemberModalOverlay">
+        <form id="deleteMemberForm" action="" method="POST" class="suspend-modal-card">
+            @csrf
+            @method('DELETE')
+            <div class="modal-round-icon-frame">
+                <i class="bi bi-trash3"></i>
+            </div>
+
+            <h3 class="modal-main-title">Delete Member</h3>
+            <p class="modal-warning-body">This will permanently remove the member and all their associated records.</p>
+
+            <div class="modal-info-grid-box">
+                <div class="info-grid-row">
+                    <span class="label">Member</span>
+                    <span class="value" id="deleteModalMemberName">—</span>
+                </div>
+                <div class="info-grid-row">
+                    <span class="label">Student ID</span>
+                    <span class="value" id="deleteModalStudentId">—</span>
+                </div>
+            </div>
+
+            <div class="modal-actions-footer">
+                <button type="button" class="btn-modal-cancel" onclick="closeDeleteModal()">Cancel</button>
+                <button type="submit" class="btn-modal-delete">Delete</button>
+            </div>
+        </form>
+    </div>
+
+    <script>
+        function openDeleteModal(memberId, memberName, studentId) {
+            document.getElementById('deleteModalMemberName').textContent = memberName;
+            document.getElementById('deleteModalStudentId').textContent = studentId;
+            document.getElementById('deleteMemberForm').action = '/admin/members/' + memberId;
+            document.getElementById('deleteMemberModalOverlay').classList.add('modal-visible');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteMemberModalOverlay').classList.remove('modal-visible');
+        }
+    </script>
 </body>
 </html>
 
@@ -408,7 +449,7 @@
         transition: opacity 0.15s ease;
     }
     .action-btn:hover { opacity: 0.7; }
-    .action-btn img { width: 20px; height: 20px; }
+    .action-btn img { width: 40px; height: 40px; }
 
     .catalog-pagination-row {
         display: flex;
@@ -436,4 +477,127 @@
     }
     .page-link:hover { background-color: #F4F1EA; color: #1A1A1A; }
     .page-link.active { background-color: #FF5722; color: #FFFFFF; }
+
+    /* Modal Backdrop Layer */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.4);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+    }
+    .modal-overlay.modal-visible {
+        display: flex !important;
+    }
+
+    /* Modal Surface Card */
+    .suspend-modal-card {
+        background-color: #FFFFFF;
+        border-radius: 16px;
+        padding: 32px;
+        width: 100%;
+        max-width: 440px;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+        text-align: center;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+    .modal-round-icon-frame {
+        width: 56px;
+        height: 56px;
+        background-color: #FFE2E2;
+        color: #C10007;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        margin-bottom: 16px;
+    }
+    .modal-main-title {
+        font-size: 1.25rem;
+        font-weight: 800;
+        color: #1A1A1A;
+        margin-bottom: 8px;
+    }
+    .modal-warning-body {
+        font-size: 0.875rem;
+        color: #71717A;
+        margin-bottom: 24px;
+        line-height: 1.4;
+        padding: 0 16px;
+    }
+
+    /* Info Field Rows Box */
+    .modal-info-grid-box {
+        width: 100%;
+        background-color: #FAF8F5;
+        border-radius: 12px;
+        padding: 16px;
+        border: 1px solid #F4F1EA;
+        margin-bottom: 24px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        text-align: left;
+    }
+    .info-grid-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.85rem;
+    }
+    .info-grid-row .label {
+        font-weight: 600;
+        color: #71717A;
+    }
+    .info-grid-row .value {
+        font-weight: 600;
+        color: #52525B;
+    }
+
+    /* Modal Action Buttons */
+    .modal-actions-footer {
+        width: 100%;
+        display: flex;
+        gap: 12px;
+    }
+    .btn-modal-cancel {
+        flex: 1;
+        background-color: #FFFFFF;
+        border: 1px solid #EAE6DF;
+        color: #1A1A1A;
+        border-radius: 12px;
+        padding: 12px;
+        font-size: 0.875rem;
+        font-weight: 700;
+        font-family: inherit;
+        cursor: pointer;
+        transition: background-color 0.15s;
+    }
+    .btn-modal-cancel:hover {
+        background-color: #F9F6F0;
+    }
+    .btn-modal-delete {
+        flex: 1;
+        background-color: #C10007;
+        border: none;
+        color: #FFFFFF;
+        border-radius: 12px;
+        padding: 12px;
+        font-size: 0.875rem;
+        font-weight: 700;
+        font-family: inherit;
+        cursor: pointer;
+        transition: background-color 0.15s;
+    }
+    .btn-modal-delete:hover {
+        background-color: #A00005;
+    }
 </style>

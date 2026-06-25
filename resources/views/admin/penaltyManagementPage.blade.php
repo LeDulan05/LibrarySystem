@@ -45,7 +45,7 @@
                 <div class="member-search-container">
                     <form action="{{ route('admin.penaltyManagement') }}" method="GET" class="search-box-wrapper">
                         <i class="bi bi-search search-icon-inside"></i>
-                        <input type="text" name="search" class="search-input" placeholder="Search penalties..." value="{{ request('search') }}" onkeypress="if(event.key === 'Enter') this.form.submit();">
+                        <input type="text" name="search" class="search-input" placeholder="Search penalties by name, book, or fine code..." value="{{ request('search') }}" onkeypress="if(event.key === 'Enter') this.form.submit();">
                     </form>
                 </div>
 
@@ -69,7 +69,7 @@
                                 @forelse($penalties as $p)
                                     <tr>
                                         <td class="mono-text">
-                                            {{ $p->penalty_code ?? 'PEN-2024-' . str_pad($p->id, 3, '0', STR_PAD_LEFT) }}
+                                            {{ $p->penalty_code ?? 'PEN-2026-' . str_pad($p->id, 4, '0', STR_PAD_LEFT) }}
                                         </td>
                                         <td class="member-name-text">{{ $p->member_name }}</td>
                                         <td class="mono-text">{{ $p->student_number ?? 'N/A' }}</td>
@@ -79,7 +79,7 @@
                                         <td class="date-text">{{ \Carbon\Carbon::parse($p->created_at)->format('M d, Y') }}</td>
                                         <td>
                                             <span class="status-badge {{ $p->status === 'paid' ? 'badge-success' : 'badge-due' }}">
-                                                {{ ucfirst($p->status === 'paid' ? 'Paid' : 'Unpaid') }}
+                                                {{ ucfirst($p->status) }}
                                             </span>
                                         </td>
                                         <td class="actions-cell-row">
@@ -362,11 +362,6 @@
     }
     .text-zinc {
         color: #71717A;
-    }
-    .pagination-nav {
-        display: flex;
-        align-items: center;
-        gap: 8px;
     }
     .page-link {
         width: 32px;

@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
@@ -35,9 +36,7 @@
                             </a>
                         @endif
                         
-                        <div class="dropdown-wrapper-spacer"></div>
-                        <div class="dropdown-wrapper-spacer"></div>
-                    </form>
+                        </form>
                 </div>
 
                 <div class="categories-panel">
@@ -53,18 +52,28 @@
                             <tbody>
                                 @forelse($categories as $category)
                                     <tr>
-                                        <td class="cat-title-text">{{ $category->name }}</td>
-                                        <td class="count-text">
+                                        <td class="cat-title-text" id="cat-name-{{ $category->id }}">{{ $category->name }}</td>
+                                        <td class="count-text" id="cat-count-{{ $category->id }}" data-raw-count="{{ $category->books_count }}">
                                             {{ $category->books_count }} 
                                             <span class="sub-count-label">{{ Str::plural('book', $category->books_count) }}</span>
                                         </td>
                                         <td class="actions-cell-row">
-                                            <!-- ROUTE FIXED: Now routes to your custom single category layout view -->
                                             <a href="{{ route('admin.categories.show', $category->id) }}" class="action-btn-view">
                                                 <img src="{{ asset('AdminAssets/CategoriesAssets/viewIcon.svg') }}" alt="View">
                                             </a>
-                                            <button class="action-btn-edit"><img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit"></button>
-                                            <button class="action-btn-delete"><img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete"></button>
+                                            
+                                            <a href="{{ route('admin.categories.edit', $category->id) }}" class="action-btn-edit">
+                                                <img src="{{ asset('AdminAssets/CatalogAssets/editIcon.svg') }}" alt="Edit">
+                                            </a>
+                                            
+                                            <button type="button" class="action-btn-delete" onclick="triggerDeleteModal({{ $category->id }})">
+                                                <img src="{{ asset('AdminAssets/CatalogAssets/deleteIcon.svg') }}" alt="Delete">
+                                            </button>
+                                            
+                                            <form id="delete-form-{{ $category->id }}" action="{{ route('admin.categories.destroy', $category->id) }}" method="POST" style="display:none;">
+                                                @csrf
+                                                @method('DELETE')
+                                            </form>
                                         </td>
                                     </tr>
                                 @empty
@@ -82,6 +91,71 @@
             </div>
         </main>
     </div>
+
+    <!-- DELETE CATEGORY INTERACTIVE CONFIRMATION MODAL -->
+    <div class="modal-overlay" id="deleteCategoryModalOverlay">
+        <div class="delete-modal-card">
+            <div class="modal-icon-header">
+                <div class="modal-round-icon-frame">
+                    <i class="bi bi-trash3-fill"></i>
+                </div>
+            </div>
+            
+            <h3 class="modal-main-title">Delete Category</h3>
+            <p class="modal-warning-body">
+                Are you sure you want to delete this category? This action cannot be undone.
+            </p>
+            
+            <div class="category-meta-summary-box">
+                <div class="summary-box-row">
+                    <span class="summary-box-label">Category</span>
+                    <span class="summary-box-value font-extrabold" id="modalTargetCategoryName">Artificial Intelligence</span>
+                </div>
+                <div class="summary-box-row">
+                    <span class="summary-box-label">Books</span>
+                    <span class="summary-box-value" id="modalTargetBookCountStatus">0 &mdash; safe to delete</span>
+                </div>
+            </div>
+            
+            <div class="modal-actions-footer">
+                <button type="button" class="btn-modal-cancel" onclick="closeDeleteModal()">Cancel</button>
+                <button type="button" class="btn-modal-delete" id="modalConfirmDeleteBtn">Delete</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let activeDeleteFormId = null;
+
+        function triggerDeleteModal(categoryId) {
+            activeDeleteFormId = 'delete-form-' + categoryId;
+            
+            const categoryName = document.getElementById('cat-name-' + categoryId).innerText;
+            const bookCount = parseInt(document.getElementById('cat-count-' + categoryId).getAttribute('data-raw-count')) || 0;
+            
+            document.getElementById('modalTargetCategoryName').innerText = categoryName;
+            
+            const statusElement = document.getElementById('modalTargetBookCountStatus');
+            if (bookCount === 0) {
+                statusElement.innerHTML = '<span class="status-safe">0 &mdash; safe to delete</span>';
+            } else {
+                statusElement.innerHTML = `<span class="status-warning">${bookCount} ${bookCount === 1 ? 'book' : 'books'} remaining</span>`;
+            }
+            
+            document.getElementById('deleteCategoryModalOverlay').classList.add('modal-visible');
+        }
+
+        function closeDeleteModal() {
+            document.getElementById('deleteCategoryModalOverlay').classList.remove('modal-visible');
+            activeDeleteFormId = null;
+        }
+
+        document.getElementById('modalConfirmDeleteBtn').addEventListener('click', function() {
+            if (activeDeleteFormId) {
+                document.getElementById(activeDeleteFormId).submit();
+            }
+        });
+    </script>
 </body>
 </html>
 
@@ -275,5 +349,138 @@
     .action-btn-view img, .action-btn-edit img, .action-btn-delete img {
         width: 50px;
         height: 50px;
+    }
+
+    /* Modal Context Style Overrides (image_23ed88.png / image_23eda5.png) */
+    .modal-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+        background-color: rgba(0, 0, 0, 0.4);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        opacity: 0;
+        transition: opacity 0.2s ease;
+    }
+    .modal-overlay.modal-visible {
+        display: flex;
+        opacity: 1;
+    }
+    .delete-modal-card {
+        background-color: #FFFFFF;
+        border-radius: 28px;
+        padding: 36px;
+        width: 100%;
+        max-width: 460px;
+        box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+        text-align: center;
+        transform: scale(0.95);
+        transition: transform 0.2s ease;
+    }
+    .modal-overlay.modal-visible .delete-modal-card {
+        transform: scale(1);
+    }
+    .modal-icon-header {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+    }
+    .modal-round-icon-frame {
+        width: 64px;
+        height: 64px;
+        background-color: #FFE2E2;
+        color: #C10007;
+        border-radius: 18px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.6rem;
+    }
+    .modal-main-title {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: #1A1A1A;
+        margin-bottom: 12px;
+        letter-spacing: -0.01em;
+    }
+    .modal-warning-body {
+        font-size: 0.95rem;
+        color: #71717A;
+        line-height: 1.5;
+        margin-bottom: 24px;
+        font-weight: 500;
+    }
+    .category-meta-summary-box {
+        background-color: #FDFBF7;
+        border: 1px solid #F4F1EA;
+        border-radius: 16px;
+        padding: 16px 20px;
+        margin-bottom: 28px;
+        display: flex;
+        flex-direction: column;
+        gap: 12px;
+        text-align: left;
+    }
+    .summary-box-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.925rem;
+    }
+    .summary-box-label {
+        font-weight: 600;
+        color: #71717A;
+    }
+    .summary-box-value {
+        font-weight: 700;
+        color: #1A1A1A;
+    }
+    .status-safe {
+        color: #008236;
+        font-weight: 700;
+    }
+    .status-warning {
+        color: #C10007;
+        font-weight: 700;
+    }
+    .modal-actions-footer {
+        display: flex;
+        gap: 14px;
+    }
+    .btn-modal-cancel {
+        flex: 1;
+        height: 48px;
+        background-color: #FFFFFF;
+        border: 1px solid #E5E7EB;
+        border-radius: 14px;
+        font-family: inherit;
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #4B5563;
+        cursor: pointer;
+        transition: background-color 0.15s;
+    }
+    .btn-modal-cancel:hover {
+        background-color: #F9FAFB;
+    }
+    .btn-modal-delete {
+        flex: 1;
+        height: 48px;
+        background-color: #C10007;
+        border: none;
+        border-radius: 14px;
+        font-family: inherit;
+        font-size: 0.95rem;
+        font-weight: 700;
+        color: #FFFFFF;
+        cursor: pointer;
+        transition: background-color 0.15s;
+    }
+    .btn-modal-delete:hover {
+        background-color: #A30005;
     }
 </style>

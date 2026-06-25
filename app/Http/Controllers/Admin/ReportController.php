@@ -14,6 +14,7 @@ class ReportController extends Controller
         $fromDate = $request->input('from_date', Carbon::now()->startOfYear()->toDateString());
         $toDate = $request->input('to_date', Carbon::now()->endOfYear()->toDateString());
 
+        // Baseline Query Object
         $lateReturnsQuery = DB::table('transactions')
             ->join('users', 'transactions.user_id', '=', 'users.id')
             ->join('books', 'transactions.book_id', '=', 'books.id')
@@ -21,6 +22,7 @@ class ReportController extends Controller
             ->select(
                 'transactions.*',
                 DB::raw("CONCAT(users.first_name, ' ', users.last_name) as member_name"),
+                'users.student_id as student_number',
                 'books.title as book_title',
                 'penalties.days_late',
                 'penalties.amount as penalty_amount',
@@ -28,17 +30,47 @@ class ReportController extends Controller
             )
             ->whereBetween('transactions.return_date', [$fromDate, $toDate]);
 
-        $lateReturns = $lateReturnsQuery->orderBy('transactions.return_date', 'desc')->get();
+        // Optional Keyword Filter
+        if ($request->has('search') && $request->search != '') {
+            $lateReturnsQuery->where(function($q) use ($request) {
+                $q->where('users.first_name', 'like', '%' . $request->search . '%')
+                  ->orWhere('users.last_name', 'like', '%' . $request->search . '%')
+                  ->orWhere('books.title', 'like', '%' . $request->search . '%');
+            });
+        }
 
-        $totalLateReturns = $lateReturns->count();
-        $totalPenalties = $lateReturns->sum('penalty_amount');
-        $paidPenalties = $lateReturns->where('penalty_status', 'paid')->sum('penalty_amount');
-        $outstandingPenalties = $lateReturns->where('penalty_status', 'unpaid')->sum('penalty_amount');
+        // Paginate collection records
+        $lateReturns = $lateReturnsQuery->orderBy('transactions.return_date', 'desc')->paginate(10)->appends($request->all());
 
+        // Analytical Summary Aggregates (Unfiltered total context overview counters)
+        $totalLateReturns = DB::table('transactions')
+            ->whereRaw('return_date > due_date')
+            ->whereBetween('return_date', [$fromDate, $toDate])
+            ->count();
+
+        $totalPenalties = DB::table('penalties')
+            ->join('transactions', 'penalties.transaction_id', '=', 'transactions.id')
+            ->whereBetween('transactions.return_date', [$fromDate, $toDate])
+            ->sum('penalties.amount');
+
+        $paidPenalties = DB::table('penalties')
+            ->join('transactions', 'penalties.transaction_id', '=', 'transactions.id')
+            ->where('penalties.status', 'paid')
+            ->whereBetween('transactions.return_date', [$fromDate, $toDate])
+            ->sum('penalties.amount');
+
+        $outstandingPenalties = DB::table('penalties')
+            ->join('transactions', 'penalties.transaction_id', '=', 'transactions.id')
+            ->where('penalties.status', 'unpaid')
+            ->whereBetween('transactions.return_date', [$fromDate, $toDate])
+            ->sum('penalties.amount');
+
+        // Render 12 Months Chronological Array Distributions
         $monthlyActivity = DB::table('transactions')
-            ->select(DB::raw('MONTH(borrow_date) as month'), DB::raw('COUNT(*) as count'))
-            ->whereYear('borrow_date', Carbon::parse($toDate)->year)
-            ->groupBy(DB::raw('MONTH(borrow_date)'))
+            ->select(DB::raw('MONTH(return_date) as month'), DB::raw('COUNT(*) as count'))
+            ->whereYear('return_date', Carbon::parse($toDate)->year)
+            ->whereRaw('return_date > due_date')
+            ->groupBy(DB::raw('MONTH(return_date)'))
             ->pluck('count', 'month')
             ->toArray();
 
@@ -53,9 +85,7 @@ class ReportController extends Controller
             'totalPenalties',
             'paidPenalties',
             'outstandingPenalties',
-            'chartData',
-            'fromDate',
-            'toDate'
+            'chartData'
         ));
     }
 }

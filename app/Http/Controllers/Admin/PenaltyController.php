@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Carbon\Carbon;
 
 class PenaltyController extends Controller
 {
@@ -21,7 +22,7 @@ class PenaltyController extends Controller
                 'penalties.*',
                 'users.id as user_id',
                 DB::raw("CONCAT(users.first_name, ' ', users.last_name) as member_name"),
-                'users.student_number',
+                'users.student_id as student_number',
                 'books.title as book_title'
             );
 
@@ -36,7 +37,7 @@ class PenaltyController extends Controller
 
         $penalties = $query->orderBy('penalties.created_at', 'desc')->paginate(10);
 
-        // Compute analytical dashboard metric summary cards (image_221fa8.png)
+        // Compute analytical dashboard metric summary cards with unambiguous column qualifiers
         $totalOutstanding = DB::table('penalties')->where('status', 'unpaid')->sum('amount');
         $collectedThisMonth = DB::table('penalties')
             ->where('status', 'paid')
@@ -57,13 +58,11 @@ class PenaltyController extends Controller
      */
     public function show($userId)
     {
-        // Fetch baseline member details safely
         $member = DB::table('users')->where('id', $userId)->first();
         if (!$member) {
             abort(404, 'Member student profile not found.');
         }
 
-        // Fetch complete historical penalty record entries for this student (image_222040.png)
         $penaltyHistory = DB::table('penalties')
             ->join('transactions', 'penalties.transaction_id', '=', 'transactions.id')
             ->join('books', 'transactions.book_id', '=', 'books.id')
@@ -75,7 +74,6 @@ class PenaltyController extends Controller
             ->orderBy('penalties.created_at', 'desc')
             ->get();
 
-        // Calculate monetary aggregations for Fine Summary card parameters
         $outstanding = $penaltyHistory->where('status', 'unpaid')->sum('amount');
         $totalPaid = $penaltyHistory->where('status', 'paid')->sum('amount');
         $grandTotal = $outstanding + $totalPaid;
@@ -87,5 +85,12 @@ class PenaltyController extends Controller
             'totalPaid',
             'grandTotal'
         ));
+    }
+
+    public function calculatePenalty($transaction)
+    {
+        $dailyRate = 10.00; 
+        $daysLate = Carbon::parse($transaction->return_date)->diffInDays($transaction->due_date);
+        return $daysLate * $dailyRate;
     }
 }
