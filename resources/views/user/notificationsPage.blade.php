@@ -32,72 +32,43 @@
 
             <div class="canvas-content">
                 <div class="notifications-list">
-                    
-                    <!-- Notification Item 1 -->
-                    <div class="notification-card unread">
-                        <div class="notification-icon-circle text-green bg-green-light">
-                            <i class="bi bi-check-circle"></i>
+                    @forelse($notifications as $notification)
+                    @php
+                        // Determine icon and colors based on status
+                        if (in_array($notification['status'], ['active', 'fulfilled', 'returned'])) {
+                            $colorClass = 'text-green bg-green-light';
+                            $iconClass = 'bi-check-circle';
+                            $statusTitle = 'Approved / Processed';
+                        } elseif (in_array($notification['status'], ['pending'])) {
+                            $colorClass = 'text-yellow bg-yellow-light';
+                            $iconClass = 'bi-clock';
+                            $statusTitle = 'Pending';
+                        } else {
+                            $colorClass = 'text-red bg-red-light';
+                            $iconClass = 'bi-x-circle';
+                            $statusTitle = ucfirst($notification['status']);
+                        }
+                    @endphp
+                    <div class="notification-card {{ $notification['is_unread'] ? 'unread' : '' }}">
+                        <div class="notification-icon-circle {{ $colorClass }}">
+                            <i class="bi {{ $iconClass }}"></i>
                         </div>
                         <div class="notification-content">
                             <div class="notification-header">
-                                <span class="notification-title">Borrow Request — Approved</span>
+                                <span class="notification-title">{{ $notification['type'] }} — {{ $statusTitle }}</span>
                             </div>
                             <div class="notification-message">
-                                <strong>"Introduction to Artificial Intelligence"</strong> — has been approved. Please pick it up within 3 days.
+                                <strong>"{{ $notification['book_title'] }}"</strong> — {{ $notification['message'] }}
                             </div>
-                            <div class="notification-date">Dec 10, 2024</div>
+                            <div class="notification-date">{{ \Carbon\Carbon::parse($notification['date'])->format('M j, Y - g:i A') }}</div>
                         </div>
-                        <div class="unread-dot"></div>
+                        @if($notification['is_unread'])
+                            <div class="unread-dot"></div>
+                        @endif
                     </div>
-
-                    <!-- Notification Item 2 -->
-                    <div class="notification-card unread">
-                        <div class="notification-icon-circle text-yellow bg-yellow-light">
-                            <i class="bi bi-clock"></i>
-                        </div>
-                        <div class="notification-content">
-                            <div class="notification-header">
-                                <span class="notification-title">Reservation — Pending</span>
-                            </div>
-                            <div class="notification-message">
-                                <strong>"Clean Code"</strong> — is currently in queue (Position #2). You will be notified when available.
-                            </div>
-                            <div class="notification-date">Dec 8, 2024</div>
-                        </div>
-                        <div class="unread-dot"></div>
-                    </div>
-
-                    <!-- Notification Item 3 -->
-                    <div class="notification-card">
-                        <div class="notification-icon-circle text-red bg-red-light">
-                            <i class="bi bi-x-circle"></i>
-                        </div>
-                        <div class="notification-content">
-                            <div class="notification-header">
-                                <span class="notification-title">Borrow Request — Rejected</span>
-                            </div>
-                            <div class="notification-message">
-                                <strong>"Database System Concepts"</strong> — has been declined. Reason: Maximum borrow limit reached.
-                            </div>
-                            <div class="notification-date">Dec 1, 2024</div>
-                        </div>
-                    </div>
-
-                    <!-- Notification Item 4 -->
-                    <div class="notification-card">
-                        <div class="notification-icon-circle text-green bg-green-light">
-                            <i class="bi bi-check-circle"></i>
-                        </div>
-                        <div class="notification-content">
-                            <div class="notification-header">
-                                <span class="notification-title">Reservation — Approved</span>
-                            </div>
-                            <div class="notification-message">
-                                <strong>"Python for Data Analysis"</strong> — has been approved. The book is now ready.
-                            </div>
-                            <div class="notification-date">Nov 28, 2024</div>
-                        </div>
-                    </div>
+                    @empty
+                        <div class="text-sm text-gray-500 text-center py-8">You have no notifications at this time.</div>
+                    @endforelse
 
                 </div>
             </div> 
@@ -125,7 +96,6 @@
         overflow: hidden;
     }
 
-    /* Main Content Area */
     .main-canvas {
         flex: 1;
         background-color: #F9F6F0;
@@ -202,7 +172,7 @@
         position: relative;
     }
     .notification-card.unread {
-        border-color: #FFCCB3; /* Subtle orange tint for unread */
+        border-color: #FFCCB3; 
     }
 
     .notification-icon-circle {

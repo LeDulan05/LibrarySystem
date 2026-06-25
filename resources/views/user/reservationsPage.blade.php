@@ -102,8 +102,15 @@
                                     <h3 class="book-title">{{ $book->title }}</h3>
                                     <div class="book-author">{{ $book->author }}</div>
                                 </div>
-                                <div>
+                                <div class="res-status-container">
                                     <span class="status-pill {{ $statusPill }}">{{ $statusText }}</span>
+                                    @if($res->status === 'pending')
+                                        <button type="button" class="btn-cancel-pill" onclick="openCancelModal({{ $res->id }}, '{{ addslashes($book->title) }}')">Cancel Reservation</button>
+                                        <form id="cancel-form-{{ $res->id }}" method="POST" action="{{ route('reservations.destroy', $res->id) }}" style="display: none;">
+                                            @csrf
+                                            @method('DELETE')
+                                        </form>
+                                    @endif
                                 </div>
                             </div>
                             
@@ -111,9 +118,6 @@
                                 <div>
                                     <div class="meta-label">Reserved</div>
                                     <div class="meta-value">{{ $res->reservation_date ? \Carbon\Carbon::parse($res->reservation_date)->format('M j, Y') : 'Unknown' }}</div>
-                                    @if($res->status === 'pending')
-                                        <button class="btn-cancel-text">Cancel Reservation</button>
-                                    @endif
                                 </div>
                                 <div>
                                     <div class="meta-label">Pickup Date</div>
@@ -134,7 +138,43 @@
 
             </div> 
         </main>
+    <!-- Cancel Modal Overlay -->
+    <div id="cancelModal" class="modal-overlay" style="display:none;">
+        <div class="modal-content">
+            <div class="modal-icon-container bg-red-light text-red">
+                <i class="bi bi-x-circle"></i>
+            </div>
+            
+            <h2 class="modal-title">Cancel Reservation?</h2>
+            <p class="modal-desc" id="cancelModalText">Are you sure you want to cancel this reservation?</p>
+            
+            <div class="modal-actions">
+                <button type="button" class="btn-modal-cancel" onclick="closeCancelModal()">Keep it</button>
+                <button type="button" class="btn-modal-danger" onclick="confirmCancel()">Yes, Cancel</button>
+            </div>
+        </div>
     </div>
+
+    <script>
+        let currentCancelId = null;
+
+        function openCancelModal(id, title) {
+            currentCancelId = id;
+            document.getElementById('cancelModalText').innerText = `Cancel reservation for "${title}"?`;
+            document.getElementById('cancelModal').style.display = 'flex';
+        }
+
+        function closeCancelModal() {
+            currentCancelId = null;
+            document.getElementById('cancelModal').style.display = 'none';
+        }
+
+        function confirmCancel() {
+            if (currentCancelId) {
+                document.getElementById('cancel-form-' + currentCancelId).submit();
+            }
+        }
+    </script>
 </body>
 </html>
 
@@ -155,6 +195,21 @@
     .profile-avatar { width: 40px; height: 40px; background-color: #E85D22; color: white; font-weight: 700; font-size: 14px; border-radius: 50%; display: flex; align-items: center; justify-content: center; }
 
     .canvas-content { padding: 32px 40px; flex: 1; max-width: 1400px; margin: 0 auto; width: 100%; }
+
+    /* Modal Styles */
+    .modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(0,0,0,0.4); display: flex; align-items: center; justify-content: center; z-index: 1000; }
+    .modal-content { background: white; width: 100%; max-width: 440px; border-radius: 24px; padding: 40px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.1); }
+    .modal-icon-container { width: 72px; height: 72px; border-radius: 20px; display: flex; align-items: center; justify-content: center; font-size: 2rem; margin: 0 auto 24px auto; }
+    .bg-red-light { background-color: #FEE2E2; }
+    .text-red { color: #DC2626; }
+    .modal-title { font-size: 1.5rem; font-weight: 800; color: #1A1A1A; margin-bottom: 8px; }
+    .modal-desc { font-size: 0.95rem; color: #71717A; margin-bottom: 32px; line-height: 1.5; }
+    .modal-actions { display: flex; gap: 16px; }
+    .modal-actions button { flex: 1; padding: 14px; border-radius: 12px; font-size: 1rem; font-weight: 700; cursor: pointer; transition: opacity 0.2s; }
+    .btn-modal-cancel { background: white; border: 1px solid #E4E4E7; color: #3F3F46; }
+    .btn-modal-cancel:hover { background: #F4F4F5; }
+    .btn-modal-danger { background: #DC2626; border: none; color: white; }
+    .btn-modal-danger:hover { opacity: 0.9; }
 
     /* Summary Cards */
     .summary-cards {
@@ -226,13 +281,9 @@
         flex-direction: column;
     }
     
-    .res-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: flex-start;
-        margin-bottom: auto;
-    }
-
+    .res-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 24px; }
+    .res-status-container { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+    
     .category-pill { display: inline-block; padding: 2px 8px; background-color: #F1F5F9; color: #475569; border-radius: 999px; font-size: 0.65rem; font-weight: 700; margin-bottom: 4px; }
     .book-title { font-size: 1.1rem; font-weight: 800; color: #1A1A1A; margin-bottom: 2px; line-height: 1.2; }
     .book-author { font-size: 0.85rem; color: #A1A1AA; }
@@ -248,7 +299,19 @@
     }
     .meta-label { font-size: 0.7rem; color: #D4D4D8; margin-bottom: 2px; }
     .meta-value { font-size: 0.85rem; font-weight: 700; color: #1A1A1A; margin-bottom: 4px; }
-    .btn-cancel-text { background: none; border: none; color: #DC2626; font-size: 0.75rem; font-weight: 700; cursor: pointer; padding: 0; margin-top: 4px;}
-    .btn-cancel-text:hover { text-decoration: underline; }
-
+    
+    .btn-cancel-pill {
+        padding: 6px 16px;
+        border-radius: 999px;
+        font-size: 0.8rem;
+        font-weight: 700;
+        background-color: transparent;
+        color: #DC2626;
+        border: 1px solid #DC2626;
+        cursor: pointer;
+        transition: all 0.2s;
+        width: 100%;
+        text-align: center;
+    }
+    .btn-cancel-pill:hover { background-color: #FEE2E2; }
 </style>

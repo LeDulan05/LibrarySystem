@@ -7,7 +7,6 @@ use Illuminate\Http\Request;
 
 class ProfileController extends Controller
 {
-    // TODO: matches "My Profile" screen, member edits their own name/email here
     public function edit(Request $request)
     {
         return response()->json(['stub' => 'profile edit form', 'user' => $request->user()]);

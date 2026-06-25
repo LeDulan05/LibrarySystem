@@ -31,14 +31,13 @@
             </div>
 
             <div class="canvas-content">
-                
-                <!-- Summary Cards -->
+        
                 <div class="summary-cards">
                     <div class="summary-card">
                         <div class="summary-icon bg-green text-white">
                             <i class="bi bi-exclamation-circle"></i>
                         </div>
-                        <div class="summary-number">₱0.00</div>
+                        <div class="summary-number">₱{{ number_format($penalties->where('penalty.status', 'unpaid')->sum('penalty.amount'), 2) }}</div>
                         <div class="summary-label">Outstanding Balance</div>
                     </div>
                     
@@ -46,7 +45,7 @@
                         <div class="summary-icon bg-blue text-white">
                             <i class="bi bi-check-lg"></i>
                         </div>
-                        <div class="summary-number">₱25.00</div>
+                        <div class="summary-number">₱{{ number_format($penalties->where('penalty.status', 'paid')->sum('penalty.amount'), 2) }}</div>
                         <div class="summary-label">Total Paid</div>
                     </div>
 
@@ -54,87 +53,67 @@
                         <div class="summary-icon bg-yellow-light text-yellow">
                             <i class="bi bi-file-earmark-text"></i>
                         </div>
-                        <div class="summary-number">2</div>
+                        <div class="summary-number">{{ $penalties->count() }}</div>
                         <div class="summary-label">Penalty Records</div>
                     </div>
                 </div>
 
-                <!-- Penalties List -->
                 <div class="books-list">
                     
-                    <!-- Dummy Paid -->
-                    <div class="penalty-card active-border">
-                        <div class="pen-cover bg-cover-green">
-                            <div class="cover-badge">DATABASE</div>
-                            <div class="cover-title">Database System Concepts</div>
-                            <div class="cover-author">Abraham Silberschatz</div>
-                        </div>
+                    @forelse($penalties as $transaction)
+                    @php
+                        $book = $transaction->book;
+                        $penalty = $transaction->penalty;
+                        $colors = ['bg-cover-blue', 'bg-cover-orange', 'bg-cover-purple', 'bg-cover-green', 'bg-cover-red'];
+                        $bgColor = $colors[$book->id % count($colors)];
+                        $borderClass = $penalty->status === 'unpaid' ? 'active-border' : '';
+                    @endphp
+                    <div class="penalty-card {{ $borderClass }}">
+                        @if($book->book_cover)
+                            <img src="{{ asset('storage/' . $book->book_cover) }}" alt="Cover" class="pen-cover" style="object-fit: cover; padding: 0; border: none;">
+                        @else
+                            <div class="pen-cover {{ $bgColor }}">
+                                <div class="cover-badge">{{ strtoupper(Str::limit($book->category->name ?? 'Category', 10)) }}</div>
+                                <div class="cover-title">{{ Str::limit($book->title, 40) }}</div>
+                                <div class="cover-author">{{ Str::limit($book->author, 20) }}</div>
+                            </div>
+                        @endif
                         
                         <div class="pen-details">
                             <div class="pen-header">
                                 <div>
-                                    <span class="category-pill">Database</span>
-                                    <h3 class="book-title">Database System Concepts</h3>
-                                    <div class="book-author">Abraham Silberschatz</div>
+                                    <span class="category-pill">{{ $book->category->name ?? 'Category' }}</span>
+                                    <h3 class="book-title">{{ $book->title }}</h3>
+                                    <div class="book-author">{{ $book->author }}</div>
                                 </div>
                                 <div>
-                                    <span class="status-pill status-paid">Paid</span>
+                                    @if($penalty->status === 'paid')
+                                        <span class="status-pill status-paid">Paid</span>
+                                    @else
+                                        <span class="status-pill status-none">Unpaid</span>
+                                    @endif
                                 </div>
                             </div>
                             
                             <div class="pen-meta-row">
                                 <div>
                                     <div class="meta-label">Days Overdue</div>
-                                    <div class="meta-value text-red">5 days</div>
+                                    <div class="meta-value {{ $penalty->status === 'unpaid' ? 'text-red' : 'text-green' }}">{{ $penalty->days_late }} days</div>
                                 </div>
                                 <div>
                                     <div class="meta-label">Amount</div>
-                                    <div class="meta-value text-orange">₱25.00</div>
+                                    <div class="meta-value text-orange">₱{{ number_format($penalty->amount, 2) }}</div>
                                 </div>
                                 <div>
                                     <div class="meta-label">Date</div>
-                                    <div class="meta-value">Nov 15, 2024</div>
+                                    <div class="meta-value">{{ \Carbon\Carbon::parse($penalty->created_at)->format('M j, Y') }}</div>
                                 </div>
                             </div>
                         </div>
                     </div>
-
-                    <!-- Dummy No Penalty -->
-                    <div class="penalty-card">
-                        <div class="pen-cover bg-cover-purple">
-                            <div class="cover-badge">NETWORKING</div>
-                            <div class="cover-title">Computer Networks</div>
-                            <div class="cover-author">Andrew S. Tanenbaum</div>
-                        </div>
-                        
-                        <div class="pen-details">
-                            <div class="pen-header">
-                                <div>
-                                    <span class="category-pill">Networking</span>
-                                    <h3 class="book-title">Computer Networks</h3>
-                                    <div class="book-author">Andrew S. Tanenbaum</div>
-                                </div>
-                                <div>
-                                    <span class="status-pill status-none">No Penalty</span>
-                                </div>
-                            </div>
-                            
-                            <div class="pen-meta-row">
-                                <div>
-                                    <div class="meta-label">Days Overdue</div>
-                                    <div class="meta-value text-green">—</div>
-                                </div>
-                                <div>
-                                    <div class="meta-label">Amount</div>
-                                    <div class="meta-value text-orange">—</div>
-                                </div>
-                                <div>
-                                    <div class="meta-label">Date</div>
-                                    <div class="meta-value">—</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    @empty
+                        <div class="text-sm text-gray-500">You don't have any penalties.</div>
+                    @endforelse
 
                 </div>
 
@@ -162,7 +141,6 @@
 
     .canvas-content { padding: 32px 40px; flex: 1; max-width: 1400px; margin: 0 auto; width: 100%; }
 
-    /* Summary Cards */
     .summary-cards {
         display: grid;
         grid-template-columns: repeat(3, 1fr);
