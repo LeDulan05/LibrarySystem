@@ -2,10 +2,9 @@
 <html lang="en">
 <head>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <!-- Google Fonts Imports for IskoLib Design System -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,700&family=Plus+Jakarta+Sans:wght@500;600;700;800&family=JetBrains+Mono:wght@100;200;400&display=swap" rel="stylesheet">    
@@ -26,32 +25,31 @@
                 <div class="summary-metrics-grid">
                     <div class="summary-card">
                         <img src="{{ asset('AdminAssets/OverviewAssets/totalPenaltiesIcon.svg') }}" alt="Total Outstanding" class="icon-wrapper">
-                        <div class="sum-value">₱75.00</div>
+                        <div class="sum-value">₱{{ number_format($totalOutstanding, 2) }}</div>
                         <div class="sum-label">Total Outstanding</div>
                     </div>
                         
                     <div class="summary-card">
                         <img src="{{ asset('AdminAssets/BorrowAssets/approvedTodayIcon.svg') }}" alt="Collected This Month" class="icon-wrapper">
-                        <div class="sum-value">₱245.00</div>
+                        <div class="sum-value">₱{{ number_format($collectedThisMonth, 2) }}</div>
                         <div class="sum-label">Collected This Month</div>
                     </div>
 
                     <div class="summary-card">
                         <img src="{{ asset('AdminAssets/PenaltyAssets/activePenaltiesIcon.svg') }}" alt="Active Penalties" class="icon-wrapper">
-                        <div class="sum-value">2</div>
+                        <div class="sum-value">{{ number_format($activePenaltiesCount) }}</div>
                         <div class="sum-label">Active Penalties</div>
                     </div>
                 </div>
 
                 <div class="member-search-container">
-                    <div class="search-box-wrapper">
+                    <form action="{{ route('admin.penaltyManagement') }}" method="GET" class="search-box-wrapper">
                         <i class="bi bi-search search-icon-inside"></i>
-                        <input type="text" class="search-input" placeholder="Search penalties...">
-                    </div>
+                        <input type="text" name="search" class="search-input" placeholder="Search penalties..." value="{{ request('search') }}" onkeypress="if(event.key === 'Enter') this.form.submit();">
+                    </form>
                 </div>
 
                 <div class="queue-panel">
-                    
                     <div class="table-responsive-wrapper">
                         <table class="queue-data-table">
                             <thead>
@@ -68,61 +66,67 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td class="mono-text">PEN-2024-001</td>
-                                    <td class="member-name-text">Juan dela Cruz</td>
-                                    <td class="mono-text">2024-00001</td>
-                                    <td class="book-title-text">Database Concepts</td>
-                                    <td class="days-late-text" style="text-align: center;">5</td>
-                                    <td class="penalty-text penalty-active">₱25.00</td>
-                                    <td class="date-text">Nov 15, 2024</td>
-                                    <td><span class="status-badge badge-success">Paid</span></td>
-                                    <td class="actions-cell-row">
-                                        <button class="action-btn-view"><img src="{{ asset('AdminAssets/CategoriesAssets/viewIcon.svg') }}" alt="View"></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="mono-text">PEN-2024-002</td>
-                                    <td class="member-name-text">Ana Lim</td>
-                                    <td class="mono-text">2022-00134</td>
-                                    <td class="book-title-text">Research Methodol...</td>
-                                    <td class="days-late-text" style="text-align: center;">12</td>
-                                    <td class="penalty-text penalty-active">₱60.00</td>
-                                    <td class="date-text">Dec 8, 2024</td>
-                                    <td><span class="status-badge badge-due">Unpaid</span></td>
-                                    <td class="actions-cell-row">
-                                        <button class="action-btn-view"><img src="{{ asset('AdminAssets/CategoriesAssets/viewIcon.svg') }}" alt="View"></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="mono-text">PEN-2024-003</td>
-                                    <td class="member-name-text">Carlos Cruz</td>
-                                    <td class="mono-text">2023-00089</td>
-                                    <td class="book-title-text">Cybersecurity</td>
-                                    <td class="days-late-text" style="text-align: center;">3</td>
-                                    <td class="penalty-text penalty-active">₱15.00</td>
-                                    <td class="date-text">Dec 1, 2024</td>
-                                    <td><span class="status-badge badge-due">Unpaid</span></td>
-                                    <td class="actions-cell-row">
-                                        <button class="action-btn-view"><img src="{{ asset('AdminAssets/CategoriesAssets/viewIcon.svg') }}" alt="View"></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="mono-text">PEN-2024-004</td>
-                                    <td class="member-name-text">Pedro Reyes</td>
-                                    <td class="mono-text">2023-00045</td>
-                                    <td class="book-title-text">Python for DS</td>
-                                    <td class="days-late-text" style="text-align: center;">8</td>
-                                    <td class="penalty-text penalty-active">₱40.00</td>
-                                    <td class="date-text">Nov 28, 2024</td>
-                                    <td><span class="status-badge badge-success">Paid</span></td>
-                                    <td class="actions-cell-row">
-                                        <button class="action-btn-view"><img src="{{ asset('AdminAssets/CategoriesAssets/viewIcon.svg') }}" alt="View"></button>
-                                    </td>
-                                </tr>
+                                @forelse($penalties as $p)
+                                    <tr>
+                                        <td class="mono-text">
+                                            {{ $p->penalty_code ?? 'PEN-2024-' . str_pad($p->id, 3, '0', STR_PAD_LEFT) }}
+                                        </td>
+                                        <td class="member-name-text">{{ $p->member_name }}</td>
+                                        <td class="mono-text">{{ $p->student_number ?? 'N/A' }}</td>
+                                        <td class="book-title-text">{{ $p->book_title }}</td>
+                                        <td class="days-late-text" style="text-align: center;">{{ $p->days_late ?? '0' }}</td>
+                                        <td class="penalty-text penalty-active">₱{{ number_format($p->amount, 2) }}</td>
+                                        <td class="date-text">{{ \Carbon\Carbon::parse($p->created_at)->format('M d, Y') }}</td>
+                                        <td>
+                                            <span class="status-badge {{ $p->status === 'paid' ? 'badge-success' : 'badge-due' }}">
+                                                {{ ucfirst($p->status === 'paid' ? 'Paid' : 'Unpaid') }}
+                                            </span>
+                                        </td>
+                                        <td class="actions-cell-row">
+                                            <a href="{{ route('admin.penalty.show', $p->user_id) }}" class="action-btn-view">
+                                                <img src="{{ asset('AdminAssets/CategoriesAssets/viewIcon.svg') }}" alt="View">
+                                            </a>
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="9" class="empty-table-text-row" style="text-align: center; color: #71717A; padding: 40px 0;">
+                                            No active penalty parameters match your request keywords.
+                                        </td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
+
+                    @if ($penalties->hasPages())
+                        <div class="catalog-pagination-row">
+                            <div class="text-zinc" style="font-size: 0.85rem; font-weight: 600;">
+                                Showing {{ $penalties->firstItem() }}-{{ $penalties->lastItem() }} of {{ $penalties->total() }}
+                            </div>
+                            <div class="pagination-nav">
+                                @if ($penalties->onFirstPage())
+                                    <span class="page-link disabled" style="opacity: 0.4; cursor: not-allowed;">&laquo;</span>
+                                @else
+                                    <a href="{{ $penalties->previousPageUrl() }}" class="page-link" style="text-decoration: none;">&laquo;</a>
+                                @endif
+
+                                @foreach ($penalties->getUrlRange(1, $penalties->lastPage()) as $page => $url)
+                                    @if ($page == $penalties->currentPage())
+                                        <span class="page-link active">{{ $page }}</span>
+                                    @else
+                                        <a href="{{ $url }}" class="page-link" style="text-decoration: none;">{{ $page }}</a>
+                                    @endif
+                                @endforeach
+
+                                @if ($penalties->hasMorePages())
+                                    <a href="{{ $penalties->nextPageUrl() }}" class="page-link" style="text-decoration: none;">&raquo;</a>
+                                @else
+                                    <span class="page-link disabled" style="opacity: 0.4; cursor: not-allowed;">&raquo;</span>
+                                @endif
+                            </div>
+                        </div>
+                    @endif
                 </div>
 
             </div>
@@ -148,8 +152,6 @@
         width: 100vw;
         overflow: hidden;
     }
-
-    /* Main Content */
     .main-canvas {
         flex: 1;
         background-color: #F9F6F0;
@@ -189,8 +191,6 @@
         align-items: center;
         justify-content: center;
     }
-
-    /* Summary Analytic Metric Cards */
     .summary-metrics-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -208,7 +208,6 @@
         height: 42px;
         margin-bottom: 16px;
     }
-
     .sum-value {
         font-family: 'Plus Jakarta Sans', sans-serif;
         font-size: 1.75rem;
@@ -223,7 +222,6 @@
         color: #71717A;
         font-weight: 600;
     }
-
     .member-search-container {
         background-color: #FFFFFF;
         border: 1px solid #EAE6DF;
@@ -258,8 +256,6 @@
         font-weight: 500;
         outline: none;
     }
-
-    /* Core Panel Presentation Card Elements */
     .queue-panel {
         background-color: #FFFFFF;
         border: 1px solid #EAE6DF;
@@ -267,7 +263,6 @@
         padding: 24px;
         margin-bottom: 24px;
     }
-
     .table-responsive-wrapper {
         width: 100%;
         overflow-x: auto;
@@ -299,8 +294,6 @@
     .queue-data-table tbody tr:last-child td {
         border-bottom: none;
     }
-
-    /* Row Content Typography */
     .mono-text {
         font-family: 'JetBrains Mono', monospace;
         font-weight: 400;
@@ -328,7 +321,6 @@
     .penalty-active {
         color: #F1580A!important; 
     }
-
     .status-badge {
         padding: 6px 14px;
         border-radius: 9999px;
@@ -338,7 +330,6 @@
     }
     .badge-success { background-color: #DCFCE7; color: #008236; } 
     .badge-due { background-color: #FFE2E2; color: #C10007; }
-
     .actions-cell-row {
         display: flex;
         align-items: center;
@@ -359,5 +350,43 @@
     .action-btn-view img {
         width: 20px;
         height: 20px;
+    }
+    .catalog-pagination-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 24px;
+        padding-top: 12px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    .text-zinc {
+        color: #71717A;
+    }
+    .pagination-nav {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .page-link {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #71717A;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.15s ease;
+    }
+    .page-link:hover {  
+        background-color: #F4F1EA;
+        color: #1A1A1A;
+    }
+    .page-link.active {
+        background-color: #FF5722;
+        color: #FFFFFF;
     }
 </style>

@@ -2,8 +2,20 @@
 use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\BookController;
-use App\Http\Controllers\Admin\CategoryController as AdminCategoryController;
+use App\Http\Controllers\Admin\CategoryController as AdminCategoryController; 
 use App\Http\Controllers\Admin\MemberController;
+use App\Http\Controllers\Admin\BorrowRequestController;
+use App\Http\Controllers\Admin\ReservationController as AdminReservationController; 
+use App\Http\Controllers\Admin\ReturnController;
+use App\Http\Controllers\Admin\PenaltyController as AdminPenaltyController;
+use App\Http\Controllers\Admin\ReportController;
+
+use App\Http\Controllers\Member\CatalogController;
+use App\Http\Controllers\Member\BorrowController;
+use App\Http\Controllers\Member\ReservationController;
+use App\Http\Controllers\Member\PenaltyController;
+
+
 use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
@@ -59,17 +71,12 @@ Route::get('/notifications', function (\Illuminate\Http\Request $request) {
     return view('user.notificationsPage', compact('notifications'));
 })->middleware(['auth', 'verified'])->name('notifications');
 
-use App\Http\Controllers\Member\CatalogController;
-use App\Http\Controllers\Member\BorrowController;
-use App\Http\Controllers\Member\ReservationController;
 
 Route::get('/library', [CatalogController::class, 'index'])->middleware(['auth', 'verified'])->name('library');
 Route::get('/library/{book}', [CatalogController::class, 'show'])->middleware(['auth', 'verified'])->name('library.show');
 Route::get('/library/{book}/details', [CatalogController::class, 'details'])->middleware(['auth', 'verified'])->name('library.details');
 
 Route::get('/borrowed', [BorrowController::class, 'index'])->middleware(['auth', 'verified'])->name('borrowed');
-
-use App\Http\Controllers\Member\PenaltyController;
 
 Route::get('/reservations', [ReservationController::class, 'index'])->middleware(['auth', 'verified'])->name('reservations');
 Route::delete('/reservations/{reservation}', [ReservationController::class, 'destroy'])->middleware(['auth', 'verified'])->name('reservations.destroy');
@@ -108,15 +115,28 @@ Route::group(['prefix' => 'admin', 'middleware' => ['auth']], function () {
     Route::get('/categories', [AdminCategoryController::class, 'index'])->name('admin.bookCategories');
     Route::get('/categories/{id}', [AdminCategoryController::class, 'show'])->name('admin.categories.show');
 
-    // FIXED: Only point to the controller and delete the duplicate closure override line below it
     Route::get('/members', [MemberController::class, 'index'])->name('admin.memberManagement');
     Route::get('/members/{id}', [MemberController::class, 'show'])->name('admin.members.show');
     Route::post('/members/{id}/suspend', [MemberController::class, 'suspend'])->name('admin.members.suspend');
 
-    Route::get('/borrow', function () {return view('admin.borrowRequestPage');})->name('admin.borrowRequest');
-    Route::get('/reservation', function () {return view('admin.reservationRequestPage');})->name('admin.reservationRequest');
-    Route::get('/return', function () {return view('admin.bookReturnsPage');})->name('admin.bookReturn');
-    Route::get('/penalty', function () {return view('admin.penaltyManagementPage');})->name('admin.penaltyManagement');
-    Route::get('/reports', function () {return view('admin.reportsPage');})->name('admin.report');
+    Route::get('/borrow', [BorrowRequestController::class, 'index'])->name('admin.borrowRequest');
+    Route::get('/borrow/{id}', [BorrowRequestController::class, 'show'])->name('admin.borrow.show');
+    Route::post('/borrow/{id}/approve', [BorrowRequestController::class, 'approve'])->name('admin.borrow.approve');
+    Route::post('/borrow/{id}/reject', [BorrowRequestController::class, 'reject'])->name('admin.borrow.reject');
+    
+    Route::get('/borrow/{id}/receipt', [BorrowRequestController::class, 'receipt'])->name('admin.borrow.receipt');
+    Route::get('/borrow/{id}/rejection', [BorrowRequestController::class, 'rejectionNotice'])->name('admin.borrow.rejection');
+
+    Route::get('/reservation', [AdminReservationController::class, 'index'])->name('admin.reservationRequest');
+    Route::get('/reservation/{id}', [AdminReservationController::class, 'show'])->name('admin.reservation.show');
+    Route::post('/reservation/{id}/approve', [AdminReservationController::class, 'approve'])->name('admin.reservation.approve');
+    Route::post('/reservation/{id}/reject', [AdminReservationController::class, 'reject'])->name('admin.reservation.reject');
+
+    Route::get('/return', [ReturnController::class, 'index'])->name('admin.bookReturn');
+
+    Route::get('/penalty', [AdminPenaltyController::class, 'index'])->name('admin.penaltyManagement');
+    Route::get('/penalty/member/{userId}', [AdminPenaltyController::class, 'show'])->name('admin.penalty.show');
+    
+    Route::get('/reports', [ReportController::class, 'index'])->name('admin.report');
 });
 

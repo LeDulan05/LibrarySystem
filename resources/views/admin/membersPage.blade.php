@@ -30,25 +30,25 @@
 
                 <div class="summary-metrics-grid">
                     <div class="summary-card">
-                        <img src="{{ asset('AdminAssets/MemberAssets/totalMembersIcon.svg') }}" alt="Member">
+                        <img src="{{ asset('AdminAssets/MemberAssets/totalMembersIcon.svg') }}" alt="Member" class="icon-wrapper">
                         <div class="sum-value">{{ number_format($totalMembersCount) }}</div>
                         <div class="sum-label">Total Members</div>
                     </div>
                         
                     <div class="summary-card">
-                        <img src="{{ asset('AdminAssets/MemberAssets/activeIcon.svg') }}" alt="Active">
+                        <img src="{{ asset('AdminAssets/MemberAssets/activeIcon.svg') }}" alt="Active" class="icon-wrapper">
                         <div class="sum-value">{{ number_format($activeCount) }}</div>
                         <div class="sum-label">Active</div>
                     </div>
 
                     <div class="summary-card">
-                        <img src="{{ asset('AdminAssets/MemberAssets/suspendedIcon.svg') }}" alt="Suspended">
+                        <img src="{{ asset('AdminAssets/MemberAssets/suspendedIcon.svg') }}" alt="Suspended" class="icon-wrapper">
                         <div class="sum-value">{{ number_format($suspendedCount) }}</div>
                         <div class="sum-label">Suspended</div>
                     </div>
 
                     <div class="summary-card">
-                        <img src="{{ asset('AdminAssets/MemberAssets/newMemberIcon.svg') }}" alt="New Member">
+                        <img src="{{ asset('AdminAssets/MemberAssets/newMemberIcon.svg') }}" alt="New Member" class="icon-wrapper">
                         <div class="sum-value">{{ number_format($newThisMonthCount) }}</div>
                         <div class="sum-label">New This Month</div>
                     </div>
@@ -236,6 +236,12 @@
     }
 
     /* Summary Analytic Metric Cards */
+    .icon-wrapper {
+        width: 42px;
+        height: 42px;
+        margin-bottom: 16px;
+    }
+    
     .summary-metrics-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));

@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
@@ -24,22 +25,29 @@
 
                 <div class="summary-metrics-grid">
                     <div class="summary-card">
-                        <img src="{{ asset('AdminAssets/BorrowAssets/pendingRequestIcon.svg') }}" alt="View" class="icon-wrapper">
-                        <div class="sum-value">3</div>
+                        <img src="{{ asset('AdminAssets/BorrowAssets/pendingRequestIcon.svg') }}" alt="Pending" class="icon-wrapper">
+                        <div class="sum-value">{{ number_format($pendingCount) }}</div>
                         <div class="sum-label">Pending Requests</div>
                     </div>
                         
                     <div class="summary-card">
-                        <img src="{{ asset('AdminAssets/BorrowAssets/approvedTodayIcon.svg') }}" alt="View" class="icon-wrapper">
-                        <div class="sum-value">1</div>
+                        <img src="{{ asset('AdminAssets/BorrowAssets/approvedTodayIcon.svg') }}" alt="Approved" class="icon-wrapper">
+                        <div class="sum-value">{{ number_format($approvedToday) }}</div>
                         <div class="sum-label">Approved Today</div>
                     </div>
 
                     <div class="summary-card">
-                        <img src="{{ asset('AdminAssets/BorrowAssets/rejectedTodayIcon.svg') }}" alt="View" class="icon-wrapper">
-                        <div class="sum-value">1</div>
+                        <img src="{{ asset('AdminAssets/BorrowAssets/rejectedTodayIcon.svg') }}" alt="Rejected" class="icon-wrapper">
+                        <div class="sum-value">{{ number_format($rejectedToday) }}</div>
                         <div class="sum-label">Rejected Today</div>
                     </div>
+                </div>
+
+                <div class="member-search-container">
+                    <form action="{{ route('admin.borrowRequest') }}" method="GET" class="search-box-wrapper">
+                        <i class="bi bi-search search-icon"></i>
+                        <input type="text" name="search" class="search-input" placeholder="Search requests by member or book title..." value="{{ request('search') }}" onkeypress="if(event.key === 'Enter') this.form.submit();">
+                    </form>
                 </div>
 
                 <div class="queue-panel">
@@ -58,69 +66,77 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td class="mono-text">BRW-2024-001</td>
-                                    <td class="member-name-text">Juan dela Cruz</td>
-                                    <td class="book-title-text">Introduction to Artificial Intelligence</td>
-                                    <td class="date-text">Dec 10, 2024</td>
-                                    <td><span class="status-badge badge-pending">Pending</span></td>
-                                    <td class="actions-cell-row">
-                                        <button class="action-btn-view"><img src="{{ asset('AdminAssets/CategoriesAssets/viewIcon.svg') }}" alt="View"></button>
-                                        <button class="action-btn-approve"><img src="{{ asset('AdminAssets/BorrowAssets/approveIcon.svg') }}" alt="Approve"></button>
-                                        <button class="action-btn-reject"><img src="{{ asset('AdminAssets/BorrowAssets/rejectIcon.svg') }}" alt="Reject"></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="mono-text">BRW-2024-002</td>
-                                    <td class="member-name-text">Pedro Reyes</td>
-                                    <td class="book-title-text">Python for Data Analysis</td>
-                                    <td class="date-text">Dec 11, 2024</td>
-                                    <td><span class="status-badge badge-pending">Pending</span></td>
-                                    <td class="actions-cell-row">
-                                        <button class="action-btn-view"><img src="{{ asset('AdminAssets/CategoriesAssets/viewIcon.svg') }}" alt="View"></button>
-                                        <button class="action-btn-approve"><img src="{{ asset('AdminAssets/BorrowAssets/approveIcon.svg') }}" alt="Approve"></button>
-                                        <button class="action-btn-reject"><img src="{{ asset('AdminAssets/BorrowAssets/rejectIcon.svg') }}" alt="Reject"></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="mono-text">BRW-2024-003</td>
-                                    <td class="member-name-text">Maria Santos</td>
-                                    <td class="book-title-text">Clean Code</td>
-                                    <td class="date-text">Dec 11, 2024</td>
-                                    <td><span class="status-badge badge-success">Approved</span></td>
-                                    <td class="actions-cell-row">
-                                        <button class="action-btn-view"><img src="{{ asset('AdminAssets/CategoriesAssets/viewIcon.svg') }}" alt="View"></button>
-                                        <button class="action-btn-approve"><img src="{{ asset('AdminAssets/BorrowAssets/approveIcon.svg') }}" alt="Approve"></button>
-                                        <button class="action-btn-reject"><img src="{{ asset('AdminAssets/BorrowAssets/rejectIcon.svg') }}" alt="Reject"></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="mono-text">BRW-2024-004</td>
-                                    <td class="member-name-text">Carlos Cruz</td>
-                                    <td class="book-title-text">Computer Networks</td>
-                                    <td class="date-text">Dec 12, 2024</td>
-                                    <td><span class="status-badge badge-rejected">Rejected</span></td>
-                                    <td class="actions-cell-row">
-                                        <button class="action-btn-view"><img src="{{ asset('AdminAssets/CategoriesAssets/viewIcon.svg') }}" alt="View"></button>
-                                        <button class="action-btn-approve"><img src="{{ asset('AdminAssets/BorrowAssets/approveIcon.svg') }}" alt="Approve"></button>
-                                        <button class="action-btn-reject"><img src="{{ asset('AdminAssets/BorrowAssets/rejectIcon.svg') }}" alt="Reject"></button>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <td class="mono-text">BRW-2024-005</td>
-                                    <td class="member-name-text">Ana Lim</td>
-                                    <td class="book-title-text">Database System Concepts</td>
-                                    <td class="date-text">Dec 13, 2024</td>
-                                    <td><span class="status-badge badge-pending">Pending</span></td>
-                                    <td class="actions-cell-row">
-                                        <button class="action-btn-view"><img src="{{ asset('AdminAssets/CategoriesAssets/viewIcon.svg') }}" alt="View"></button>
-                                        <button class="action-btn-approve"><img src="{{ asset('AdminAssets/BorrowAssets/approveIcon.svg') }}" alt="Approve"></button>
-                                        <button class="action-btn-reject"><img src="{{ asset('AdminAssets/BorrowAssets/rejectIcon.svg') }}" alt="Reject"></button>
-                                    </td>
-                                </tr>
+                                @forelse($requests as $req)
+                                    <tr>
+                                        <td class="mono-text">
+                                            {{ $req->request_code ?? 'BRW-' . \Carbon\Carbon::parse($req->created_at)->year . '-' . str_pad($req->id, 3, '0', STR_PAD_LEFT) }}
+                                        </td>
+                                        <td class="member-name-text">{{ $req->member_name }}</td>
+                                        <td class="book-title-text">{{ $req->book_title }}</td>
+                                        <td class="date-text">{{ \Carbon\Carbon::parse($req->created_at)->format('M d, Y') }}</td>
+                                        <td>
+                                            <span class="status-badge badge-{{ $req->status }}">
+                                                {{ ucfirst($req->status) }}
+                                            </span>
+                                        </td>
+                                        <td class="actions-cell-row">
+                                            <a href="{{ route('admin.borrow.show', $req->id) }}" class="action-btn-view">
+                                                <img src="{{ asset('AdminAssets/CategoriesAssets/viewIcon.svg') }}" alt="View">
+                                            </a>
+                                            
+                                            @if($req->status === 'pending')
+                                                <form action="{{ route('admin.borrow.approve', $req->id) }}" method="POST" style="display: inline;">
+                                                    @csrf
+                                                    <button type="submit" class="action-btn-approve" title="Approve Request">
+                                                        <img src="{{ asset('AdminAssets/BorrowAssets/approveIcon.svg') }}" alt="Approve">
+                                                    </button>
+                                                </form>
+                                                
+                                                <a href="{{ route('admin.borrow.show', $req->id) }}" class="action-btn-reject" title="Reject Request">
+                                                    <img src="{{ asset('AdminAssets/BorrowAssets/rejectIcon.svg') }}" alt="Reject">
+                                                </a>
+                                            @else
+                                                <span style="color: #A1A1AA; font-size: 0.8rem; font-weight: 700;">Processed</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="empty-table-text-row">No borrow track requests match the current filters.</td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
+
+                    @if ($requests->hasPages())
+                        <div class="catalog-pagination-row">
+                            <div class="text-zinc" style="font-size: 0.85rem; font-weight: 600;">
+                                Showing {{ $requests->firstItem() }}-{{ $requests->lastItem() }} of {{ $requests->total() }}
+                            </div>
+                            <div class="pagination-nav">
+                                @if ($requests->onFirstPage())
+                                    <span class="page-link disabled" style="opacity: 0.4; cursor: not-allowed;&laquo;">&laquo;</span>
+                                @else
+                                    <a href="{{ $requests->previousPageUrl() }}" class="page-link" style="text-decoration: none;">&laquo;</a>
+                                @endif
+
+                                @foreach ($requests->getUrlRange(1, $requests->lastPage()) as $page => $url)
+                                    @if ($page == $requests->currentPage())
+                                        <span class="page-link active">{{ $page }}</span>
+                                    @else
+                                        <a href="{{ $url }}" class="page-link" style="text-decoration: none;">{{ $page }}</a>
+                                    @endif
+                                @endforeach
+
+                                @if ($requests->hasMorePages())
+                                    <a href="{{ $requests->nextPageUrl() }}" class="page-link" style="text-decoration: none;">&raquo;</a>
+                                @else
+                                    <span class="page-link disabled" style="opacity: 0.4; cursor: not-allowed;">&raquo;</span>
+                                @endif
+                            </div>
+                        </div>
+                    @endif
                 </div>
 
             </div>
@@ -130,7 +146,6 @@
 </html>
 
 <style>
-    /* Baseline Overrides & Viewport Resets */
     * {
         box-sizing: border-box;
         margin: 0;
@@ -148,7 +163,6 @@
         overflow: hidden;
     }
 
-    /* Core Main Canvas Viewport Layout */
     .main-canvas {
         flex: 1;
         background-color: #F9F6F0;
@@ -163,7 +177,7 @@
         background-color: #FFFFFF;
         padding: 20px 40px;
         border-bottom: 1px solid #EAE6DF;
-        flex-wrap: wrap; /* Standard flex wrapping for small viewports */
+        flex-wrap: wrap; 
         gap: 16px;
     }
     .canvas-content {
@@ -189,7 +203,6 @@
         justify-content: center;
     }
 
-    /* Summary Analytic Metric Cards Responsive Auto-Fit Grid (No Media Queries) */
     .summary-metrics-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -202,7 +215,11 @@
         border-radius: 16px;
         padding: 24px;
     }
-
+    .icon-wrapper {
+        width: 42px;
+        height: 42px;
+        margin-bottom: 16px;
+    }
     .sum-value {
         font-family: 'Plus Jakarta Sans', sans-serif;
         font-size: 1.75rem;
@@ -216,6 +233,41 @@
         font-size: 0.8rem;
         color: #71717A;
         font-weight: 600;
+    }
+
+    .member-search-container {
+        background-color: #FFFFFF;
+        border: 1px solid #EAE6DF;
+        border-radius: 16px;
+        padding: 16px 24px;
+        margin-bottom: 24px;
+        width: 100%;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.01);
+    }
+    .search-box-wrapper {
+        position: relative; 
+        display: flex;
+        align-items: center;
+        width: 100%;
+    }
+    .search-icon {
+        position: absolute;
+        left: 18px; 
+        font-size: 1.1rem;
+        color: #A1A1AA; 
+        pointer-events: none; 
+    }
+    .search-input {
+        width: 100%;
+        padding: 12px 16px 12px 48px;
+        background-color: #F4F1EA;
+        border: none;
+        border-radius: 12px;
+        font-size: 0.925rem;
+        font-family: 'Plus Jakarta Sans', sans-serif;
+        color: #1A1A1A;
+        font-weight: 500;
+        outline: none;
     }
 
     .queue-panel {
@@ -232,7 +284,6 @@
         letter-spacing: -0.01em;
         margin-bottom: 20px;
     }
-
     .table-responsive-wrapper {
         width: 100%;
         overflow-x: auto;
@@ -265,7 +316,7 @@
         border-bottom: none;
     }
 
-    /* Row Content Typography Modifiers */
+    /* Column Cell Typography Layouts */
     .mono-text {
         font-family: 'JetBrains Mono', monospace;
         font-weight: 400;
@@ -283,8 +334,13 @@
     .date-text {
         color: #71717A;
     }
+    .empty-table-text-row {
+        text-align: center;
+        color: #71717A;
+        padding: 40px 0 !important;
+        font-weight: 600;
+    }
 
-    /* Custom System Status Badge Components */
     .status-badge {
         padding: 6px 14px;
         border-radius: 9999px;
@@ -292,11 +348,11 @@
         font-weight: 700;
         display: inline-block;
     }
-    .badge-pending { background-color: #FEF3C6; color: #BB4D00; } 
-    .badge-success { background-color: #DCFCE7; color: #008236; } 
+    .badge-pending { background-color: #FEF3C6; color: #BB4000; } 
+    .badge-approved { background-color: #DCFCE7; color: #008236; } 
     .badge-rejected { background-color: #FFE2E2; color: #C10007; }
 
-    /* Operational Actions Control Layout Row */
+    /* Action Controllers */
     .actions-cell-row {
         display: flex;
         align-items: center;
@@ -320,9 +376,44 @@
         height: 20px;
     }
 
-        .icon-wrapper {
-        width: 42px;
-        height: 42px;
-        margin-bottom: 16px;
+    .catalog-pagination-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 24px;
+        padding-top: 12px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    .text-zinc {
+        color: #71717A;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+    .pagination-nav {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .page-link {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #71717A;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.15s ease;
+    }
+    .page-link:hover {  
+        background-color: #F4F1EA;
+        color: #1A1A1A;
+    }
+    .page-link.active {
+        background-color: #FF5722;
+        color: #FFFFFF;
     }
 </style>

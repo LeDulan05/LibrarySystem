@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     
@@ -25,25 +26,24 @@
                 <div class="summary-metrics-grid">
                     <div class="summary-card">
                         <img src="{{ asset('AdminAssets/BorrowAssets/pendingRequestIcon.svg') }}" alt="Pending Returns" class="icon-wrapper">
-                        <div class="sum-value">87</div>
+                        <div class="sum-value">{{ number_format($pendingReturns) }}</div>
                         <div class="sum-label">Pending Returns</div>
                     </div>
                         
                     <div class="summary-card">
                         <img src="{{ asset('AdminAssets/BorrowAssets/approvedTodayIcon.svg') }}" alt="Returned Today" class="icon-wrapper">
-                        <div class="sum-value">12</div>
+                        <div class="sum-value">{{ number_format($returnedToday) }}</div>
                         <div class="sum-label">Returned Today</div> 
                     </div>
 
                     <div class="summary-card">
                         <img src="{{ asset('AdminAssets/OverviewAssets/totalPenaltiesIcon.svg') }}" alt="Overdue" class="icon-wrapper">
-                        <div class="sum-value">23</div>
+                        <div class="sum-value">{{ number_format($overdueCount) }}</div>
                         <div class="sum-label">Overdue</div>
                     </div>
                 </div>
 
                 <div class="queue-panel">
-                    
                     <div class="table-responsive-wrapper">
                         <table class="queue-data-table">
                             <thead>
@@ -57,41 +57,65 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td class="mono-text">RET-2024-001</td>
-                                    <td class="member-name-text">Juan dela Cruz</td>
-                                    <td class="book-title-text">Computer Networks</td>
-                                    <td class="date-text">Dec 10, 2024</td>
-                                    <td class="penalty-text penalty-active">₱25.00</td>
-                                    <td><span class="status-badge badge-due">Late</span></td>
-                                </tr>
-                                <tr>
-                                    <td class="mono-text">RET-2024-002</td>
-                                    <td class="member-name-text">Maria Santos</td>
-                                    <td class="book-title-text">Clean Code</td>
-                                    <td class="date-text">Dec 9, 2024</td>
-                                    <td class="penalty-text penalty-none">₱0.00</td>
-                                    <td><span class="status-badge badge-success">On Time</span></td>
-                                </tr>
-                                <tr>
-                                    <td class="mono-text">RET-2024-003</td>
-                                    <td class="member-name-text">Pedro Reyes</td>
-                                    <td class="book-title-text">Cybersecurity Essentials</td>
-                                    <td class="date-text">Dec 8, 2024</td>
-                                    <td class="penalty-text penalty-active">₱10.00</td>
-                                    <td><span class="status-badge badge-due">Late</span></td>
-                                </tr>
-                                <tr>
-                                    <td class="mono-text">RET-2024-004</td>
-                                    <td class="member-name-text">Carlos Cruz</td>
-                                    <td class="book-title-text">Database System Concepts</td>
-                                    <td class="date-text">Dec 7, 2024</td>
-                                    <td class="penalty-text penalty-none">₱0.00</td>
-                                    <td><span class="status-badge badge-success">On Time</span></td>
-                                </tr>
+                                @forelse($returns as $ret)
+                                    <tr>
+                                        <td class="mono-text">
+                                            {{ $ret->transaction_code ?? 'RET-' . \Carbon\Carbon::parse($ret->return_date)->year . '-' . str_pad($ret->id, 3, '0', STR_PAD_LEFT) }}
+                                        </td>
+                                        <td class="member-name-text">{{ $ret->member_name }}</td>
+                                        <td class="book-title-text">{{ $ret->book_title }}</td>
+                                        <td class="date-text">{{ \Carbon\Carbon::parse($ret->return_date)->format('M d, Y') }}</td>
+                                        
+                                        <td class="penalty-text {{ $ret->penalty_amount > 0 ? 'penalty-active' : 'penalty-none' }}">
+                                            ₱{{ number_format($ret->penalty_amount, 2) }}
+                                        </td>
+                                        <td>
+                                            @if($ret->penalty_amount > 0)
+                                                <span class="status-badge badge-due">Late</span>
+                                            @else
+                                                <span class="status-badge badge-success">On Time</span>
+                                            @endif
+                                        </td>
+                                    </tr>
+                                @empty
+                                    <tr>
+                                        <td colspan="6" class="empty-table-text-row" style="text-align: center; color: #71717A; padding: 40px 0; font-weight: 600;">
+                                            No completed book return logs discovered matching database records.
+                                        </td>
+                                    </tr>
+                                @endforelse
                             </tbody>
                         </table>
                     </div>
+
+                    @if ($returns->hasPages())
+                        <div class="catalog-pagination-row">
+                            <div class="text-zinc" style="font-size: 0.85rem; font-weight: 600;">
+                                Showing {{ $returns->firstItem() }}-{{ $returns->lastItem() }} of {{ $returns->total() }}
+                            </div>
+                            <div class="pagination-nav">
+                                @if ($returns->onFirstPage())
+                                    <span class="page-link disabled" style="opacity: 0.4; cursor: not-allowed;">&laquo;</span>
+                                @else
+                                    <a href="{{ $returns->previousPageUrl() }}" class="page-link" style="text-decoration: none;">&laquo;</a>
+                                @endif
+
+                                @foreach ($returns->getUrlRange(1, $returns->lastPage()) as $page => $url)
+                                    @if ($page == $returns->currentPage())
+                                        <span class="page-link active">{{ $page }}</span>
+                                    @else
+                                        <a href="{{ $url }}" class="page-link" style="text-decoration: none;">{{ $page }}</a>
+                                    @endif
+                                @endforeach
+
+                                @if ($returns->hasMorePages())
+                                    <a href="{{ $returns->nextPageUrl() }}" class="page-link" style="text-decoration: none;">&raquo;</a>
+                                @else
+                                    <span class="page-link disabled" style="opacity: 0.4; cursor: not-allowed;">&raquo;</span>
+                                @endif
+                            </div>
+                        </div>
+                    @endif
                 </div>
 
             </div>
@@ -101,7 +125,6 @@
 </html>
 
 <style>
-    /* Baseline Overrides & Viewport Resets */
     * {
         box-sizing: border-box;
         margin: 0;
@@ -118,8 +141,6 @@
         width: 100vw;
         overflow: hidden;
     }
-
-    /* Core Main Canvas Viewport Layout */
     .main-canvas {
         flex: 1;
         background-color: #F9F6F0;
@@ -134,7 +155,7 @@
         background-color: #FFFFFF;
         padding: 20px 40px;
         border-bottom: 1px solid #EAE6DF;
-        flex-wrap: wrap; /* Standard flex wrapping for small viewports */
+        flex-wrap: wrap;
         gap: 16px;
     }
     .canvas-content {
@@ -159,8 +180,6 @@
         align-items: center;
         justify-content: center;
     }
-
-    /* Summary Analytic Metric Cards Responsive Auto-Fit Grid (No Media Queries) */
     .summary-metrics-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -173,7 +192,6 @@
         border-radius: 16px;
         padding: 24px;
     }
-
     .sum-value {
         font-family: 'Plus Jakarta Sans', sans-serif;
         font-size: 1.75rem;
@@ -188,7 +206,6 @@
         color: #71717A;
         font-weight: 600;
     }
-
     .queue-panel {
         background-color: #FFFFFF;
         border: 1px solid #EAE6DF;
@@ -196,7 +213,6 @@
         padding: 24px;
         margin-bottom: 24px;
     }
-
     .table-responsive-wrapper {
         width: 100%;
         overflow-x: auto;
@@ -228,8 +244,6 @@
     .queue-data-table tbody tr:last-child td {
         border-bottom: none;
     }
-
-    /* Row Content Typography Modifiers */
     .mono-text {
         font-family: 'JetBrains Mono', monospace;
         font-weight: 400;
@@ -256,8 +270,6 @@
     .penalty-none {
         color: #16A34A!important; 
     }
-
-    /* Custom System Status Badge Components */
     .status-badge {
         padding: 6px 14px;
         border-radius: 9999px;
@@ -267,10 +279,47 @@
     }
     .badge-success { background-color: #DCFCE7; color: #008236; } 
     .badge-due { background-color: #FFE2E2; color: #C10007; }
-
     .icon-wrapper {
         width: 42px;
         height: 42px;
         margin-bottom: 16px;
+    }
+    .catalog-pagination-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 24px;
+        padding-top: 12px;
+        flex-wrap: wrap;
+        gap: 12px;
+    }
+    .text-zinc {
+        color: #71717A;
+    }
+    .pagination-nav {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+    .page-link {
+        width: 32px;
+        height: 32px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.85rem;
+        font-weight: 700;
+        color: #71717A;
+        border-radius: 50%;
+        cursor: pointer;
+        transition: all 0.15s ease;
+    }
+    .page-link:hover {  
+        background-color: #F4F1EA;
+        color: #1A1A1A;
+    }
+    .page-link.active {
+        background-color: #FF5722;
+        color: #FFFFFF;
     }
 </style>
