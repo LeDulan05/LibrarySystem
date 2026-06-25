@@ -6,7 +6,19 @@ npm install
 
 # Configure environment
 cp .env.example .env
-# Edit .env file with your database credentials
+# Edit .env file with these credentials
+
+set:
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=iskolib
+DB_USERNAME=root
+DB_PASSWORD=(your password)
+
+SESSION_DRIVER=file
+QUEUE_CONNECTION=sync
+CACHE_STORE=file
 
 # Generate application key
 php artisan key:generate
