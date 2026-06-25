@@ -21,5 +21,8 @@ class DatabaseSeeder extends Seeder
             'name' => 'Test User',
             'email' => 'test@example.com',
         ]);
+
+        $this->command->info('Fetching books from OpenLibrary to seed the database...');
+        \Illuminate\Support\Facades\Artisan::call('app:scrape-books', ['--count' => 10], $this->command->getOutput());
     }
 }
