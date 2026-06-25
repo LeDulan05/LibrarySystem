@@ -12,6 +12,6 @@ class PenaltyController extends Controller
     {
         $penalties = $request->user()->transactions()->with('penalty')->whereHas('penalty')->get();
 
-        return response()->json(['stub' => 'my penalties', 'penalties' => $penalties]);
+        return view('user.penaltiesPage', compact('penalties'));
     }
 }

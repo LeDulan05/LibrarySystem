@@ -13,7 +13,7 @@ class ReservationController extends Controller
     {
         $reservations = $request->user()->reservations()->with('book')->get();
 
-        return response()->json(['stub' => 'my reservations', 'reservations' => $reservations]);
+        return view('user.reservationsPage', compact('reservations'));
     }
 
     // TODO: only reachable when $book->isAvailable() is false, matches

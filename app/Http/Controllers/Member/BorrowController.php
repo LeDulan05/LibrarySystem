@@ -13,7 +13,7 @@ class BorrowController extends Controller
     {
         $transactions = $request->user()->transactions()->with('book')->get();
 
-        return response()->json(['stub' => 'my borrowed books', 'transactions' => $transactions]);
+        return view('user.borrowedPage', compact('transactions'));
     }
 
     // TODO: creates a transaction row with status "pending", does NOT
