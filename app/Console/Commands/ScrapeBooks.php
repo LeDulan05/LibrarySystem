@@ -40,7 +40,26 @@ class ScrapeBooks extends Command
             'Biology',
             'Science',
             'Business',
-            'Philosophy'
+            'Philosophy',
+            'Fantasy',
+            'Mystery',
+            'Romance',
+            'Thriller',
+            'Mathematics',
+            'Physics',
+            'Chemistry',
+            'Psychology',
+            'Sociology',
+            'Politics',
+            'Art',
+            'Music',
+            'Cooking',
+            'Travel',
+            'Self Help',
+            'Health',
+            'Sports',
+            'Biography',
+            'Comics'
         ];
 
         $count = $this->option('count');
